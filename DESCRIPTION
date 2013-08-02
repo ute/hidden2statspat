@@ -1,0 +1,20 @@
+Package: hidden2ndorder
+Version: 0.1
+Date: 2013-07-31
+Title: Analysis of hidden second-order stationary point processes
+Author: Ute Hahn <ute@imf.au.dk>
+Maintainer: Ute Hahn <ute@imf.au.dk>
+Depends: R (>= 3.0), spatstat (>= 1.31)
+Imports: spatstat
+Description: A package on top of spatstat, contributing functions for 
+    the analysis of inhomogeneous spatial point patterns with hidden 
+    second-order stationarity. 
+    To this point it includes reweighted, retransformed and rescaled 
+    versions of Ripley's K-function, and a framework for permutation 
+    tests, as described in the paper "Inhomogeneous spatial point 
+    processes with hidden second-order stationarity" by Ute Hahn and
+    Eva B. Vedel Jensen (2013). The package also supplies the data
+    analysed there, unless included in package spatstat.
+License: GPL (>= 2)
+NeedsCompilation: yes
+LazyData: true
