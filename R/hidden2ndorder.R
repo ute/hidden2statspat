@@ -1,0 +1,1 @@
+#' @useDynLib hidden2ndorder

@@ -1,15 +1,32 @@
 #
-#	hKscaled.R	Estimation of K function for locally-scaled process
-#
-#	$Revision: 1.7 $	$Date: 2013/02/07 09:58:14 $
+# Klocscaled.R Estimation of K function for locally-scaled process
 #
 
-hLscaled <- function(...) {
-  K <- nKscaled(...)
+#' Locally rescaled L-function
+#' 
+#' Estimates the locally rescaled template \eqn{L}-function of a point process by transforming
+#' the locally scaled \eqn{K}-function.
+#' 
+#' @param \ldots Arguments for \code{\link{Klocscaled}}.
+#' @details 
+#' For a Poisson point process, the theoretical value of the locally rescaled 
+#' \eqn{L}-function is \eqn{L_0(r)=r}. Due to approximations when calculating 
+#' locally scaled distances and due to a simplifications in the estimation of 
+#' the locally scaled \eqn{K}-function, the estimates of the locally scaled 
+#' \eqn{L}-function may be biased for inhomogeneous Poisson point processes. 
+#' The bias depends upon how fast the intensity function varies.
+#' @export
+#' @seealso \code{\link{Klocscaled}}
+
+Llocscaled <- function(...) {
+  K <- Klocscaled(...)
   L <- eval.fv(sqrt(pmax.int(K,0)/pi))
   # relabel the fv object
-  L <- rebadge.fv(L, substitute(Lscaled(r), NULL), "Lscaled")
-  return(L)  
+  L <- rebadge.fv(L, substitute(L[0]^(s)*(r), NULL), "widehat(L)[0]^(s)",
+                  names(K), new.labl=attr(K, "labl"))
+#  L <- tweak.fv.entry(L, "theo", new.labl="paste(L[0]^{(s)}*(r),', ',scriptstyle(CSR))") 
+    L <- tweak.fv.entry(L, "theo", new.labl="paste(L[0]*(r),', ',scriptstyle(CSR))") 
+return(L)  
 }
 
 #' Locally rescaled K-function
@@ -39,7 +56,7 @@ hLscaled <- function(...) {
 #' renormalisation of the intensity, as in \code{\link{Kinhom}}. If 
 #' \code{renormalise=T}, the estimated intensity \eqn{lambda} is multiplied by
 #' \eqn{c^(normpower/2)}, where \eqn{c = area(W)/sum[i] (1/lambda(x[i]))}. This way,
-#' renormalisation has about the same effect as in \code\link{Kinhom}.
+#' renormalisation has about the same effect as in \code{\link{Kinhom}}.
 #' 
 #' All edge corrections are implemented as approximations. The translational edge 
 #' correction suffers from a small intrinsic bias in some cases of the locally 
@@ -50,8 +67,9 @@ hLscaled <- function(...) {
 #' @export
 #' @seealso \code{\link{Kest}}, \code{\link{Kinhom}}, \code{\link{Kscaled}}
 
-hKscaled<-
-  function (X, lambda=NULL, ..., r = NULL, #breaks = NULL, 
+
+Klocscaled <- 
+  function (X, lambda=NULL, ..., r = NULL, breaks = NULL, 
             correction=c("border", "isotropic", "translate"),
             renormalise=FALSE,
             normpower=1,
@@ -59,27 +77,19 @@ hKscaled<-
             r.max = 10)
 {
     verifyclass(X, "ppp")
-    breaks <- NULL
     rfixed <- !missing(r) || !missing(breaks)
 
     # determine basic parameters
     W <- X$window
-    npts <- X$n
+    npts <- npoints(X)
     area <- area.owin(W)
 
-  ################ CHANGE (U, 01.08.2013)   ####################
-  # changed handling of rmax and breaks, according to lambda
-  #  rmaxdefault <- rmax.rule("K", W, npts/area) * sqrt(npts/area)
-  #  breaks <- handle.r.b.args(r, breaks, W, rmaxdefault=rmaxdefault)
-  #  r <- breaks$r
-  #  rmax <- breaks$max
-  ################ END CHANGE ##################################
-  
     # match corrections
     correction.given <- !missing(correction) && !is.null(correction)
     correction <- pickoption("correction", correction,
                              c(none="none",
                                border="border",
+                              # "bord.modif"="bord.modif",
                                isotropic="isotropic",
                                Ripley="isotropic",
                                trans="translate",
@@ -91,7 +101,7 @@ hKscaled<-
     best.wanted <- ("best" %in% correction)
     correction <- implemented.for.K(correction, W$type, correction.given)
 
-    ###########################################################
+   ###########################################################
     # DETERMINE WEIGHTS AND VALIDATE
     #
 
@@ -117,11 +127,12 @@ hKscaled<-
     # renormalise. Here we only need half the power ;-)
       if(renormalise) {
         check.1.real(normpower)
-        stopifnot (r %in% 1:2) #((0.5 <= normpower) & (normpower <= 1))
-        renorm.factor <- (area/sum(1 / lambda))^(normpower /2)
+        stopifnot ((1 <= normpower) & (normpower <= 2)) #((0.5 <= normpower) & (normpower <= 1))
+        renorm.factor <- (area/sum(1 / lambda))^(normpower / 2)
         lambda <- lambda / renorm.factor
       } 
-  ################ CHANGE (U, 01.08.2013)   ####################
+    
+ ################ CHANGE (U, 01.08.2013)   ####################
   # recommended range of r values
   # use max lambda instead of npts/area 
   # calculate recommended arguments r differently
@@ -145,86 +156,89 @@ hKscaled<-
     
     
     alim <- c(0, min(absrmax*maxrescale, rmaxdefault* maxrescale, r.max))
-    rlim <- diameter(W)/2 * minrescale
-    
-    ############### END CHANGE ##################################
- 
+    rlim <- diameter(W)/2 * maxrescale # minrescale # this is picky, really!
+  
+     
+# no efficient border correction engine here...     
         
     # this will be the output data frame
     K <- data.frame(r=r, theo= pi * r^2)
     desc <- c("distance argument r", "theoretical Poisson %s")
-    K <- fv(K, "r", substitute(Kscaled(r), NULL),
-            "theo", , alim, c("r","%s[pois](r)"), desc, fname="Kscaled")
-        
+  
+   # Khatlab <- substitute(hat(K)[0]^(s)*(r), NULL)
+    Ktheolab <- substitute(K[0]^(s)*(r), NULL)
+    Kname <- "K[0]^{(s)}"
+    Krname <- "K[0]^{(s)}(r)"
+    Khatname <- "widehat(K)[0]^(s)"
+    K <- fv(K, "r", Ktheolab,
+            "theo", , alim, c("r", Krname), desc, fname=Kname)
+ #   K <- tweak.fv.entry(K, "theo", new.labl="paste(K[0]^{(s)}*(r),', ',scriptstyle(CSR))") 
+    K <- tweak.fv.entry(K, "theo", new.labl="paste(K[0]*(r),', ',scriptstyle(CSR))") 
+    ############### END CHANGE ##################################   
+    
     # identify all close pairs
-  ################ CHANGE (U, 01.08.2013)   ####################
-  # this may lead to problems since rmax refers to the locally-scaled distances
-  #  
-  #  rmax <- max(r)
-  #  close <- closepairs(X, rmax)
-  #
-  #  use worst case for lambda to get limits of r. somewhat optimistically
-  #  
-    abs.rmax <- min(diameter(W)/2, max(r)/minrescale)
-    close <- closepairs(X, abs.rmax)
-  ################ END CHANGE ##################################
-     
+    rmax <- max(r)
+ ################ CHANGE (U, 16.08.2013)   ####################
+    close <- lsclosepairs(X, lambda, rmax)
+    dIJ <- close$d
+    eudIJ <- close$eud
+ ################ END CHANGE ##################################       
+    # compute weights for these pairs
     I <- close$i
     J <- close$j
-    # locally-scaled distances
-    lamIJ <- (sqrt(lambda[I]) + sqrt(lambda[J]))/2
-    absDIJ <- close$d
-    DIJ <- absDIJ * lamIJ
+    XI <- X[I]
 
-    XI <- ppp(close$xi, close$yi, window=W, check=FALSE)
-  
-  if(any(correction == "none")) {
+   if(any(correction == "none")) {
     # uncorrected! For demonstration purposes only!
-    wh <- whist(DIJ, breaks$val)  # no weights
+    wh <- whist(dIJ, breaks$val)  # no weights
     Kun <- cumsum(wh)/npts
     K <- bind.fv(K, data.frame(un=Kun), "%s[un](r)",
                  "uncorrected estimate of %s",
                  "un")
   }
   
-  if(any(correction == "border")) {
+ if(any(correction == "border")) {
   # border method
   # Compute SCALED distances to boundary
     b <- bdist.points(X) * sqrt(lambda)
     I <- close$i
     bI <- b[I]
   # apply reduced sample algorithm
-    RS <- Kount(DIJ, bI, b, breaks)
+    RS <- Kount(dIJ, bI, b, breaks)
   # ################ CHANGE (U, 01.08.2013)   ####################
-  #  if(any(correction == "border")) {
-  
     Kb <- RS$numerator/RS$denom.count
-    Kb[r > rlim] <- NA
-    
-    K <- bind.fv(K, data.frame(border=Kb), "%s[bord](r)",
+    Kb[r > rlim] <- NA 
+    K <- bind.fv(K, data.frame(border=Kb),"%s*(r)", # "%s[bord](r)",
                    "border-corrected estimate of %s",
                    "border")
-  #  }
+    K <- rebadge.fv(K, Ktheolab, Khatname)
+    K <- tweak.fv.entry(K, "border", new.labl="paste(%s*(r),', ',scriptstyle(bord))") 
+   
+   ################ END CHANGE ##################################       
   }
 
   if(any(correction == "translate")) {
     # translation correction
     XJ <- ppp(close$xj, close$yj, window=W, check=FALSE)
     edgewt <- edge.Trans(XI, XJ, paired=TRUE)
-    wh <- whist(DIJ, breaks$val, edgewt)
+    wh <- whist(dIJ, breaks$val, edgewt)
     Ktrans <- cumsum(wh)/npts 
   # ################ CHANGE (U, 01.08.2013)   ####################
   #  h <- diameter(W)/2
   #  Ktrans[r >= h] <- NA
     Ktrans[r > rlim] <- NA
+   ################ END CHANGE ##################################       
     K <- bind.fv(K, data.frame(trans=Ktrans), "%s[trans](r)",
                  "translation-corrected estimate of %s",
                  "trans")
+    K <- rebadge.fv(K, Ktheolab, Khatname)
+    K <- tweak.fv.entry(K, "trans", new.labl="paste(%s*(r),', ',scriptstyle(trans))") 
+   
   }
   if(any(correction == "isotropic")) {
     # Ripley isotropic correction (using UN-SCALED distances)
-    edgewt <- edge.Ripley(XI, matrix(absDIJ, ncol=1))
-    wh <- whist(DIJ, breaks$val, edgewt)
+    edgewt <- edge.Ripley(XI, matrix(eudIJ, ncol=1))
+    wh <- whist(dIJ, breaks$val, edgewt)
     Kiso <- cumsum(wh)/npts 
   ################ CHANGE (U, 01.08.2013)   ####################
   #  h <- diameter(W)/2
@@ -233,10 +247,13 @@ hKscaled<-
     K <- bind.fv(K, data.frame(iso=Kiso), "%s[iso](r)",
                  "Ripley isotropic correction estimate of %s",
                  "iso")
+     K <- rebadge.fv(K, Ktheolab, Khatname)
+    K <- tweak.fv.entry(K, "iso", new.labl="paste(%s*(r),', ',scriptstyle(iso))") 
   }
   # ################ CHANGE (U, 01.08.2013)   ####################
-  K$theo[r > rlim] <- NA
-  
+  K$theo[r > rlim] <- NA    
+    # compute edge corrected estimates
+ 
   # default plot will display all edge corrections
   formula(K) <- . ~ r
   nama <- rev(colnames(K))
@@ -245,4 +262,4 @@ hKscaled<-
   unitname(K) <- c("normalised unit", "normalised units")
   return(K)
 }
-	
+

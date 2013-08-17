@@ -5,17 +5,19 @@
 
 # helper functions, transform image, subdivide polygons----------------------------------
 
-#'
-#' internal
-#' @param xy list or dataframe with elements \code{x} and \code{y}
+#' internal functions of hidden2ndorder package
+#' @name internal_functions
+#' @description
+#' functions for use by the package's functions, partly slightly 
+#' documented in the source code
+# @param xy list or dataframe with elements \code{x} and \code{y}
+#' @rdname hidden2ndorder-internal
 #' @keywords internal
 
 identxy <- function (xy) return (xy)
 
-#' 
-#' internal
+#' @rdname hidden2ndorder-internal
 #' @keywords internal
-#' 
 mapstructxy <- function(X, mapxy = identxy)
 {
   newxy <- mapxy(X)
@@ -24,9 +26,8 @@ mapstructxy <- function(X, mapxy = identxy)
   return(X)
 }
 
-#' 
-#' internal
-#' @param poly list or dataframe with elements \code{x} and \code{y}
+# @param poly list or dataframe with elements \code{x} and \code{y}
+#' @rdname hidden2ndorder-internal
 #' @keywords internal
 
 peripolyxy <- function (poly)
@@ -36,10 +37,9 @@ peripolyxy <- function (poly)
   return(sum(sqrt(diff(xx)^2 + diff(yy)^2)))
 }
 
-#'
-#' internal function
-#' @param poly list or dataframe with elements \code{x} and \code{y}
-#' @param newlen maximal length of edges in refined polygon
+# @param poly list or dataframe with elements \code{x} and \code{y}
+# @param newlen maximal length of edges in refined polygon
+#' @rdname hidden2ndorder-internal
 #' @keywords internal
 
 subdivpolyxy <- function (poly, newlen)
