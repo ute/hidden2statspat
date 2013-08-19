@@ -52,9 +52,9 @@ Lhidden <- function(...) {
 #'   be evaluated.
 #' @param correction a character vector giving the edge correction type, may be
 #'   any subset of \code{"border"},  \code{"isotropic"}, \code{"translate"}, \code{"none"}.
-# @param r.max upper limit for argument \eqn{r}. The default 10 is huge - note
-#  that the argument of the locally rescaled \eqn{K}-function corresponds to
-#  \eqn{\r/\sqrt{\lambda}} in the non scaled case.
+#' @param max.ls.r upper limit for argument \eqn{r}. The default 6 is huge - note
+#'  that the argument of the locally rescaled \eqn{K}-function corresponds to
+#'  \deqn{r/\sqrt{\lambda}}{r / sqrt(lambda)} in the non scaled case.
 #'
 #' @details
 #'
@@ -76,9 +76,10 @@ Khidden <- function (X,
                      correction = c("border", "isotropic", "Ripley", "translate"),
                      max.ls.r = 6.0) 
 {
-  verifyclass(X, "ppp")
+  # verifyclass(X, "ppp")
   
-  matching <- matchtype(X, type)
+  if (missing(type)) matching <- getlasttype(X)
+  else matching <- matchtype(X, type)
   htype <- matching$htype
   marx <- matching$marx
   # algorithms to be used
@@ -86,18 +87,15 @@ Khidden <- function (X,
   homogen <- htype %in% c("t", "h")
   weighted <- htype == "w"
   
-  # name of the function and its estimates
-  nametype = "htype"
-  # if (htype == "hs") nametype ="s"
-  # if (htype == "h") nametype ="w"
-  Kname <- paste("K[0]^{(", nametype, ")}", sep="")
-  Krname <- paste("K[0]^{(", nametype, ")}(r)", sep="")
-  Khatname <- paste("widehat(K)[0]^(", nametype, ")", sep="")
   
-    
   npts <- npoints(X)
   W <- X$window
   area <- area.owin(W)
+  stopifnot(npts > 1)
+  
+  # modify point pattern to "become" the template, if retransformed or rescaled
+  
+  if (scaling) marx$lambda <- rep(1, npts) # refers to unit rate template
   
   if (htype == "t") 
   {
@@ -107,9 +105,11 @@ Khidden <- function (X,
   }
   
   
+  # get arguments r for K
+  
   if (scaling) { 
     # transition from scaled to real world
-    maxrescale <- (marx$invscale)
+    maxrescale <- max(marx$invscale)
     if(!is.null(r)) {
       suggested.absr <- r/maxrescale 
       r.max <- max(r)
@@ -120,7 +120,8 @@ Khidden <- function (X,
     }
     # calculate in the real world, without scaling
     rmaxdefault <- rmax.rule("K", W) 
-    breaks <- handle.r.b.args(suggested.absr, NULL, W, rmaxdefault=rmaxdefault)
+    breaks <- NULL
+    breaks <- handle.r.b.args(suggested.absr, breaks, W, rmaxdefault=rmaxdefault)
     # get back to scaled world
     rmaxdefault <- rmaxdefault * maxrescale
     breaks$val <- breaks$val * maxrescale
@@ -133,7 +134,7 @@ Khidden <- function (X,
   else { 
     if(htype == "w") lamax <- max(marx$lambda) else lamax <- npts / area
     rmaxdefault <- rmax.rule("K", W, lamax)
-    breaks <- handle.r.b.args(r, breaks, W, rmaxdefault = rmaxdefault)
+    breaks <- handle.r.b.args(r, NULL, W, rmaxdefault = rmaxdefault)
     r <- breaks$r
     rmax <- breaks$max
     # recommended range of r values
@@ -147,76 +148,104 @@ Khidden <- function (X,
   correction <- pickoption("correction", correction, c(none = "none", 
                                                        border = "border", bord.modif = "bord.modif", isotropic = "isotropic", 
                                                        Ripley = "isotropic", trans = "translate", translate = "translate", 
-                                                       translation = "translate", best = "best"), multi = TRUE)
-  best.wanted <- ("best" %in% correction)
+                                                       translation = "translate"), multi = TRUE)
   correction <- implemented.for.K(correction, W$type, correction.given)
   
-  demand.best <- correction.given && best.wanted
-
   
- 
+  # name of the function and its estimates
+  typename = htype
+  # if (htype == "hs") typename ="s"
+  # if (htype == "h") typename ="w"
   
+  Kname <- paste("K[0]^{(", typename, ")}", sep="")
+  Krname <- paste("K[0]^{(", typename, ")}(r)", sep="")
+  Khatname <- paste("widehat(K)[0]^(", typename, ")", sep="")
+  Ktheolab <- substitute(K[0]^(name)*(r), list(name = typename))
   
-  Kdf <- data.frame(r = r, theo = pi * r^2)
+  # start data frame with CSR
+  K <- data.frame(r=r, theo= pi * r^2)
   desc <- c("distance argument r", "theoretical Poisson %s")
-  denom <- lambda2 * area
-  K <- ratfv(Kdf, NULL, denom, "r", quote(K(r)), "theo", NULL, 
-             alim, c("r", "%s[pois](r)"), desc, fname = "K", ratio = ratio)
+  K <- fv(K, "r", Ktheolab,
+            "theo", , alim, c("r",Krname), desc, fname=Kname)
+  K <- tweak.fv.entry(K, "theo", new.labl="paste(K[0]*(r),', ',scriptstyle(CSR))") 
+  
+  
+  # identify all close pairs
   rmax <- max(r)
-  close <- closepairs(X, rmax)
-  DIJ <- close$d
-  XI <- ppp(close$xi, close$yi, window = W, check = FALSE)
+  
+  if(scaling) close <- lsclosepairs(X, rmax, invscale = marx$invscale)
+  else close <- lsclosepairs(X, rmax) 
+  
+  dIJ <- close$d
+  eudIJ <- close$eud
+  # compute weights for these pairs
+  I <- close$i
+  J <- close$j
+  XI <- X[I]
+  XJ <- X[J]
+  
+# lambdaweights. No worries, mate, they are one if we deal with scaled processes.
+# we use them here in the homogeneous / scaled case, too, and implement implicitely that
+# infamous Poisson lambda^2 estimator n*(n-1)/area^2  
+  
+  if (weighted) wIJ <- 1 / (marx$lambda[J] * marx$lambda[I])
+  else wIJ <- 1 / marx$lambda[J] * area / (npts - 1)
+      
+ 
   if (any(correction == "none")) {
-    wh <- whist(DIJ, breaks$val)
-    numKun <- cumsum(wh)
-    denKun <- lambda2 * area
-    K <- bind.ratfv(K, data.frame(un = numKun), denKun, "hat(%s)[un](r)", 
-                    "uncorrected estimate of %s", "un", ratio = ratio)
+    wh <- whist(dIJ, breaks$val, wIJ)
+    Kun <- cumsum(wh) / area
+    K <- bind.fv(K, data.frame(un = Kun), "%s[un](r)", 
+                    "uncorrected estimate of %s", "un")
   }
+  
   if (any(correction == "border" | correction == "bord.modif")) {
     b <- bdist.points(X)
-    I <- close$i
+    if (scaling) b <- b * marx$invscale
     bI <- b[I]
-    RS <- Kount(DIJ, bI, b, breaks)
-    if (any(correction == "bord.modif")) {
-      denom.area <- eroded.areas(W, r)
-      numKbm <- RS$numerator
-      denKbm <- lambda2 * denom.area
-      K <- bind.ratfv(K, data.frame(bord.modif = numKbm), 
-                      data.frame(bord.modif = denKbm), "hat(%s)[bordm](r)", 
-                      "modified border-corrected estimate of %s", "bord.modif", 
-                      ratio = ratio)
-    }
+    newwIJ <- wIJ 
+    if(scaling) newwIJ <- newwIJ * npts / area
+    RS <- Kwtsum(dIJ, bI, newwIJ, b, w = 1/marx$lambda, breaks)
     if (any(correction == "border")) {
-      numKb <- RS$numerator
-      denKb <- lambda * RS$denom.count
-      K <- bind.ratfv(K, data.frame(border = numKb), data.frame(border = denKb), 
-                      "hat(%s)[bord](r)", "border-corrected estimate of %s", 
-                      "border", ratio = ratio)
+      Kb <- RS$ratio
+      K <- bind.fv(K, data.frame(border=Kb),"%s*(r)", # "%s[bord](r)",
+                   "border-corrected estimate of %s",
+                   "border")
+      K <- rebadge.fv(K, Ktheolab, Khatname)
+      K <- tweak.fv.entry(K, "border", new.labl="paste(%s*(r),', ',scriptstyle(bord))") 
+    }
+    if (any(correction == "bord.modif")) {
+      Kbm <- RS$numerator / eroded.areas(W, r)
+      K <- bind.fv(K, data.frame(bord.modif = Kbm),"%s*(r)", # "%s[bordm](r)",
+                   "modified border-corrected estimate of %s",
+                   "bord.modif")
+      K <- rebadge.fv(K, Ktheolab, Khatname)
+      K <- tweak.fv.entry(K, "bord.modif", new.labl="paste(%s*(r),', ',scriptstyle(bord.mod))") 
     }
   }
+  
   if (any(correction == "translate")) {
-    XJ <- ppp(close$xj, close$yj, window = W, check = FALSE)
     edgewt <- edge.Trans(XI, XJ, paired = TRUE)
-    wh <- whist(DIJ, breaks$val, edgewt)
-    numKtrans <- cumsum(wh)
-    denKtrans <- lambda2 * area
-    h <- diameter(as.rectangle(W))/2
-    numKtrans[r >= h] <- NA
-    K <- bind.ratfv(K, data.frame(trans = numKtrans), denKtrans, 
-                    "hat(%s)[trans](r)", "translation-corrected estimate of %s", 
-                    "trans", ratio = ratio)
+    totalwt <- edgewt * wIJ
+    wh <- whist(dIJ, breaks$val, totalwt)
+    Ktrans <- cumsum(wh) / area
+    K <- bind.fv(K, data.frame(trans=Ktrans), "%s[trans](r)",
+                 "translation-corrected estimate of %s",
+                 "trans")
+    K <- rebadge.fv(K, Ktheolab, Khatname)
+    K <- tweak.fv.entry(K, "trans", new.labl="paste(%s*(r),', ',scriptstyle(trans))") 
   }
+  
   if (any(correction == "isotropic")) {
-    edgewt <- edge.Ripley(XI, matrix(DIJ, ncol = 1))
-    wh <- whist(DIJ, breaks$val, edgewt)
-    numKiso <- cumsum(wh)
-    denKiso <- lambda2 * area
-    h <- diameter(W)/2
-    numKiso[r >= h] <- NA
-    K <- bind.ratfv(K, data.frame(iso = numKiso), denKiso, 
-                    "hat(%s)[iso](r)", "Ripley isotropic correction estimate of %s", 
-                    "iso", ratio = ratio)
+    edgewt <- edge.Ripley(XI, matrix(eudIJ, ncol = 1))
+    totalwt <- edgewt * wIJ
+    wh <- whist(dIJ, breaks$val, totalwt)
+    Kiso <- cumsum(wh) / area
+    K <- bind.fv(K, data.frame(iso=Kiso), "%s[iso](r)",
+                 "Ripley isotropic correction estimate of %s",
+                 "iso")
+    K <- rebadge.fv(K, Ktheolab, Khatname)
+    K <- tweak.fv.entry(K, "iso", new.labl="paste(%s*(r),', ',scriptstyle(iso))") 
   }
   
   formula(K) <- . ~ r

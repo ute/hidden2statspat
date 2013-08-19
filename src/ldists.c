@@ -2,7 +2,9 @@
 #include <R.h>
 #include <Rinternals.h>
 
-SEXP lspairdist(SEXP(x), SEXP(y), SEXP(la))
+// using lambda
+
+SEXP lspairdistla(SEXP(x), SEXP(y), SEXP(la))
 {
   const char *outnames[] = {"lsd", "eud", ""};
   int n = length(x);
@@ -32,6 +34,48 @@ SEXP lspairdist(SEXP(x), SEXP(y), SEXP(la))
       peud[i + n * j] = dd;
       peud[j + n * i] = dd;   
       ldd = dd * (prola[j] + rolai);
+      plsd[i + n * j] = ldd;
+      plsd[j + n * i] = ldd;   
+    }
+  }
+
+  UNPROTECT(2);
+
+  return(out);
+}
+
+// using inverse scale
+
+SEXP lspairdist(SEXP(x), SEXP(y), SEXP(iscal))
+{
+  const char *outnames[] = {"lsd", "eud", ""};
+  int n = length(x);
+  double *px, *py, *pisc, *plsd, *peud;
+  double xi, yi, isci, dx, dy, dd, ldd;
+
+  SEXP isc = PROTECT(duplicate(iscal));
+  SEXP out = PROTECT (mkNamed(VECSXP, outnames));
+  SEXP lsd = SET_VECTOR_ELT(out, 0, allocMatrix(REALSXP, n, n));
+  SEXP eud = SET_VECTOR_ELT(out, 1, allocMatrix(REALSXP, n, n));
+ 
+  px = REAL(x);
+  py = REAL(y);
+  pisc = REAL(isc);
+  plsd = REAL(lsd);
+  peud = REAL(eud);
+  
+  for(int i = 0; i < n; i++) { pisc[i] = pisc[i]/2; }
+  for(int i = 0; i < n; i++) {
+    xi = px[i]; yi = py[i]; isci = pisc[i];
+    plsd[i * (n + 1)] = 0;
+    peud[i * (n + 1)] = 0;
+    for(int j = i+1; j < n; j++){
+      dx = px[j] - xi;
+      dy = py[j] - yi;
+      dd = sqrt(dx * dx + dy * dy); 
+      peud[i + n * j] = dd;
+      peud[j + n * i] = dd;   
+      ldd = dd * (pisc[j] + isci);
       plsd[i + n * j] = ldd;
       plsd[j + n * i] = ldd;   
     }
