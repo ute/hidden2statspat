@@ -1,7 +1,7 @@
-#' @useDynLib hidden2ndorder
+#' @useDynLib sosspp
 # @param x,y vectors of x and y coordinates
 # @param la intensity vector
-#' @rdname hidden2ndorder-internal
+#' @rdname sosspp-internal
 #' @keywords internal
 #' @export
 #'
@@ -22,7 +22,7 @@ lspairdist <- function(x, y, la)
 #   but without dx and dy !!!! has to be changed if ever needed
 # @details raw version that corresponds to spatstat.closepairs in call
 #    but not in safety.
-#' @rdname hidden2ndorder-internal
+#' @rdname sosspp-internal
 #' @keywords internal
 #' @export
 #' 

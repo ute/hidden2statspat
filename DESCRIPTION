@@ -1,12 +1,12 @@
-Package: hidden2ndorder
-Version: 0.2
-Date: 2013-08-16
+Package: sosspp
+Version: 0.5
+Date: 2013-08-19
 Title: Analysis of hidden second-order stationary point processes
 Author: Ute Hahn <ute@imf.au.dk>
 Maintainer: Ute Hahn <ute@imf.au.dk>
 Depends:
-    R (>= 3.0),
-    spatstat (>= 1.31)
+    R (>= 2.3),
+    spatstat (>= 1.2)
 Imports:
     spatstat,
     inline
