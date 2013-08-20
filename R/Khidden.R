@@ -34,9 +34,9 @@ Lhidden <- function(...) {
   return(L)
 }
 
-#' Locally rescaled K-function
+#' Template K-function
 #'
-#' Estimates the locally rescaled \eqn{K}-function of a point process.
+#' Estimates the template \eqn{K}-function of a point process.
 #' Modified (and frozen) version of \code{\link{Kest}}.
 #'
 #' @param X a point pattern, object of class \code{"ppp"}.
@@ -46,17 +46,26 @@ Lhidden <- function(...) {
 #'        \item \code{"t"} retransformed
 #'        \item \code{"s"} locally rescaled
 #'        \item \code{"h"} homogeneous, i.e. first order stationary
+#'        \item \code{"hs"} homogeneous, but evaluated as scaled \eqn{K}-function
 #'   }
 #'   Only the first match is used.
 #' @param r optional: vector of argument values \eqn{r} at which \eqn{K(r)} should
 #'   be evaluated.
 #' @param correction a character vector giving the edge correction type, may be
 #'   any subset of \code{"border"},  \code{"isotropic"}, \code{"translate"}, \code{"none"}.
-#' @param max.ls.r upper limit for argument \eqn{r}. The default 6 is huge - note
+#' @param ... optional arguments passed to \code{\link{makehidden}}   
+#' @param max.ls.r upper limit for argument \eqn{r}. The default 3 is quite large - note
 #'  that the argument of the locally rescaled \eqn{K}-function corresponds to
 #'  \deqn{r/\sqrt{\lambda}}{r / sqrt(lambda)} in the non scaled case.
 #'
 #' @details
+#' If \code{type} is not given, the last type of second order stationarity assigned
+#' to \code{X} is used to determine how the template \eqn{K}-function is estimated.
+#' If \code{X} has no type of second-order stationarity, it is assumed to be homogeneous.
+#' 
+#' If \code{type} is given, but does not match the type of \code{X}, the function
+#' \code{\link{makehidden}} is called with arguments ldots to ensure the correct
+#' hidden second-order information.
 #'
 #' For locally rescaled s.o. stationarity, all edge corrections are implemented 
 #' as approximations. The translational edge
@@ -67,31 +76,59 @@ Lhidden <- function(...) {
 #' For more details, see \code{\link{Kscaled} and }
 #' @export
 #' @seealso \code{\link{Kest}}, \code{\link{Kinhom}}, \code{\link{Kscaled}}
-
+#' @examples
+#' # compare homogeneous version of Khidden and spatstat's Kest
+#' # bronzefilter data are not marked as hidden
+#' plot(Kest(bronzefilter))
+#' plot(Khidden(bronzefilter))
+#' 
+#' # Evaluate as reweighted, with default intensity estimate, 
+#' # compare with spatstat's Kinhom 
+#' plot(Kinhom(bronzefilter))
+#' plot(Khidden(bronzefilter, type = "w"))
+#' # There is a subtle difference because spatstat uses intensity renormalisation
+#' # by default. We can do that, too:
+#' plot(Khidden(bronzefilter, type = "w", normpower = 1))
+#' 
+#' # Evaluate a rescaled version of the bronzefilter data:
+#' plot(Khidden(rescaled(bronzefilter)))
+#' 
+#' # The last given type is the one that counts
+#' plot(Khidden(retransformed(rescaled(bronzefilter), trafo="gradx")))
 
 
 Khidden <- function (X, 
                      type = c("w", "t", "s", "h", "hs"), 
                      r = NULL,
                      correction = c("border", "isotropic", "Ripley", "translate"),
-                     max.ls.r = 6.0) 
+                     ...,
+                     max.ls.r = 3.0) 
 {
   # verifyclass(X, "ppp")
-  
-  if (missing(type)) matching <- getlasttype(X)
-  else matching <- matchtype(X, type)
-  htype <- matching$htype
-  marx <- matching$marx
-  # algorithms to be used
-  scaling <- htype %in% c("s", "hs")
-  homogen <- htype %in% c("t", "h")
-  weighted <- htype == "w"
-  
-  
   npts <- npoints(X)
   W <- X$window
   area <- area.owin(W)
   stopifnot(npts > 1)
+  
+  if (missing(type)) 
+  {
+    htype <- getlasttype(X)
+    if (length(htype) == 0) 
+      {
+         X <- ashomogeneous(X)
+         htype <- "h"
+      }
+  }
+  else {
+    htype <- type[1]
+    if (!has.type (X, htype)) X <- makehidden(X, type = htype, ...)
+  }
+    
+  marx <- X$marks
+  # algorithms to be used
+  scaling <- htype %in% c("s", "hs")
+  homogen <- htype %in% c("t", "h")
+  weighted <- htype == "w"
   
   # modify point pattern to "become" the template, if retransformed or rescaled
   
@@ -99,7 +136,7 @@ Khidden <- function (X,
   
   if (htype == "t") 
   {
-    X <- extractRetransformed (X)
+    X <- backtransformed (X)
     # make uniform lambdas
     marx$lambda <- npts / area
   }
