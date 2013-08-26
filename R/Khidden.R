@@ -40,7 +40,7 @@ Lhidden <- function(...) {
 #' Modified (and frozen) version of \code{\link{Kest}}.
 #'
 #' @param X a point pattern, object of class \code{"ppp"}.
-#' @param type character, the type of second-stationarity assumed: 
+#' @param type character, the type of second-order stationarity assumed: 
 #'   \itemize{
 #'        \item \code{"w"} reweighted
 #'        \item \code{"t"} retransformed
@@ -53,6 +53,8 @@ Lhidden <- function(...) {
 #'   be evaluated.
 #' @param correction a character vector giving the edge correction type, may be
 #'   any subset of \code{"border"},  \code{"isotropic"}, \code{"translate"}, \code{"none"}.
+#' @param normpower an integer between 0 and 2. If \code{normpower} > 0, the 
+#'  intensity is normalized, see the Details.
 #' @param ... optional arguments passed to \code{\link{makehidden}}   
 #' @param max.ls.r upper limit for argument \eqn{r}. The default 3 is quite large - note
 #'  that the argument of the locally rescaled \eqn{K}-function corresponds to
@@ -66,7 +68,11 @@ Lhidden <- function(...) {
 #' If \code{type} is given, but does not match the type of \code{X}, the function
 #' \code{\link{makehidden}} is called with arguments ldots to ensure the correct
 #' hidden second-order information.
-#'
+#' 
+#' If  \code{normpower} > 0, the intensity is renormalized, so that \code{\link{Khidden}} yields similar results as
+#' the \bold{spatstat}-function \code{\link{Kinhom}}. The intensity values are then multiplied by 
+#' \deqn{c^{normpower/2}}{c^(normpower/2)}, where 
+#' \deqn{c = area(W)/sum_i(1/\lambda(x_i))}{c = area(W)/sum[i](1/lambda(x[i]))}.#'
 #' For locally rescaled s.o. stationarity, all edge corrections are implemented 
 #' as approximations. The translational edge
 #' correction suffers from a small intrinsic bias in some cases of the locally
@@ -101,6 +107,7 @@ Khidden <- function (X,
                      type = c("w", "t", "s", "h", "hs"), 
                      r = NULL,
                      correction = c("border", "isotropic", "Ripley", "translate"),
+                     normpower = 0,
                      ...,
                      max.ls.r = 3.0) 
 {
@@ -125,6 +132,18 @@ Khidden <- function (X,
   }
     
   marx <- X$marks
+  if (normpower != 0) {
+    stopifnot ((1 <= normpower) & (normpower <= 2)) 
+    if (!is.null(marx$lambda)){  
+      renorm.factor <-  (sum(1 / marx$lambda) / (area.owin(X)))^(normpower / 2) 
+      marx$lambda <- marx$lambda * renorm.factor
+    }
+    if(!is.null(marx$invscale)){
+      renorm.factor <-  (sum(1 / marx$invscale^2) / (area.owin(X)))^(normpower / 4) 
+      marx$invscale <- marx$invscale * renorm.factor
+    }
+  }
+  
   # algorithms to be used
   scaling <- htype %in% c("s", "hs")
   homogen <- htype %in% c("t", "h")
@@ -221,7 +240,7 @@ Khidden <- function (X,
   XI <- X[I]
   XJ <- X[J]
   
-# lambdaweights. No worries, mate, they are one if we deal with scaled processes.
+# lambdaweights. No worries, mate, lambdas are one if we deal with scaled processes.
 # we use them here in the homogeneous / scaled case, too, and implement implicitely that
 # infamous Poisson lambda^2 estimator n*(n-1)/area^2  
   

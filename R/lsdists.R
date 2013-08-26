@@ -57,11 +57,12 @@ lsclosepairs <- function (X, rmax, invscale, lambda,
   OK <- i != j
   i <- i[OK]
   j <- j[OK]
+  xi <- X$x[i]; yi <- X$y[i]; xj <- X$x[j];  yj <- X$y[j]
   answer <- switch(what, 
             all = list(i = i, j = j, 
-                  xi = X$x[i], yi = X$y[i], xj = X$x[j],  yj = X$y[j],
-                  # dx = dx, dy = dy, 
-                  d = lsdist[indi[OK, ]],
+                       xi = xi, yi = yi, xj = xj,  yj = yj,
+                       dx = xi - xj, dy = yi - yj,
+                       d = lsdist[indi[OK, ]],
                   eud = eudist[indi[OK, ]]),
            indices = list(i = i, j = j))
   return(answer)

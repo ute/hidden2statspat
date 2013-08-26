@@ -105,7 +105,7 @@ studpermut.test <- function (foos1, foos2, use.tbar=FALSE, nperm = NULL)
   pval <- mean(Tvals >= Tvals[1])           
   stat <- Tvals[1]
   names(stat) <- if(use.tbar) "Tbar" else "T"
-  datname <- paste( deparse(substitute(samp1)),"and", deparse(substitute(samp2)))
+  datname <- paste( deparse(substitute(foos1)),"and", deparse(substitute(foos2)))
   method <- paste("Studentized two sample permutation test for fda, using T",
                   ifelse(use.tbar, "bar", ""), sep="")
   alternative <- "samples not exchangeable"

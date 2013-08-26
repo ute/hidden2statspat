@@ -212,6 +212,7 @@ retransformed <- function (X, trafo = identxy, ...)
 #' @param X the original point pattern
 #' @param type optional character. If set to "hs", the patterns is preferentially
 #'   evaluated as "rescaled", otherwise as "reweighted" (default).
+#' @param lambda optional, constant lambda.   
 #' @return A point pattern (object of class \code{\link{"ppp"}}), marked with 
 #'   dataframe with elements \code{lambda} (estimated intensity), 
 #'   \code{invscale} (square root of lambda)  and 
@@ -220,12 +221,12 @@ retransformed <- function (X, trafo = identxy, ...)
 #' @export
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 
-ashomogeneous <- function (X,  type="h")
+ashomogeneous <- function (X,  type="h", lambda = NULL)
 {
   npts <- npoints(X)
   marx <- marks.as.df(X$marks)
   if (npts > 0){
-    la <- npts / area.owin(X$window)
+    if (isnull(lambda)) la <- npts / area.owin(X$window) else la <- lambda[1]
     if (!is.null(marx$lambda)) marx$lambda <- la
     else marx <-  as.data.frame(cbind(marx, lambda = rep(la, npts)))
     if (!is.null(marx$invscale)) marx$invscale <- sqrt(la)
@@ -429,6 +430,7 @@ getlasttype <- function (X)
 #' @rdname sosspp-internal
 #' @keywords internal
 
+.TYPENAMES  <- c("reweighted", "retransformed", "rescaled", "homogeneous", "homogeneous, scaled")
 .TYPES  <- c("w", "t", "s", "h", "hs")
 .TYBITS <- c(1, 2, 4, 8, 16)
 .TYLAST <- 32
