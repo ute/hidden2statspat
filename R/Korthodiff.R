@@ -21,6 +21,8 @@
 #'   be evaluated.
 #' @param correction a character vector giving the edge correction type, so far only
 #'    \code{"isotropic"} is supported.
+#' @param normpower an integer between 0 and 2. If \code{normpower} > 0, the 
+#'  intensity is normalized, see the Details.
 #' @param ... optional arguments passed to \code{\link{makehidden}}   
 #' @param rescaledangle logical, indicating whether to rescale the directional 
 #'   \eqn{K}-functions as to represent the full circle
@@ -46,10 +48,11 @@
 #' lines(rr, DeltaKdir (Y[W2], r = rr)$iso, col="blue", lty = "dotted" ) 
 
 DeltaKdir <- function (X, 
-                       type = c("s", "hs"),      
+                       type = c("s", "t", "w", "h", "hs"),      
                        dphi = pi/4, # half angle!!! in contrast to the above
                        r = NULL,
                        correction = "isotropic",# c("border", "isotropic", "Ripley", "translate"),
+                       normpower = 0,
                        ...,
                        rescaleangle = TRUE, # rescale to full angle
                        max.ls.r = 3.0) 
@@ -59,10 +62,33 @@ DeltaKdir <- function (X,
   area <- area.owin(W)
   stopifnot(npts > 1)
   
-  htype <- type[1]
-  if (!has.type (X, htype)) X <- makehidden(X, type = htype, ...)  
-  
+  if (missing(type))   
+  {
+    htype <- getlasttype(X)
+    if (length(htype) == 0) 
+      {
+         X <- ashomogeneous(X)
+         htype <- "h"
+      }
+  }
+  else {
+    htype <- type[1]
+    if (!has.type (X, htype)) X <- makehidden(X, type = htype, ...)
+  }
+    
   marx <- X$marks
+  if (normpower != 0) {
+    stopifnot ((1 <= normpower) & (normpower <= 2)) 
+    if (!is.null(marx$lambda)){  
+      renorm.factor <-  (sum(1 / marx$lambda) / (area.owin(X)))^(normpower / 2) 
+      marx$lambda <- marx$lambda * renorm.factor
+    }
+    if(!is.null(marx$invscale)){
+      renorm.factor <-  (sum(1 / marx$invscale^2) / (area.owin(X)))^(normpower / 4) 
+      marx$invscale <- marx$invscale * renorm.factor
+    }
+  }
+
   # algorithms to be used
   scaling <- htype %in% c("s", "hs")
   homogen <- htype %in% c("t", "h")
@@ -71,6 +97,13 @@ DeltaKdir <- function (X,
   # modify point pattern to "become" the template, if retransformed or rescaled
   
   if (scaling) marx$lambda <- rep(1, npts) # refers to unit rate template
+  
+  if (htype == "t") 
+  {
+    X <- backtransformed (X)
+    # make uniform lambdas
+    marx$lambda <- npts / area
+  }
   
   # get arguments r for K
   
@@ -130,10 +163,8 @@ DeltaKdir <- function (X,
   # identify all close pairs
   rmax <- max(r)
   
-  # not needed now, change that later:  if(scaling) 
-  
-  close <- lsclosepairs(X, rmax, invscale = marx$invscale)
-  # not needed now, later change that:   else close <- lsclosepairs(X, rmax) 
+  if(scaling) close <- lsclosepairs(X, rmax, invscale = marx$invscale)
+  else close <- lsclosepairs(X, rmax) 
    
   # only those in the orientation interval around 0 and pi/2, symmetric     
   dir <-  with(close, atan2(dy,dx))%% (2*pi)
@@ -155,9 +186,8 @@ DeltaKdir <- function (X,
   XI <- X[I]
   XJ <- X[J]
   
-  # if (weighted) wIJ <- 1 / (marx$lambda[J] * marx$lambda[I])
-  # else 
-  wIJ <- 1 / marx$lambda[J] * area / (npts - 1)
+  if (weighted) wIJ <- 1 / (marx$lambda[J] * marx$lambda[I])
+  else  wIJ <- 1 / marx$lambda[J] * area / (npts - 1)
 
   
   edgewts <- edgecross.Ripley(XI, r = matrix(dIJ, ncol = 1), dphi = dphi)
