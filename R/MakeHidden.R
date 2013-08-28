@@ -144,6 +144,13 @@ rescaled <- function (X,  invscale = NULL, lambda = NULL, ..., normpower = 0)
 #'    and is valid at each point of \code{X} 
 #'   \item a string with value \code{"gradx"} or \code{"grady"}.
 #'   }
+#' @param lambda optional, intensity. Only used if \code{trafo="gradx")} or \code{trafo="grady")}. 
+#' can be given as  \itemize{
+#'   \item a single number,
+#'   \item a vector of intensity values at the points of \code{X},  
+#'   \item a \code{function(x,y)} that returns the intensity and is valid at each point of \code{X} 
+#'   \item a pixel image of class \code{"\link{im}"}.
+#'   }  
 #' @param \ldots optional extra parameters for \code{trafo}, if this is given as a \code{function}.
 #' @return A point pattern (object of class \code{\link{"ppp"}}), marked with 
 #'   dataframe with elements \code{x0},  \code{y0} (backtransformed points) and 
@@ -158,10 +165,11 @@ rescaled <- function (X,  invscale = NULL, lambda = NULL, ..., normpower = 0)
 #'   If \code{trafo = "gradx"} or \code{trafo = "grady"}, the backtransformation is obtained from the 
 #'   data by inverse cdf transform, under
 #'   the assumption that the transformation function affects only the \eqn{x}- or \eqn{y}-coordinate, respectively.
+#'   If additionally the intensity \code{lambda} is given, the gradient back transform is calculated from \code{lambda}.
 #' @export
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 
-retransformed <- function (X, trafo = identxy, ...)
+retransformed <- function (X, trafo = identxy, lambda = NULL, ...)
 {
   npts <- npoints(X)
   if (npts > 0){
@@ -172,19 +180,44 @@ retransformed <- function (X, trafo = identxy, ...)
     y0 <- xy$y
   } 
   else if (trafo %in% c("gradx", "grady"))
-    { # just an ordinary inverse cdf transformation, could be more sophisticated at some point
-    if (trafo == "gradx") {
+    { # just an ordinary inverse cdf transformation
+    if (is.null(lambda))  # just an ordinary inverse cdf transformation
+    {
+      if (trafo == "gradx") {
       xlims <- X$window$xrange
       oo <- rank(X$x, ties="first")
       x0 <- (xlims[1] + diff(xlims) * (0.5 + (1:npts)) / (npts+1))[oo]
       y0 <- X$y
-    }
-    else {
+      }
+      else {
       ylims <- X$window$yrange
       oo <- rank(X$y, ties="first")
       y0 <- (ylims[1] + diff(ylims) * (0.5 + (1:npts)) / (npts+1))[oo]
       x0 <- X$x
-    }
+      }
+    } else {
+      la <- getIntensity(X, lambda, ...)
+       if(trafo == "gradx") {
+         z <- X$x; zrange <- X$window$xrange
+       } else {
+         z <- X$y; zrange <- X$window$yrange
+       }
+       oo <- order(z)
+       rk <- rank(z)  
+       n <- length(z)  
+       zz <- c(zrange[1], z[oo], zrange[2] )
+       lam <- (c(la[oo], la[oo[n]]) + c(la[oo[1]], la[oo])) / 2
+       intlam <- cumsum(c(0, lam * diff(zz)))
+       znew <- zrange[1] + intlam / max(intlam) * diff(zrange)
+       z <- znew[-c(1, n+2)][rk] 
+       if (trafo == "gradx") {
+          x0 <- z
+          y0 <- X$y
+       } else {
+          y0 <- z
+          x0 <- X$x
+       }
+    }  
   }
   else stop(paste(sQuote("trafo"),
                   "should be a function, or one of the character strings",
@@ -226,7 +259,7 @@ ashomogeneous <- function (X,  type="h", lambda = NULL)
   npts <- npoints(X)
   marx <- marks.as.df(X$marks)
   if (npts > 0){
-    if (isnull(lambda)) la <- npts / area.owin(X$window) else la <- lambda[1]
+    if (is.null(lambda)) la <- npts / area.owin(X$window) else la <- lambda[1]
     if (!is.null(marx$lambda)) marx$lambda <- la
     else marx <-  as.data.frame(cbind(marx, lambda = rep(la, npts)))
     if (!is.null(marx$invscale)) marx$invscale <- sqrt(la)

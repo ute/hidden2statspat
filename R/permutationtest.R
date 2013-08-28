@@ -9,7 +9,8 @@
 #'   studentization after integration, see `Details'.
 #' @param nperm \code{NULL} or an integer giving the number of random 
 #'   permutations. If \code{NULL}, all permutations are used. Only feasible if 
-#'   group sizes \eqn{m_1}, \eqn{m_2} do not exceed 10.
+#'   group sizes \eqn{m_1}, \eqn{m_2} do not exceed 10. Default value is 25000,
+#'   thus all permutations will be used on groups with \code{m_1 = m_2 =9}.
 #' @details Test statistics are integral means of studentized square distances 
 #'   between the group means. The test statistics are closely related, but not 
 #'   equal to Hotelling's two-sample T-squared statistic. It is assumed that 
@@ -49,7 +50,7 @@
 #' @keywords nonparametric
 #' @keywords ts    
 
-studpermut.test <- function (foos1, foos2, use.tbar=FALSE, nperm = NULL)
+studpermut.test <- function (foos1, foos2, use.tbar=FALSE, nperm = 25000)
 {
   ##### preparations ----------------
   n <- dim(foos1)[1]
@@ -64,10 +65,11 @@ studpermut.test <- function (foos1, foos2, use.tbar=FALSE, nperm = NULL)
   # If m1 == m2, break the symmetry and save half time and memory!
   
   allcomb <- is.null(nperm)
+  ncomb <- if (m1 == m2) choose(m-1, m1-1) else choose(m, m1)
   # if nperm is larger than the actual number of combinations, also use all of them
   if (!allcomb)
   {
-    ncomb <- if (m1 == m2) choose(m-1, m1-1) else choose(m, m1)
+    # ncomb <- if (m1 == m2) choose(m-1, m1-1) else choose(m, m1)
     if (ncomb < (nperm + 1)) allcomb <- TRUE
   }
   if (allcomb) 
@@ -106,8 +108,10 @@ studpermut.test <- function (foos1, foos2, use.tbar=FALSE, nperm = NULL)
   stat <- Tvals[1]
   names(stat) <- if(use.tbar) "Tbar" else "T"
   datname <- paste( deparse(substitute(foos1)),"and", deparse(substitute(foos2)))
-  method <- paste("Studentized two sample permutation test for fda, using T",
-                  ifelse(use.tbar, "bar", ""), sep="")
+  method <- c(paste("Studentized two sample permutation test for fda, using T",
+                  ifelse(use.tbar, "bar", ""), sep=""),
+              ifelse(allcomb, paste("exact test, using all",ncomb,"permutations (combinations)"), 
+                        paste("using",nperm,"randomly selected permuations")))
   alternative <- "samples not exchangeable"
   ptt <- list(statistic = stat, 
               p.value = pval, 

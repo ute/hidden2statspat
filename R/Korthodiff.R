@@ -190,7 +190,7 @@ DeltaKdir <- function (X,
   else  wIJ <- 1 / marx$lambda[J] * area / (npts - 1)
 
   
-  edgewts <- edgecross.Ripley(XI, r = matrix(dIJ, ncol = 1), dphi = dphi)
+  edgewts <- edgecross.Ripley(XI, r = matrix(eudIJ, ncol = 1), dphi = dphi)
   if(!is.data.frame(edgewts)) stop(paste("uhadada something wrong with",X$n,"points"))
   edgewt <- close$in.hor * edgewts$w.horiz - close$in.ver * edgewts$w.vert
   totalwt <- edgewt * wIJ
