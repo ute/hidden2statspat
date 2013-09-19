@@ -389,6 +389,7 @@ getIntensity <- function(X, lambda = NULL, ..., normpower = 0)
 # @param X point pattern, of class ppp
 # @param type assumed type of second-order stationarity
 # @return logical
+#' @export
 #' @rdname sosspp-internal
 #' @keywords internal
 
@@ -400,51 +401,13 @@ has.type <- function (X, type = .TYPES)
 }
 
 
-# @param X point pattern, of class ppp
-# @param type assumed type of second-order stationarity
-# @return a list (\code{htype}, \code{marx}) with matched type and mark data frame of \code{X}
-#' @rdname sosspp-internal
-#' @keywords internal
-
-
-matchtype <- function (X, type = c("w", "t", "s", "h", "hs"))
-{
-  verifyclass(X, "ppp")
-  marx <- X$marks
-  if (!is.data.frame(marx)) stop("Given point pattern is not marked hidden 2nd-order stationary.")
-  knowntype <-  any(!is.na(match(type, c("w", "t", "s", "h", "hs"))))
-  if (!knowntype) stop ("unknown type od hidden 2nd-order stationarity")
-  
-  # check if X matches type
-  htype <- NULL
-  if ("w" %in% type) { 
-     if (!is.null(marx$lambda)) htype <- "w" }
-  else if ("t" %in% type) {
-     if (!is.null(marx$x0) && !is.null(marx$y0)) htype <- "t"}
-  else if ("s" %in% type) {
-     if (!is.null(marx$invscale) || !is.null(marx$lambda)) htype = "s" 
-     if (is.null(marx$invscale)) marx <- as.data.frame(cbind(marx, invscale = sqrt(marx$lambda))) }
-  else if ("h" %in% type) {  
-     la <- rep(npoints(X) / area.owin(X), npoints(X))
-     htype <- "h"
-     if (is.null(marx$lambda))  marx <- as.data.frame(cbind(marx, lambda = rep(la, npoints(X)))) }
-  else if ("hs" %in% type) {  
-      iscale <- sqrt(rep(npoints(X) / area.owin(X), npoints(X)))
-      htype <- "hs"
-      if (is.null(marx$invscale))  marx <- as.data.frame(cbind(marx, invscale = rep(iscale, npoints(X)))) }   
-  else htype <- NULL
-  if(is.null(htype)) stop ("given inhomogeneity type does not match point pattern")
-  return(list(htype = htype, marx = marx))
-}
-
-
-
 
 # @param X point pattern, of class ppp, with attribute htype
 # @return a list (\code{htype}, \code{marx}) with matched type and mark data frame of \code{X}
 # if several types are present, the last one is picked
 #' @rdname sosspp-internal
 #' @keywords internal
+#' @export
 
 getlasttype <- function (X)
 {

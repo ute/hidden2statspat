@@ -46,6 +46,8 @@ correctionkey <- function (correction)
 #'   Only the first match is used. 
 #' @param quads quadrats for subsampling \code{X}. A \code{list} of objects
 #' of \bold{spatstat}-class \code{\link{owin}} or an object of \bold{spatstat}-class \code{\link{tess}}.
+#' In the current version not used for retransformed used if \code{type != "t"}.
+#' @param tquads used instead of \code{quads} for the backtransformed pattern if \code{type != "t"}.
 #' @param rmin optional, lower bound, defaults to 0,
 #' @param rmax upper bound for the radius,
 #' @param rlen optional, number of steps in argument vector, defaults to 256,
@@ -74,7 +76,7 @@ correctionkey <- function (correction)
 #' @keywords nonparametric
 #' @keywords ts    
 
-KestOnQuadrats <- function(X, type=NULL, quads,
+KestOnQuadrats <- function(X, type=NULL, quads, tquads,
                         rmin = 0, rmax = 1.25, rlen = 100,
                         correction = "isotropic",
                         Kfun = Khidden,
@@ -83,18 +85,28 @@ KestOnQuadrats <- function(X, type=NULL, quads,
   use.DeltaKdir <- identical(Kfun, DeltaKdir)
   corr <- correction[1]
   ckey <- correctionkey(correction)
-  if (is.null(type)) type <- getlasttype(X)
+  
+  if (!is.null(type)) # type request
+  {
+    type <- type[1]
+    if (!has.type(X, type)) X <- makehidden(X, type, ...)
+  }
+  else type <- getlasttype(X)
+  
+  # now we are sure that X has the right type :-)
+  
   if (length(type) == 0) stop ("no type of hidden 2nd order stationarity given")
+  
   tindex <-  which(.TYPES == type)
   
-  if (type=="t")  X <- retransformed(backtransformed(X)) 
+  if (type=="t")  {X <- retransformed(backtransformed(X)); quads <- tquads}
     # transformation is dangerous for the split list: quadrats do likely not map onto themselves
     # causing a lot of trouble. Therefore make some shortcuts
   
   pplist <- ppsplit(X, quads)
   ckey <- correctionkey(correction)
   rr <- seq(rmin, rmax, length.out=rlen)
-  Kar <- sapply(pplist, function(X) Kfun(X, type = type, r = rr, correction = corr, ...)[[ckey]])
+  Kar <- sapply(pplist, function(X) Kfun(X, r = rr, correction = corr, ...)[[ckey]])
   
   if (use.DeltaKdir){  
     ylab <- substitute(widehat(Delta*K)[dir]^(x)*(r), list(x=type))
@@ -135,6 +147,7 @@ KestOnQuadrats <- function(X, type=NULL, quads,
 #' @param add logical, whether to add to current plot. Defaults to FALSE.
 #' @param lwdtheo,ltytheo,coltheo plot parameters for K-function of Poisson point process (CSR).
 #'        If lwdtheo=0, the curve is not plotted. Defaults: lwdtheo = 1, ltythgeo="dotted", coltheo="black". 
+#' @param labline numerical, where to plot the axis labels
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 #' @S3method plot foolist
 #' @export
@@ -145,7 +158,8 @@ plot.foolist <- function(flist,
                   minn = 10, minm = 1,
                   ylim = NULL,
                   ..., add = FALSE, 
-                  lwdtheo = 1, ltytheo = "dotted", coltheo="black")
+                  lwdtheo = 1, ltytheo = "dotted", coltheo="black",
+                  labline = 2.4)
 {
   OK <- flist$npts >= minn
   m <- sum(OK)
@@ -154,9 +168,12 @@ plot.foolist <- function(flist,
   rr <- flist$r    
   if (is.null(ylim)) ylim <- c(min(flist$footheo, flist$fpparray), max(flist$fooarray, flist$footheo))
 
-  if (!add) plot(rr, foomean, type = "n", ylim = ylim,
-                xlab = flist$xlab, ylab = flist$ylab,
-                col = col, lwd = lwd, ...)
+  if (!add) {
+    plot(rr, foomean, type = "n", ylim = ylim,
+                col = col, lwd = lwd,
+                xlab = "", ylab = "", ...)
+    title(xlab = flist$xlab, ylab = flist$ylab, line=labline, ...)
+  }
     # plot Poisson reference curve
   if (!add & lwdtheo>0) lines(rr, flist$footheo, lwd = lwdtheo, lty = ltytheo, col=coltheo)
   
@@ -188,6 +205,9 @@ plot.foolist <- function(flist,
 #'   Only the first match is used. 
 #' @param quads1,quads2 quadrats for subsampling \code{X} (and \code{Y}). A \code{list} of objects
 #' of \bold{spatstat}-class \code{\link{owin}} or an object of \bold{spatstat}-class \code{\link{tess}}.
+#' In the current version not used for retransformed used if \code{type != "t"}.
+#' @param tquads1,tquads2 used instead of \code{quads1} and \code{quads2} for 
+#'      the backtransformed pattern if \code{type != "t"}.
 #' @param rmin optional, lower integration bound, defaults to 0; see `Details',
 #' @param rmax upper integration bound, see `Details',
 #' @param rlen optional, number of steps for numerical integration, defaults to 256; see `Details',
@@ -250,6 +270,7 @@ plot.foolist <- function(flist,
 Kpermute.test <- function(X, Y = NULL,
                       type = NULL,
                       quads1, quads2,
+                      tquads1, tquads2,
                       rmin = 0,
                       rmax,
                       rlen = 100,
@@ -260,12 +281,22 @@ Kpermute.test <- function(X, Y = NULL,
                       nperm = 25000)
 {
   AnisTest <- identical(Kfun, DeltaKdir)
-  if (is.null(type)) type <- getlasttype(X)
-  if (length(type) == 0) stop ("no type of hidden 2nd order stationarity given")
-  tindex <-  which(.TYPES == type)
   
   dataname <- if(is.null(Y)) paste( "point pattern",deparse(substitute(X)))
               else paste( "point patterns",deparse(substitute(X)), "and" ,deparse(substitute(Y)))
+    
+  if (!is.null(type)) # type request
+  {
+    type <- type[1]
+    if (!has.type(X, type)) X <- makehidden(X, type, ...)
+  }
+  else type <- getlasttype(X)
+  
+  # now we are sure that X has the right type :-)
+  
+  if (length(type) == 0) stop ("no type of hidden 2nd order stationarity given")
+  
+  tindex <-  which(.TYPES == type)
   
   if (type=="t")  
   {
@@ -273,6 +304,7 @@ Kpermute.test <- function(X, Y = NULL,
     # causing a lot of trouble. Therefore make some shortcuts
     X <- retransformed(backtransformed(X)) 
     if(!is.null(Y)) Y <- retransformed(backtransformed(Y)) 
+    quads1 <- tquads1; quads2 <- tquads2
   }  
   
   pplist1 <- ppsplit(X, quads1)
@@ -280,8 +312,8 @@ Kpermute.test <- function(X, Y = NULL,
   corr <- correction[1]
   ckey <- correctionkey(correction)
   rr <- seq(rmin, rmax, length.out=rlen)
-  Kar1 <- sapply(pplist1, function(X) Kfun(X, type = type, r = rr, correction = corr, ...)[[ckey]])
-  Kar2 <- sapply(pplist2, function(X) Kfun(X, type = type, r = rr, correction = corr, ...)[[ckey]])
+  Kar1 <- sapply(pplist1, function(X) Kfun(X, r = rr, correction = corr, ...)[[ckey]])
+  Kar2 <- sapply(pplist2, function(X) Kfun(X, r = rr, correction = corr, ...)[[ckey]])
   if (use.tbar) testerg <- studpermut.test((Kar1 / rr)[rr>0, ], (Kar2 / rr)[rr>0, ], use.tbar = TRUE, nperm = nperm)
   else  testerg <- studpermut.test(Kar1, Kar2, use.tbar = FALSE, nperm = nperm)
   if (is.null(Y))  {
@@ -292,8 +324,8 @@ Kpermute.test <- function(X, Y = NULL,
                         paste("test statistic: ", if(use.tbar) "Tbar," 
                               else "T,", "integration limits",rmin,"to",rmax),
                         testerg$method[2] )
-    alternative <- paste("not",.TYPENAMESX[tindex],"second-order stationary",
-                                 ifelse(AnisTest, "but different kinds of anisotropy",""))
+    alternative <- c(paste("not the same",.TYPENAMESX[tindex],"K-function"),
+                                 if(AnisTest) ",\nbut different kinds of anisotropy")
   } else  {
     method <- c(paste("Studentized permutation test of identical",
                               .TYPENAMESX[tindex]," K-functions,"),
@@ -304,8 +336,8 @@ Kpermute.test <- function(X, Y = NULL,
                         #if(is.null(nperm)) "exact test, using all permutations" 
                         #else paste("using",nperm,"randomly selected permuations")
                         testerg$method[2])
-    alternative <- paste("not the same",.TYPENAMESX[tindex],"K-function",
-                                 ifelse(AnisTest, "but different kinds of anisotropy",""))
+    alternative <- c(paste("not the same",.TYPENAMESX[tindex],"K-function"),
+                                 if(AnisTest) ",\nbut different kinds of anisotropy")
   }
   testerg$method <- method
   testerg$alternative <- alternative
