@@ -1,10 +1,29 @@
-# adding marks to point processes to make them hidden so stationary
+# second-order stationarity typed point patterns
+
+#' Convert object of class ppp to class sostpp
+#' 
+#' Converts a spatstat-point pattern of class \code{"ppp"} into a second-order 
+#' stationarity typed point pattern of class \code{"sostpp"}.
+#'
+#' @S3method as.sostpp ppp
+#' @rdname sostatpp-internal
+#' @param X an object of class \code{"ppp"}
+#' @return an object of class \code{"sostpp"}, but with no type information.
+#' @seealso \code{\link{sostpp.object}} for details on the class.
+#' @author Ute Hahn,  \email{ute@@imf.au.dk}
+
+as.sostpp.ppp <- function(x) 
+{
+  class(x) <- c("sostpp", class(x))
+  return(x)
+}
+
 
 #' Make point pattern reweighted 2nd-order stationary
 #' 
-#' Add mark information for reweighted second-order stationary point processes.
+#' Add type information for reweighted second-order stationary point processes.
 #' 
-#' @param X the original point pattern
+#' @param X the original point pattern, an object of class \code{"ppp"} or \code{"sostpp"}
 #' @param lambda optional. The estimated intensity function, can be either 
 #' \itemize{
 #'   \item a single number,
@@ -14,19 +33,18 @@
 #'   }
 #' @param \ldots optional extra parameters. If \code{lambda} is given as a function, \ldots may contain extra parameters,
 #'   if \code{lambda} is empty, these are parameters passed to the \bold{spatstat}-function \code{\link{density.ppp}}.
-#' @param normpower an integer between 0 and 2. If \code{normpower} > 0, the intensity is normalized, see the Details.
-#' @return A point pattern (object of class \code{\link{"ppp"}}), marked with 
-#'   dataframe with elements \code{lambda} (estimated intensity) and 
-#'   \code{htypes} (encrypted type information).
+#' @return A reweighted s.o.s. typed point pattern (object of class \code{\link{"sostpp"}}), having typemarks 
+#'   with  an element \code{lambda} (estimated intensity) 
 #' @export
 #' @details
 #'   If  \code{lambda} is missing, the function will check if the pattern \code{X} 
-#'   has previously been marked with an inverse scale factor (by function \code{\link{rescale}}). In that case,
+#'   has previously been typed as rescaled s.o.s. (by function \code{\link{rescale}}). In that case,
 #'   the intensity is calculated as the square inverse scale factor.
 #'   
 #'   If  \code{lambda} is empty, and \code{X} has no inverse scale factor marks, the intensity
 #'   is estimated using the \bold{spatstat}-function \code{\link{density.ppp}}, and extra arguments \ldots
-#'   are passed to \code{density.ppp}.
+#'   are passed to \code{density.ppp}. By contrast to \bold{spatstat},
+#'   the {"leaveoneout"}-method is not chosen by default.
 #'    
 #'   If  \code{lambda} is given as a function, extra parameters may be passed as \ldots.
 #'   
@@ -34,34 +52,29 @@
 #'   constant intensity, which effectively means that it will be analysed as a homogeneous 
 #'   point process with known intensity.
 #'   
-#'   If  \code{normpower} > 0, the intensity is renormalized, so that \code{\link{Khidden}} yields similar results as
-#'   the \bold{spatstat}-function \code{\link{Kinhom}}. The intensity values are then multiplied by 
-#'   \deqn{c^{normpower/2}} {c^(normpower/2)}, where 
-#'   \deqn{c = area(W)/sum_i(1/\lambda(x_i))}{c = area(W)/sum[i](1/lambda(x[i]))}.
-#' @seealso \code{\link{rescaled.ppp}}, \code{\link{retransformed}}    
+#' @seealso \code{\link{rescaled}}, \code{\link{retransformed}}    
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 
 reweighted <- function (X, lambda = NULL, ..., normpower = 0)
 {
+  if(!is.sostpp(X)) X <- as.sostpp.ppp(X) 
   npts <- npoints(X)
-  marx <- marks.as.df(X$marks)
+  marx <- X$typemarks
   if (npts > 0){
     if (is.null(lambda) && !is.null(marx$invscale)) lambda <- marx$invscale^2
     la <- getIntensity(X, lambda, ...,  normpower = normpower)
     if (!is.null (marx$lambda)) marx$lambda <- la 
     else marx <- as.data.frame(cbind(marx, lambda = la))
     # now marx is really a data frame
-    htype <- .settype("w", marx$htypes[1])
-    marx$htypes <- htype
-    X$marks <-  marx
-    X$markformat <- class(X$marks)
+    X$typemarks <-  marx
   }
+  X$sostype <- .settype("w", X$sostype)
   return(X)
 }
 
 #' Make point pattern locally rescaled 2nd-order stationary
 #' 
-#' Add mark information for locally rescaled second-order stationary point processes.
+#' Add type information for locally rescaled second-order stationary point processes.
 #' 
 #' @param X the original point pattern
 #' @param invscale optional. The \emph{inverse} of estimated scale function, can be either 
@@ -75,12 +88,11 @@ reweighted <- function (X, lambda = NULL, ..., normpower = 0)
 #' The possible format of this corresponds to that of parameter \code{iscale}.
 #' @param \ldots arguments passed to \code{invscale} or \code{lambda}, if these are functions, or to 
 #'   the \bold{spatstat}-function \code{\link{density.ppp}} if both \code{invscale} and \code{lambda} are missing.
-#' @param normpower an integer between 0 and 2. If \code{normpower} > 0 and \code{invscale} is missing, 
-#'   the intensity \code{lambda} is normalized,
-#'   see the Details.
-#' @return A point pattern (object of class \code{\link{"ppp"}}), marked with 
-#'   dataframe with elements \code{invscale} (square root of estimated intensity) and 
-#'   \code{htypes} (encrypted type information).
+# @param normpower an integer between 0 and 2. If \code{normpower} > 0 and \code{invscale} is missing, 
+#   the intensity \code{lambda} is normalized,
+#   see the Details.
+#' @return A rescaled s.o.s. typed point pattern (object of class \code{\link{"sostpp"}}), having typemarks 
+#'   with   an element  \code{invscale} (square root of estimated intensity) 
 #' @details
 #'   If \code{invscale} is empty, the square root of the intensity \code{lambda} is used instead.
 #'   If neither \code{invscale} nor \code{lambda} are given, the function checks if the pattern \code{X} 
@@ -99,17 +111,20 @@ reweighted <- function (X, lambda = NULL, ..., normpower = 0)
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 
 
-rescaled <- function (X,  invscale = NULL, lambda = NULL, ..., normpower = 0)
+rescaled <- function (X,  invscale = NULL, lambda = NULL, ...)
 {
+  if(!is.sostpp(X)) X <- as.sostpp.ppp(X) 
+  
   npts <- npoints(X)
-  marx <- marks.as.df(X$marks)
+  marx <- X$typemarks
+  
   if (npts > 0){
   if (is.null(invscale))  {
     if (is.null(lambda)){
        if (!is.null(marx$lambda)) la <- marx$lambda
-       else la <- getIntensity(X, NULL, ..., normpower = normpower)
+       else la <- getIntensity(X, NULL, ...)
     }  
-    else la <- getIntensity(X, lambda, ..., normpower = normpower)   
+    else la <- getIntensity(X, lambda, ...)   
     iscale <- sqrt(la)
   } else {
       if(is.im(invscale)) 
@@ -125,11 +140,9 @@ rescaled <- function (X,  invscale = NULL, lambda = NULL, ..., normpower = 0)
       }         
   if (!is.null (marx$invscale)) marx$invscale <- iscale
   else marx <- as.data.frame(cbind(marx, invscale = iscale))
-  htype <- .settype("s", marx$htypes[1])
-  marx$htypes <- htype
-  X$marks <-  marx
-  X$markformat <- class(X$marks)
+   X$typemarks <-  marx
   }
+  X$sostype <- .settype("s", X$sostype)
   return(X)
 }
 
@@ -151,10 +164,17 @@ rescaled <- function (X,  invscale = NULL, lambda = NULL, ..., normpower = 0)
 #'   \item a \code{function(x,y)} that returns the intensity and is valid at each point of \code{X} 
 #'   \item a pixel image of class \code{"\link{im}"}.
 #'   }  
+#' @param invtrafo optional. The inverse of \code{trafo}, 
+#' is used by function \code{\link{"backtransformed"}} to transform the window. 
+#' \itemize{
+#'   \item a \code{function(x,y)} that returns a data frame or list with elements \code{x} and \code{y}
+#'    and is valid at each point of \code{X} 
+#'   \item a string with value \code{"gradx"} or \code{"grady"}.
+#'   }
 #' @param \ldots optional extra parameters for \code{trafo}, if this is given as a \code{function}.
-#' @return A point pattern (object of class \code{\link{"ppp"}}), marked with 
-#'   dataframe with elements \code{x0},  \code{y0} (backtransformed points) and 
-#'   \code{htypes} (internal information).
+#' @return A retransformed s.o.s. typed point pattern (object of class \code{\link{"sostpp"}}), having typemarks 
+#'   with  elements \code{x0} and  \code{y0} (backtransformed points), and extra information
+#'   about the backtransform. 
 #' @seealso \code{\link{rescaled}}, \code{\link{reweighted}}
 #' @details
 #'   It is assumed that the transformation is one-to-one, in the sense that the observation window is mapped to itself.
@@ -166,111 +186,145 @@ rescaled <- function (X,  invscale = NULL, lambda = NULL, ..., normpower = 0)
 #'   data by inverse cdf transform, under
 #'   the assumption that the transformation function affects only the \eqn{x}- or \eqn{y}-coordinate, respectively.
 #'   If additionally the intensity \code{lambda} is given, the gradient back transform is calculated from \code{lambda}.
+#'   
+#'   The function \code{invtrafo} is applied to the window when the pattern is backtransformed
+#'   using \code{\ink{"backtransformed"}}. If not given, linear interpolation is used, however
+#'   currently only for gradient transformations (\code{trafo = "gradx"} or \code{trafo = "grady"}).
 #' @export
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 
-retransformed <- function (X, trafo = identxy, lambda = NULL, ...)
+retransformed <- function (X, trafo = identxy, lambda = NULL, invtrafo = NULL, ...)
 {
+  if(!is.sostpp(X)) X <- as.sostpp.ppp(X) 
   npts <- npoints(X)
   if (npts > 0){
-  if (is.function(trafo))
-  {
-    xy <- trafo(X$x, X$y)
-    x0 <- xy$x
-    y0 <- xy$y
-  } 
-  else if (trafo %in% c("gradx", "grady"))
-    { # just an ordinary inverse cdf transformation
-    if (is.null(lambda))  # just an ordinary inverse cdf transformation
+    if (is.function(trafo))
     {
-      if (trafo == "gradx") {
-      xlims <- X$window$xrange
-      oo <- rank(X$x, ties="first")
-      x0 <- (xlims[1] + diff(xlims) * (0.5 + (1:npts)) / (npts+1))[oo]
-      y0 <- X$y
-      }
-      else {
-      ylims <- X$window$yrange
-      oo <- rank(X$y, ties="first")
-      y0 <- (ylims[1] + diff(ylims) * (0.5 + (1:npts)) / (npts+1))[oo]
-      x0 <- X$x
-      }
-    } else {
-      la <- getIntensity(X, lambda, ...)
-       if(trafo == "gradx") {
-         z <- X$x; zrange <- X$window$xrange
-       } else {
-         z <- X$y; zrange <- X$window$yrange
-       }
-       oo <- order(z)
-       rk <- rank(z)  
-       n <- length(z)  
-       zz <- c(zrange[1], z[oo], zrange[2] )
-       lam <- (c(la[oo], la[oo[n]]) + c(la[oo[1]], la[oo])) / 2
-       intlam <- cumsum(c(0, lam * diff(zz)))
-       znew <- zrange[1] + intlam / max(intlam) * diff(zrange)
-       z <- znew[-c(1, n+2)][rk] 
-       if (trafo == "gradx") {
+      xy <- trafo(X$x, X$y)
+      x0 <- xy$x
+      y0 <- xy$y
+    } 
+    else if (trafo %in% c("gradx", "grady"))
+    { # just an ordinary inverse cdf transformation
+      if (is.null(lambda))  # just an ordinary inverse cdf transformation
+      {
+        if (trafo == "gradx") {
+          xlims <- X$window$xrange
+          oo <- rank(X$x, ties="first")
+          x0 <- (xlims[1] + diff(xlims) * (0.5 + (1:npts)) / (npts+1))[oo]
+          y0 <- X$y
+        }
+        else {
+          ylims <- X$window$yrange
+          oo <- rank(X$y, ties="first")
+          y0 <- (ylims[1] + diff(ylims) * (0.5 + (1:npts)) / (npts+1))[oo]
+          x0 <- X$x
+        }
+      } else {
+        la <- getIntensity(X, lambda, ...)
+        if(trafo == "gradx") {
+          z <- X$x; zrange <- X$window$xrange
+        } else {
+          z <- X$y; zrange <- X$window$yrange
+        }
+        oo <- order(z)
+        rk <- rank(z)  
+        n <- length(z)  
+        zz <- c(zrange[1], z[oo], zrange[2] )
+        lam <- (c(la[oo], la[oo[n]]) + c(la[oo[1]], la[oo])) / 2
+        intlam <- cumsum(c(0, lam * diff(zz)))
+        znew <- zrange[1] + intlam / max(intlam) * diff(zrange)
+        z <- znew[-c(1, n+2)][rk] 
+        if (trafo == "gradx") {
           x0 <- z
           y0 <- X$y
-       } else {
+        } else {
           y0 <- z
           x0 <- X$x
-       }
-    }  
+        }
+      }  
+    }
+    else stop(paste(sQuote("trafo"),
+      "should be a function, or one of the character strings",
+      dQuote("gradx"),"or", dQuote("grady")))
+    
+    marx <- X$typemarks
+    # gave a funny name for old marks in the old version using marks(X)  
+    if (!is.null (marx$x0)) marx$x0 <- x0
+    else marx <-  as.data.frame(cbind(marx, x0 = x0))
+    if (!is.null (marx$y0)) marx$y0 <- y0
+    else marx <-  cbind(marx, y0 = y0)
+    X$typemarks <-  marx
+    
+    # now get backtransform
+    if (is.function(trafo)) otra <- trafo else otra <- NULL  
+    if (!is.null(invtrafo)) itra <- invtrafo
+    else{
+      if (trafo == "gradx") 
+      {
+        xw <- X$window$xrange
+        otra <- function(x, y = NULL) {
+          if (is.null(y)) return(data.frame(x = approxfun(c(x0, xw), c(X$x, xw))(x$x), y = x$y))
+          else return (data.frame(x = approxfun(c(x0, xw), c(X$x, xw))(x), y = y))
+        }
+        itra <- function(x, y = NULL) {
+          if (is.null(y)) return(data.frame(x = approxfun(c(X$x, xw), c(x0, xw))(x$x), y = x$y))
+          else return (data.frame(x = approxfun(c(X$x, xw), c(x0, xw))(x), y = y))
+        }
+      }
+      else if (trafo == "grady") 
+      {
+        yw <- X$window$yrange
+        otra <- function(x, y = NULL) {
+          if (is.null(y)) return(data.frame(x = x$x, y = approxfun(c(y0, yw), c(X$y, yw))(x$y)))
+          else return (data.frame(x = x, y = approxfun(c(y0, yw), c(X$y, yw))(y)))
+        }
+        itra <- function(x, y = NULL) {
+          if (is.null(y)) return(data.frame(x = x$x, y = approxfun(c(y0, yw), c(X$y, yw))(x$y)))
+          else return(data.frame(x = x, y = approxfun(c(y0, yw), c(X$y, yw))(y)))
+        }
+      } else itra <- NULL
+    }
   }
-  else stop(paste(sQuote("trafo"),
-                  "should be a function, or one of the character strings",
-                  dQuote("gradx"),"or", dQuote("grady")))
-  
-  old.marx <- marks.as.df(X$marks)
-  # gave a funny name for old marks in the old version using marks(X)  
-  if (!is.null (old.marx$x0)) old.marx$x0 <- x0
-  else old.marx <-  as.data.frame(cbind(old.marx, x0 = x0))
-  if (!is.null (old.marx$y0)) old.marx$y0 <- y0
-  else old.marx <-  cbind(old.marx, y0 = y0)
-  htype <- .settype("t", old.marx$htypes[1])
-  old.marx$htypes <- htype
-  X$marks <- old.marx
-  X$markformat <- class(old.marx)
-  }
+  X$sostype <- .settype("t", X$sostype)
+  X$extra$trafo <- trafo
+  X$extra$lambda <- lambda
+  X$extra$trafoo <- otra
+  X$extra$invtrafo <- itra
   return(X)
 }  
 
 
 #' Mark point pattern as homogeneous
 #' 
-#' Add mark information for second-order stationary point processes.
+#' Add type information for second-order stationary point processes.
 #' 
 #' @param X the original point pattern
 #' @param type optional character. If set to "hs", the patterns is preferentially
 #'   evaluated as "rescaled", otherwise as "reweighted" (default).
 #' @param lambda optional, constant lambda.   
-#' @return A point pattern (object of class \code{\link{"ppp"}}), marked with 
-#'   dataframe with elements \code{lambda} (estimated intensity), 
-#'   \code{invscale} (square root of lambda)  and 
-#'   \code{htypes} (encrypted type information).
+#' @return A homogeneous s.o.s. typed point pattern (object of class \code{\link{"sostpp"}}), having typemarks 
+#'   with   elements \code{lambda} (estimated intensity) and
+#'   \code{invscale} (square root of lambda).
 #' @seealso \code{\link{rescaled}}, \code{\link{retransformed}}, \code{\link{reweighted}}
 #' @export
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 
 ashomogeneous <- function (X,  type="h", lambda = NULL)
 {
+  if(!is.sostpp(X)) X <- as.sostpp.ppp(X) 
   npts <- npoints(X)
-  marx <- marks.as.df(X$marks)
+  marx <- X$typemarks
   if (npts > 0){
     if (is.null(lambda)) la <- npts / area.owin(X$window) else la <- lambda[1]
     if (!is.null(marx$lambda)) marx$lambda <- la
     else marx <-  as.data.frame(cbind(marx, lambda = rep(la, npts)))
     if (!is.null(marx$invscale)) marx$invscale <- sqrt(la)
     else marx <-  cbind(marx, invscale = sqrt(la))
-    htype <- .settype("h", .settype("hs", NULL))
     # make sure last type is set to given argument:
-    htype <- .settype(type, htype)
-    marx$htypes <- htype
-    X$marks <-  marx
-    X$markformat <- class(X$marks)
+    X$typemarks <-  marx
   }
+  X$sostype  <- .settype(type, .settype("h", .settype("hs", NULL)))
   return(X)
 }
 
@@ -279,11 +333,19 @@ ashomogeneous <- function (X,  type="h", lambda = NULL)
 #' 
 #' Extract the backtransformed template from a retransformed point process.
 #' 
-#' @param X the (inhomogeneous) point pattern. Needs to have marks \code{x0} and \code{y0}.
-#' @return a point pattern of \bold{spatstat}-class \code{\link{ppp}}
-#'  with points in \code{x0} and \code{y0} and marks stripped by these two columns.
-#'  The result has an additional attribute \code{"htypes"} set to contain the character \code{"h"},
-#'  and is marked with constant intensity and constant inverse scale factor.
+#' @param X a retransformed s.o.s. typed point pattern, object of class \code{\link{sostpp}}. 
+#' @return a homogeneous s.o.s. typed point pattern of class \code{\link{sostpp}}
+#'  with points in \code{x0} and \code{y0}.
+#'  The type of the result is set to both  homogeneous and scaled-homogeneous,
+#'  and is typemarked with constant intensity and constant inverse scale factor.
+#' @details As retransformed s.o.s. typed point pattern, \code{X} has an element \code{extra}, 
+#' a list containing information about the transformation. If this list contains
+#' an element \code{invtrafo}, this element is taken to be a function and used 
+#' to backtransform the window. If the original transformation was a gradient transformation,
+#' the coordinates of the window are interpolated. Currently, no saftey precautions if 
+#' \code{invtrafo} returns rubbish.
+#' 
+#' If no \code{invtrafo} is given, the original window is retained, which also might result in rubbish.
 #' @export
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 #' @examples
@@ -292,15 +354,17 @@ ashomogeneous <- function (X,  type="h", lambda = NULL)
 #' plot(bronzetemplate, use.marks = FALSE)
 backtransformed <- function(X)
 {
-  old.marx <- marks.as.df(X$marks)
-  stopifnot (!is.null (old.marx$x0), !is.null (old.marx$y0))
-  Y <- ppp(old.marx$x0, old.marx$y0, window = X$window)
-  old.marx <- old.marx[, !(names(old.marx) %in% c("htypes", "x0", "y0", "lambda", "invscale"))]
-  npts <- npoints(Y)
-  la <- npts / area.owin(Y)
-  old.marx <- as.data.frame(cbind(old.marx, lambda = rep(la, npts), invscale = sqrt(la)))
-  old.marx$htypes <- .settype("h", .settype("hs", NULL))
-  Y$marks <- old.marx
+  tmarx <- X$typemarks
+  stopifnot (!is.null (tmarx$x0), !is.null (tmarx$y0))
+  # if inverse transform is not given, the original window is taken. This
+  # can lead to problems if the transformation did not preserve the window,
+  # or if the point pattern was subsampled.
+  # if the trafo was gradx or grady, the result can only be approximated.
+  W <- X$window
+  itra <- X$extra$invtrafo
+  otra <- X$extra$trafoo
+  if (!is.null(itra) &!is.null(otra)) W <- coordTransform.owin(W, itra, otra)
+  Y <- ashomogeneous(ppp(tmarx$x0, tmarx$y0, window = W, marks=X$marks))
   return(Y)
 }
 
@@ -334,35 +398,25 @@ makehidden <- function(X, type, ...)
   return(X)
 }
 
-# @param marx NULL, a vector or a data.frame
-# @return NULL, if X has no marks, otherwise a data.frame
-#' @rdname sosspp-internal
-#' @keywords internal
-
-marks.as.df <- function(marx)
-{
-  if (is.vector(marx)) {
-    marx <- as.data.frame(marx)
-    names(marx) <- "old.marx"
-  }
-  return(marx)
-}
 
 # @param X point pattern, of class ppp
 # @param lambda optional intensity, number, vector, function or image
 # @param ... extra parameters for estimation of intensity 
-# @param normpower renormalizing power.
 #' @rdname sosspp-internal
+#' @export
 #' @keywords internal
 
-getIntensity <- function(X, lambda = NULL, ..., normpower = 0)
+getIntensity <- function(X, lambda = NULL, ...)
 {
   verifyclass(X, "ppp")
   npts <- npoints(X)
   if(is.null(lambda)) {
     # No intensity data provided
-    # Estimate density by leave-one-out kernel smoothing
-    lambda <- density(X, ..., at="points", leaveoneout=TRUE)
+    # use a kernel estimate
+    # in spatstat, leaveoneout = TRUE is set by default. This may lead to strange
+    # result in sparse regions, in particular when the density is "renormalized"
+    # afterwards. Therefore this default has been removed here.
+    lambda <- density(X, ..., at="points")
     lambda <- as.numeric(lambda)
   } else {
     # lambda values provided
@@ -377,6 +431,41 @@ getIntensity <- function(X, lambda = NULL, ..., normpower = 0)
     else stop(paste(sQuote("lambda"),
                     "should be a vector, a pixel image, or a function"))
   }
+  return(lambda)
+}
+
+# renormalize intensity as in spatstat
+# @param X point pattern, of class ppp or sostpp
+# @param lambda optional intensity vector
+# @param normpower renormalizing power.
+# @details if lambda is not given, and X is sos retransformed or reweighted,
+# the typemarks are adjusted accordingly
+#' @export
+#' @rdname sosspp-internal
+#' @keywords internal
+
+normalizedIntensity <- function(X, lambda = NULL, normpower = 2)
+{
+  verifyclass(X, "ppp")
+  npts <- npoints(X)
+  if(is.null(lambda)) {
+    if(!is.sostpp(X)) stop("no intensity given")
+    # first priority: current type
+    if (currenttype(X) %in% c("w","s")) {
+        if (currenttype(X) == "w") lambda <- X$typemarks$lambda
+        else lambda <- X$typemarks$invscale^2
+      }
+    else if (has.type(X, "w")) lambda <- X$typemarks$lambda
+    else if (has.type(X, "s")) lambda <- X$typemarks$invscale^2
+    else stop("error: no intensity information in point pattern")
+  }
+  else {
+    if(length(lambda) == 1) lambda <- rep(lambda, npts)
+    else if(length(lambda) != npts) 
+      stop(paste(sQuote("lambda"),
+        "should be a single number or a vector of values for each point in",
+        sQuote("X")))
+  }
   if (normpower != 0) {
     stopifnot ((1 <= normpower) & (normpower <= 2)) 
     renorm.factor <-  (sum(1 / lambda) / (area.owin(X)))^(normpower / 2) 
@@ -385,79 +474,3 @@ getIntensity <- function(X, lambda = NULL, ..., normpower = 0)
   return(lambda)
 }
 
-
-# @param X point pattern, of class ppp
-# @param type assumed type of second-order stationarity
-# @return logical
-#' @export
-#' @rdname sosspp-internal
-#' @keywords internal
-
-has.type <- function (X, type = .TYPES)
-{
-  knowntype <-  any(!is.na(match(type, .TYPES)))
-  if (!knowntype) stop ("unknown type of hidden 2nd-order stationarity")
-  return(type %in% .gettype(marks.as.df(X$marks)$htypes[1])$all) 
-}
-
-
-
-# @param X point pattern, of class ppp, with attribute htype
-# @return a list (\code{htype}, \code{marx}) with matched type and mark data frame of \code{X}
-# if several types are present, the last one is picked
-#' @rdname sosspp-internal
-#' @keywords internal
-#' @export
-
-getlasttype <- function (X)
-{
-#  verifyclass(X, "ppp")
-#  htype <- attr(X, "htypes")
-#  if (is.vector(htype)) htype <- htype[length(htype)] 
-#  return(matchtype(X, htype))
-  return(.gettype(marks.as.df(X$marks)$htypes[1])$last) 
-}
-
-
-# hand made bit operations, certainly much too awkward...
-# @param typecode integer. encrypted information on last type, and all types 
-# @return a list (\code{last}, \code{all}) of character vectors giving the type
-# if several types are present, the last one is picked
-#' @rdname sosspp-internal
-#' @keywords internal
-
-.TYPENAMES  <- c("reweighted", "retransformed", "rescaled", "homogeneous", "homogeneous, scaled")
-.TYPES  <- c("w", "t", "s", "h", "hs")
-.TYBITS <- c(1, 2, 4, 8, 16)
-.TYLAST <- 32
-
-.gettype <- function (typecode)
-{
-  last <- typecode %/% .TYLAST
-  lindex <- (last %/% .TYBITS) %% 2 == 1
-  all <- typecode %% .TYLAST
-  contained <- (all %/% .TYBITS) %% 2 == 1
-  return(list(last = .TYPES[lindex], all = .TYPES[contained]))
-}
-
-# @param typecode integer, encrypted information on last type, and all types so far
-# @param type character, giving the type to be entered in encrypted info
-# @return integer, updated encrypted type information
-# if several types are present, the last one is picked
-#' @rdname sosspp-internal
-#' @keywords internal
-
-.settype <- function(type, typecode)
-{
-  tindex <- which(.TYPES == type)
-  stopifnot(length(tindex) == 1)
-  if (length(typecode) < 1) { # new typecode  
-    return(.TYBITS[tindex] * (.TYLAST+1))
-  }
-  else {
-    all <- typecode %% .TYLAST
-    contained <- (all %/% .TYBITS) %% 2 == 1
-    if (!contained[tindex]) all <- all + .TYBITS[tindex]
-    return (.TYBITS[tindex] * .TYLAST + all)  
-  }
-}  
