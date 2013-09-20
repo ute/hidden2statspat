@@ -1,10 +1,13 @@
 # History files
 .Rhistory
-
 # Example code in package build process
 *-Ex.R
-
 # Rstudio stuff
 .Rproj.user
 .Rhistory
 .RData
+.Rbuildignore
+# backups
+*.bak
+# all figures
+allfigures/*.*

@@ -123,7 +123,7 @@ refinepoly <- function (X, edgelen = NULL)
 
 coordTransform <- function(X,  ...)
 {
-  UseMethod("coordTransform", X,  ...)
+  UseMethod("coordTransform", X)
 }
 
 
