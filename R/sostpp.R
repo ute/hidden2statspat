@@ -125,12 +125,15 @@ print.sostpp <- function(x, ...)
 #' 
 #' Access the encrypted type information of second-order stationarity typed point
 #' patterns, objects of class \code{sostpp}.
-# @param x point pattern, of class sostpp
-# @param type assumed type of second-order stationarity
+#' @param x point pattern, of class sostpp
+#' @param type character, type of second-order stationarity. See \code{\link{sostpp.object}}
+#' for details.
 # @return logical
 #' @export
-#' @rdname sostpp-types
-#' @keywords internal
+# @rdname sostpp-types
+# @alias sos-type functions
+# @keywords internal
+#' @author Ute Hahn,  \email{ute@@imf.au.dk}
 
 has.type <- function (x, type = .TYPES)
 {
@@ -143,18 +146,22 @@ has.type <- function (x, type = .TYPES)
 # @param x point pattern, of class sostpp
 # @return character, giving the last second-order stationarity type X was assigned to
 # if several types are present, the last one is picked
-#' @rdname sostpp-types
-#' @keywords internal
+# @rdname sostpp-types
+# @keywords internal
 #' @export
+# @alias sos-type functions
+#' @rdname has.type
 
 currenttype <- function (x)
 {
   return(.gettype(x$sostype)$last) 
 }
+
 # @return integer, index number of second-order stationarity type
-#' @rdname sostpp-types
+# @rdname sostpp-types
+#' @rdname sostatpp-internal
 #' @keywords internal
-#' @export
+# @export
 
 currenttypeno <- function (x)
 {
@@ -165,9 +172,10 @@ currenttypeno <- function (x)
 # @param x point pattern, of class sostpp
 # @return vector of type numbers, all but the current type
 # if several types are present, the last one is picked
-#' @rdname sostpp-types
+# @rdname sostpp-types
+#' @rdname sostatpp-internal
 #' @keywords internal
-#' @export
+# @export
 
 furthertypeno <- function (x)
 {
@@ -181,7 +189,7 @@ furthertypeno <- function (x)
 # if several types are present, the last one is picked
 #' @rdname sostatpp-internal
 #' @keywords internal
-#' \code{"ppp"}
+# \code{"ppp"}
 
 .TYPENAMES  <- c("reweighted", "retransformed", "rescaled", "homogeneous", "scaled-homogeneous")
 .TYPES  <- c("w", "t", "s", "h", "hs")
@@ -202,7 +210,7 @@ furthertypeno <- function (x)
 # @param type character, giving the type to be entered in encrypted info
 # @return integer, updated encrypted type information
 # if several types are present, the last one is picked
-#' @export
+# @export
 #' @rdname sostatpp-internal
 #' @keywords internal
 

@@ -304,8 +304,8 @@ coordTransform.owin <- function (X, trafoxy = identxy, invtrafoxy = NULL, isAffi
 #' # transforming a Poisson point pattern by inhomogeneous scaling 
 #' # around origo
 #' 
-#' galaxytrafo <- function(xy) { 
-#'   xx <- xy$x; yy <- xy$y; dd <- xx^2 + yy^2
+#' galaxytrafo <- function(xx, yy) { 
+#'   dd <- xx^2 + yy^2
 #'   return(list(x = dd * xx, y = dd * yy))
 #'   }
 #'

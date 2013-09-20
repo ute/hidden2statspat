@@ -7,8 +7,7 @@
 #' supports objects of spatstat-class \code{ppp}
 #'
 #' @export
-#' @rdname sostatpp-internal
-#' @param X an R-object, currentlu of class \code{"ppp"}
+#' @param X an R-object, currently of class \code{"ppp"}
 #' @return an object of class \code{"sostpp"}, but with no type information.
 #' @seealso \code{\link{sostpp.object}} for details on the class.
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
@@ -26,7 +25,6 @@ as.sostpp <- function(x, ...)
 #'
 #' @S3method as.sostpp ppp
 #' @export
-#' @rdname sostatpp-internal
 #' @param X an object of class \code{"ppp"}
 #' @return an object of class \code{"sostpp"}, but with no type information.
 #' @seealso \code{\link{sostpp.object}} for details on the class.
@@ -220,7 +218,7 @@ retransformed <- function (X, trafo = identxy, lambda = NULL, invtrafo = NULL, .
   if (npts > 0){
     if (is.function(trafo))
     {
-      xy <- trafo(X$x, X$y)
+      xy <- trafo(X$x, X$y, ...)
       x0 <- xy$x
       y0 <- xy$y
     } 
@@ -275,11 +273,12 @@ retransformed <- function (X, trafo = identxy, lambda = NULL, invtrafo = NULL, .
     if (!is.null (marx$y0)) marx$y0 <- y0
     else marx <-  cbind(marx, y0 = y0)
     X$typemarks <-  marx
-    
-    # now get backtransform
-    if (is.function(trafo)) otra <- trafo else otra <- NULL  
-    if (!is.null(invtrafo)) itra <- invtrafo
-    else{
+   }
+  # now get backtransform
+  if (is.function(trafo)) 
+      { itra <- trafo 
+        otra <- invtrafo  }
+  else{
       if (trafo == "gradx") 
       {
         xw <- X$window$xrange
@@ -303,9 +302,8 @@ retransformed <- function (X, trafo = identxy, lambda = NULL, invtrafo = NULL, .
           if (is.null(y)) return(data.frame(x = x$x, y = approxfun(c(y0, yw), c(X$y, yw))(x$y)))
           else return(data.frame(x = x, y = approxfun(c(y0, yw), c(X$y, yw))(y)))
         }
-      } else itra <- NULL
+      } 
     }
-  }
   X$sostype <- .settype("t", X$sostype)
   X$extra$trafo <- trafo
   X$extra$lambda <- lambda
