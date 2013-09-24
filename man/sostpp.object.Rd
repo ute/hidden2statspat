@@ -1,5 +1,6 @@
 \name{sostpp.object}
 \alias{sostpp.object}
+\alias{sostpp}
 \title{Class of Second-Order Stationarity-Typed Point Patterns}
 \description{
   A class \code{"sostpp"} to represent a two-dimensional point

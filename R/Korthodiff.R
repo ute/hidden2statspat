@@ -64,7 +64,7 @@ DeltaKdir <- function (X,
   
   if (missing(type))   
   {
-    htype <- getlasttype(X)
+    htype <- currenttype(X)
     if (length(htype) == 0) 
       {
          X <- ashomogeneous(X)
@@ -76,7 +76,7 @@ DeltaKdir <- function (X,
     if (!has.type (X, htype)) X <- makehidden(X, type = htype, ...)
   }
     
-  marx <- X$marks
+  marx <- X$typemarks
   if (normpower != 0) {
     stopifnot ((1 <= normpower) & (normpower <= 2)) 
     if (!is.null(marx$lambda)){  

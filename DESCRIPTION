@@ -1,8 +1,9 @@
-Package: sosspp
-Version: 0.5
-Date: 2013-08-19
+Package: sostatpp
+Version: 0.6
+Date: 2013-09-24
 Title: Analysis of hidden second-order stationary point processes
 Author: Ute Hahn <ute@imf.au.dk>
+Creator: Ute Hahn
 Maintainer: Ute Hahn <ute@imf.au.dk>
 Depends:
     R (>= 2.15),
@@ -17,7 +18,7 @@ Description: A package on top of spatstat, contributing functions for
     tests, as described in the paper "Inhomogeneous spatial point
     processes with hidden second-order stationarity" by Ute Hahn and
     Eva B. Vedel Jensen (2013). The package also supplies the data
-    analysed there, unless included in package spatstat.
+    set scholtzia, which is not included in package spatstat.
 License: GPL (>= 2)
 NeedsCompilation: yes
 LazyData: true
