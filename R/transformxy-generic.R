@@ -20,13 +20,13 @@ identxy <- function (x, y = NULL)
   else return (data.frame(x = x, y = y))
 }  
 
-#' internal functions of sosspp package
+#' internal functions of sostatpp package
 #'
-#' @name sosspp-internal
+#' @name sostatpp-internal
 #' @description
 #' functions for use by the package's functions, partly slightly 
 #' documented in the source code
-#' @rdname sosspp-internal
+#' @rdname sostatpp-internal
 #' @keywords internal
 mapstructxy <- function(X, mapxy = identxy)
 {
@@ -38,7 +38,7 @@ mapstructxy <- function(X, mapxy = identxy)
 }
 
 # @param poly list or dataframe with elements \code{x} and \code{y}
-#' @rdname sosspp-internal
+#' @rdname sostatpp-internal
 #' @keywords internal
 
 peripolyxy <- function (poly)
@@ -50,7 +50,7 @@ peripolyxy <- function (poly)
 
 # @param poly list or dataframe with elements \code{x} and \code{y}
 # @param newlen maximal length of edges in refined polygon
-#' @rdname sosspp-internal
+#' @rdname sostatpp-internal
 #' @keywords internal
 
 subdivpolyxy <- function (poly, newlen)

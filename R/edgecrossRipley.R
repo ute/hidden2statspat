@@ -18,7 +18,7 @@
 # @param r matrix of radii
 # @param W window
 # @param dphi half angle
-#' @rdname sosspp-internal
+#' @rdname sostatpp-internal
 #' @keywords internal
 #' @export
 

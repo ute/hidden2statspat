@@ -1,8 +1,8 @@
-#' @useDynLib sosspp
+#' @useDynLib sostatpp
 # @param x,y vectors of x and y coordinates
 # @param lambda intensity vector
 # @param invscale inverse scale factor
-#' @rdname sosspp-internal
+#' @rdname sostatpp-internal
 #' @keywords internal
 #' @export
 #'
@@ -28,7 +28,7 @@ lspairdist <- function(x, y, invscale, lambda)
 #    but not in safety.
 #    if invscale is given, it is used for the calculation, otherwise lambda is used
 #    if none of them is given, the euclidean distances are returned
-#' @rdname sosspp-internal
+#' @rdname sostatpp-internal
 #' @keywords internal
 #' @export
 #' 

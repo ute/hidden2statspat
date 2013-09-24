@@ -2,7 +2,7 @@
 
 # @param X point pattern
 # @param quadrats a list of owins, or an object of class \code{"\link{tess}"}
-#' @rdname sosspp-internal
+#' @rdname sostatpp-internal
 #' @keywords internal
 
 ppsplit <- function (X, quadrats)
@@ -12,7 +12,7 @@ ppsplit <- function (X, quadrats)
 }
 
 # @param correction character
-#' @rdname sosspp-internal
+#' @rdname sostatpp-internal
 #' @keywords internal
 
 correctionkey <- function (correction)
@@ -91,7 +91,7 @@ KestOnQuadrats <- function(X, type=NULL, quads, tquads,
     type <- type[1]
     if (!has.type(X, type)) X <- makehidden(X, type, ...)
   }
-  else type <- getlasttype(X)
+  else type <- currenttype(X)
   
   # now we are sure that X has the right type :-)
   
@@ -290,7 +290,7 @@ Kpermute.test <- function(X, Y = NULL,
     type <- type[1]
     if (!has.type(X, type)) X <- makehidden(X, type, ...)
   }
-  else type <- getlasttype(X)
+  else type <- currenttype(X)
   
   # now we are sure that X has the right type :-)
   

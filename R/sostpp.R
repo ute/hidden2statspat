@@ -33,7 +33,7 @@ is.sostpp <- function(x) inherits(x, "sostpp")
     # attach typemarks to marks
     marx <- as.data.frame(marks(x))
     male <- dim(marx)[2]
-    marx <- cbind(marx, x$typemarks)  
+    if (male>0) marx <- cbind(marx, x$typemarks)  else marx <- x$typemarks
     x$marks <- marx
     y <- NextMethod()
     y <- as.sostpp.ppp(y)
@@ -48,7 +48,7 @@ is.sostpp <- function(x) inherits(x, "sostpp")
     }
     y$sostype <- x$sostype
     y$extra <- x$extra
-  #  names(y$typemarks) <- names(x$typemarks)
+    names(y$typemarks) <- names(x$typemarks)
     class(y)<- c("sostpp", class(y))
     return(y)
   }
@@ -72,13 +72,13 @@ is.sostpp <- function(x) inherits(x, "sostpp")
     #attach typemarks to marks
     marx <- as.data.frame(marks(x))
     male <- dim(marx)[2]
-    marx <- cbind(marx, x$typemarks)  
+    if (male>0) marx <- cbind(marx, x$typemarks)  else marx <- x$typemarks
     mary <- as.data.frame(marks(value))
     maly <- dim(mary)[2]
-    mary <- cbind(mary, value$typemarks)  
-    
+    if (maly>0) mary <- cbind(mary, value$typemarks)  else mary <- value$typemarks
+   
     # marks function is not inheritable - securing valuables before using it...
-   # typemarknames <- names(x$typemarks)
+    typemarknames <- names(x$typemarks)
     sostyp <- x$sostype
     xtras <- x$extra
     
@@ -97,7 +97,7 @@ is.sostpp <- function(x) inherits(x, "sostpp")
     }
     y$sostype <- sostyp
     y$extra <- xtras
-  #  names(y$typemarks) <- typemarknames
+    names(y$typemarks) <- typemarknames
     class(y)<- c("sostpp", class(y))
     invisible(y)
 } 
@@ -116,7 +116,9 @@ is.sostpp <- function(x) inherits(x, "sostpp")
 print.sostpp <- function(x, ...)
 {
   print.ppp(x)
-  cat("pattern is",.TYPENAMES[currenttypeno(x)],"second-order stationary","\n")
+  if(length (currenttypeno(x)) > 0)
+    cat("pattern is",.TYPENAMES[currenttypeno(x)],"second-order stationary","\n")
+  else cat("pattern is second-order stationary of unassigned type","\n")
   further <- furthertypeno(x)
   if (length(further>0)) cat("additional types:",.TYPENAMES[further],"\n")
 }

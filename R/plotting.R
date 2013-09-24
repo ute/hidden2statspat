@@ -4,7 +4,7 @@
 
 # @param col color
 # @param add coefficient on rgb, a single number
-#' @rdname sosspp-internal
+#' @rdname sostatpp-internal
 #' @keywords internal
 #' @export
 # @details works on all devices that support rgb
@@ -13,7 +13,7 @@
 
 # @param col color
 # @param add coefficient on rgb, a single number
-#' @rdname sosspp-internal
+#' @rdname sostatpp-internal
 #' @keywords internal
 #' @export
 # @details works on all devices that support rgb
@@ -25,7 +25,7 @@ lightcol <- function(col, light = .lightcoldefault){
 
 # @param col color
 # @param add coefficient on rgb, a single number
-#' @rdname sosspp-internal
+#' @rdname sostatpp-internal
 #' @keywords internal
 #' @export
 # @details works on all devices that support rgb
