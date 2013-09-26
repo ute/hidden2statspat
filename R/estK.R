@@ -36,14 +36,14 @@ estL <- function(...) {
     Ltheolab <- "L(r)"
   } 
   else if (sostype == "hs") {
-    Lhatname <- "widehat(L)^(s)"
-    Ltheolab <- expression(L^(s)*(r))
+    Lhatname <- "widehat(L)^symbol('*')"
+    Ltheolab <- expression(L^symbol('*')*(r))
   }
   
   # relabel the fv object
   L <- rebadge.fv(L, Ltheolab, Lhatname, names(K), new.labl=attr(K, "labl"))
-  CSRlab <- if(sostype %in% c("s", "hs")) "paste(L^(s)*(r),', ',scriptstyle(CSR))" 
-            else  "paste(L*(r),', ',scriptstyle(CSR))" 
+  CSRlab <- if(sostype %in% c("s", "hs")) "paste(L^symbol('*')*(r),', ',scriptstyle(CSR))" 
+             else  "paste(L*(r),', ',scriptstyle(CSR))"  
   L <- tweak.fv.entry(L, "theo", new.labl=CSRlab) 
    
   return(L)
@@ -274,9 +274,9 @@ estK <- function (X,
     Ktheolab <- "K(r)"
   } 
   else if (sostype == "hs") {
-    Kname <- "K^(s)"
-    Khatname <- "widehat(K)^(s)"
-    Ktheolab <- expression(K^(s)*(r))
+    Kname <- "K^*"
+    Khatname <- "widehat(K)^symbol('*')"
+    Ktheolab <- expression(K^symbol("*")*(r))
   }
   Krname <- paste(Kname, "*(r)", sep="")
   
@@ -285,7 +285,7 @@ estK <- function (X,
   desc <- c("distance argument r", "theoretical Poisson %s")
   K <- fv(K, "r", Ktheolab,
             "theo", , alim, c("r",Krname), desc, fname=Kname)
-  CSRlab <- if(typename == "s") "paste(K^(s)*(r),', ',scriptstyle(CSR))" 
+  CSRlab <- if(typename == "s") "paste(K^symbol('*')*(r),', ',scriptstyle(CSR))" 
             else  "paste(K*(r),', ',scriptstyle(CSR))" 
   K <- tweak.fv.entry(K, "theo", new.labl=CSRlab) 
     
