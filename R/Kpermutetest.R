@@ -79,17 +79,16 @@ correctionkey <- function (correction)
 KestOnQuadrats <- function(X, type=NULL, quads, tquads,
                         rmin = 0, rmax = 1.25, rlen = 100,
                         correction = "isotropic",
-                        Kfun = Khidden,
+                        Kfun = estK,
                         ...)
 {
-  use.DeltaKdir <- identical(Kfun, DeltaKdir)
   corr <- correction[1]
   ckey <- correctionkey(correction)
   
   if (!is.null(type)) # type request
   {
     type <- type[1]
-    if (!has.type(X, type)) X <- makehidden(X, type, ...)
+    if (!has.type(X, type)) X <- as.sostpp(X, type, ...)
   }
   else type <- currenttype(X)
   
@@ -104,18 +103,27 @@ KestOnQuadrats <- function(X, type=NULL, quads, tquads,
     # causing a lot of trouble. Therefore make some shortcuts
   
   pplist <- ppsplit(X, quads)
+  npp <- length(pplist)
   ckey <- correctionkey(correction)
   rr <- seq(rmin, rmax, length.out=rlen)
-  Kar <- sapply(pplist, function(X) Kfun(X, r = rr, correction = corr, ...)[[ckey]])
   
-  if (use.DeltaKdir){  
-    ylab <- substitute(widehat(Delta*K)[dir]^(x)*(r), list(x=type))
-    Ktheo <- rep(0, rlen)
-  } 
-  else {
-    ylab <- substitute(widehat(K)[0]^(x)*(r), list(x = type))
-    Ktheo <- rr^2 * pi
-  }  
+  #Kar <- sapply(pplist, function(X) Kfun(X, r = rr, correction = corr, ...)[[ckey]])
+  # have read that sapply is inefficient (?)
+  
+  Kar <- array(0, c(rlen, length(pplist)))
+  KK <- Kfun(pplist[[1]], r = rr, correction = corr, ...)
+  Kar[ , 1] <- KK[[ckey]]
+  
+  # CSR-function and plot axis labels from info in KK
+  Ktheo <- KK$theo
+  ylab <- attr(KK, "ylab")
+  KKu <- attr(KK, "units")$singular
+  xlab <- paste(attr(KK, "argu"), ifelse(KKu != "unit", paste("(", KKu, ")", sep=""), ""), sep=" ")
+  
+  # rest of estimates
+  if (npp > 1) 
+      for (j in 2 : npp)   Kar[ , j] <- Kfun(pplist[[j]], r = rr, correction = corr, ...)[[ckey]]
+  
   Kmean <- apply(Kar, 1, mean, na.rm=T)
   npts <- sapply(pplist, npoints)
   Klist <- list(npts = npts,
@@ -126,7 +134,7 @@ KestOnQuadrats <- function(X, type=NULL, quads, tquads,
     type = type,
     correction = correction,
     ylab = ylab,
-    xlab = "r"
+    xlab = xlab
     )
   attr(Klist, "class") <- "foolist"
   return(Klist)

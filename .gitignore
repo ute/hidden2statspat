@@ -7,7 +7,48 @@
 .Rhistory
 .RData
 .Rbuildignore
+*.Rproj
+#
 # backups
+#
 *.bak
-# all figures
+.gitignore-bak
+#
+# roxygened files
+#
+NAMESPACE
+# maybe include that later again
+*.Rd
+!scholtzia.Rd
+!intensities.Rd
+!*-package.Rd
+!*.object.Rd
+#
+# all figures, testkram und anderes
+#
 allfigures/*.*
+allfigures/*
+testR/*.*
+paper/*.*
+#
+# documentation aux files
+#
+inst/*
+!inst/*.Rnw
+!inst/doc/*
+#
+# texfiles
+#
+*.aux
+*.bak
+*.synctex*
+*.bbl
+*.log
+*.blg
+Sweave.sty
+*.tex
+#
+# compiled stuff
+#
+*.o
+*.dll

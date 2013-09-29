@@ -103,7 +103,7 @@ estL <- function(...) {
 #' The Euclidean distance between two points is multiplied by the 
 #' average of the square roots of the intensity values at the two points.
 #' Similarly, all edge corrections are implemented 
-#' as approximations. Here \code{estK} corresponds to  the {spatstat}-function \code{\link{Kscaled}}
+#' as approximations. Here \code{estK} is similar to the {spatstat}-function \code{\link{Kscaled}}
 #'  The translational edge
 #' correction suffers from a small intrinsic bias in some cases of locally
 #' rescaled s.o.s., depending on intensity and window shape. It is

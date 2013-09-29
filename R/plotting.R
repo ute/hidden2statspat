@@ -4,24 +4,24 @@
 
 # @param col color
 # @param add coefficient on rgb, a single number
-#' @rdname sostatpp-internal
-#' @keywords internal
-#' @export
+# @rdname sostatpp-internal
+# @keywords internal
+# @export
 # @details works on all devices that support rgb
 
-.lightcoldefault <- .66
+# .lightcoldefault <- .66
 
 # @param col color
 # @param add coefficient on rgb, a single number
-#' @rdname sostatpp-internal
-#' @keywords internal
-#' @export
+# @rdname sostatpp-internal
+# @keywords internal
+# @export
 # @details works on all devices that support rgb
 
-lightcol <- function(col, light = .lightcoldefault){
-  RGB <- pmin(light + (1 - light) * col2rgb(col) / 255, 1) # pmin just to be on the safe side
-  rgb(RGB["red", ], RGB["green", ], RGB["blue", ])
-}  
+# lightcol <- function(col, light = .lightcoldefault){
+#  RGB <- pmin(light + (1 - light) * col2rgb(col) / 255, 1) # pmin just to be on the safe side
+#  rgb(RGB["red", ], RGB["green", ], RGB["blue", ])
+#}  
 
 # @param col color
 # @param add coefficient on rgb, a single number
