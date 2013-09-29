@@ -1,6 +1,6 @@
 #' @useDynLib sostatpp
 
-require(fdsamples)
+library(fdsamples)
 
 #' 
 # wishes: name statspatpp statspp sostatspat SOStatSpatPP spat2ostat spatsostat sostatpp sstatpp

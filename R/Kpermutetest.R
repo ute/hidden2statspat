@@ -55,19 +55,19 @@ correctionkey <- function (correction)
 #'   one of \code{"border"},  \code{"isotropic"}, \code{"translate"}, \code{"none"}.
 #' @param DeltaKdir logical, whether to return the Delta K_dir function instead 
 #' of the template K-function  
-#' @param ... further arguments for \code{\link{Khidden}} or \code{\link{DeltaKdir}}
+#' @param ... further arguments for \code{\link{estK}} or \code{\link{DeltaKdir}}
 #' @return An object of class \code{foolist}, which is a list with items
 #' \itemize{
 #'    \item \code{npts} number of points on the quadrats
 #'    \item \code{r} arguments of the \eqn{K}-function
-#'    \item \code{foomean} unweighted mean of the estimated \eqn{K}-functions
+#    \item \code{foomean} unweighted mean of the estimated \eqn{K}-functions
 #'    \item \code{fooarray} array of estimates, of dimension \code{rlen} x number of quadrats
 #'    \item \code{footheo} theoretical values under CSR (Poisson process)
 #'    \item \code{type} the type character
 #'    \item \code{correction} character, the correction used
 #'    \item \code{xlab, ylab} labels for plotting
 #' }
-#' @seealso \code{\link{Khidden}}, \code{\link{DeltaKdir}}
+#' @seealso \code{\link{estK}}, \code{\link{DeltaKdir}}
 #'    for estimation of the template \eqn{K}-function or of Delta K_dir.
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 #' @export
@@ -115,7 +115,7 @@ KestOnQuadrats <- function(X, type=NULL, quads, tquads,
   Kar[ , 1] <- KK[[ckey]]
   
   # CSR-function and plot axis labels from info in KK
-  Ktheo <- KK$theo
+ # Ktheo <- KK$theo
   ylab <- attr(KK, "ylab")
   KKu <- attr(KK, "units")$singular
   xlab <- paste(attr(KK, "argu"), ifelse(KKu != "unit", paste("(", KKu, ")", sep=""), ""), sep=" ")
@@ -124,17 +124,21 @@ KestOnQuadrats <- function(X, type=NULL, quads, tquads,
   if (npp > 1) 
       for (j in 2 : npp)   Kar[ , j] <- Kfun(pplist[[j]], r = rr, correction = corr, ...)[[ckey]]
   
-  Kmean <- apply(Kar, 1, mean, na.rm=T)
+  Ktheo <- fdsample(rr, KK$theo, xlab = xlab, ylab=ylab)
+ # Kmean <- fdsample (rr, apply(Kar, 1, mean, na.rm=T), xlab = xlab, ylab=ylab)
+  Kars  <- fdsample (rr, Kar, xlab = xlab, ylab=ylab)
+  
   npts <- sapply(pplist, npoints)
   Klist <- list(npts = npts,
-    r = rr,
-    foomean = Kmean,
-    fooarray = Kar,
+   # r = rr,
+  #  foomean = Kmean,
+    # fooarray = Kar,
+    foosample = Kars,            
     footheo = Ktheo,    
     type = type,
-    correction = correction,
-    ylab = ylab,
-    xlab = xlab
+    correction = correction
+ #   ylab = ylab,
+  #  xlab = xlab
     )
   attr(Klist, "class") <- "foolist"
   return(Klist)
@@ -172,22 +176,22 @@ plot.foolist <- function(flist,
   OK <- flist$npts >= minn
   m <- sum(OK)
   if (m < minm) stop(paste("not enough subpatterns with at least minn=", minn, "points"))
-  foomean <- apply(flist$fooarray[, OK], 1, mean, na.rm=T)  
   rr <- flist$r    
-  if (is.null(ylim)) ylim <- c(min(flist$footheo, flist$fpparray), max(flist$fooarray, flist$footheo))
-
-  if (!add) {
-    plot(rr, foomean, type = "n", ylim = ylim,
-                col = col, lwd = lwd,
-                xlab = "", ylab = "", ...)
-    title(xlab = flist$xlab, ylab = flist$ylab, line=labline, ...)
-  }
-    # plot Poisson reference curve
-  if (!add & lwdtheo>0) lines(rr, flist$footheo, lwd = lwdtheo, lty = ltytheo, col=coltheo)
+  if (is.null(ylim)) ylim <- range(c(yrange(flist$footheo), yrange(flist$foosample)))
   
-  if(lwdquad > 0) apply(flist$fooarray, 2, function(y) lines(rr, y, col=colquad, lwd=lwdquad, ...))
-  lines(rr, foomean, col = col, lwd = lwd, ...)
+ textline <- par("mgp")
+  textline[1] <- labline
+  
+  if (!add) {
+     if (lwdtheo > 0) { 
+       plot(flist$footheo, lwd = lwdtheo, lty = ltytheo, col = coltheo, mgp = textline);
+       add <- TRUE }
+   }
+    
+  if(lwdquad > 0) 
+    summaryplot (flist$foosample, col = colquad, lwd = lwdquad, mgp = textline, ..., add = add)
 }  
+  
 
 # from MakeHidden:
 .TYPENAMES  <- c("reweighted", "retransformed", "rescaled", "homogeneous", "homogeneous, scaled")
