@@ -7,7 +7,8 @@ Creator: Ute Hahn
 Maintainer: Ute Hahn <ute@imf.au.dk>
 Depends:
     R (>= 2.15),
-    spatstat (>= 1.25)
+    spatstat (>= 1.25),
+    fdsamples
 Imports:
     spatstat,
     fdsamples

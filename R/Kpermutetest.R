@@ -117,6 +117,7 @@ KestOnQuadrats <- function(X, type=NULL, quads, tquads,
   # CSR-function and plot axis labels from info in KK
  # Ktheo <- KK$theo
   ylab <- attr(KK, "ylab")
+  if (is.call(ylab)) ylab <- do.call(expression, list(ylab))
   KKu <- attr(KK, "units")$singular
   xlab <- paste(attr(KK, "argu"), ifelse(KKu != "unit", paste("(", KKu, ")", sep=""), ""), sep=" ")
   
@@ -184,12 +185,12 @@ plot.foolist <- function(flist,
   
   if (!add) {
      if (lwdtheo > 0) { 
-       plot(flist$footheo, lwd = lwdtheo, lty = ltytheo, col = coltheo, mgp = textline);
+       plot(flist$footheo, lwd = lwdtheo, lty = ltytheo, col = coltheo, ylim = ylim, mgp = textline);
        add <- TRUE }
    }
     
   if(lwdquad > 0) 
-    summaryplot (flist$foosample, col = colquad, lwd = lwdquad, mgp = textline, ..., add = add)
+    summaryplot (flist$foosample, col = colquad, lwd = lwdquad, mgp = textline, ylim = ylim, ..., add = add)
 }  
   
 

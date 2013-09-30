@@ -103,6 +103,14 @@ DeltaKdir <- function (X,
     X <- backtransformed (X)
     # make uniform lambdas
     marx$lambda <- npts / area
+    # approximate window, if not a rectangle
+    W <- X$window
+    if (!is.rectangle(W))
+    {
+      warning("window of backtransformed pattern approximated by its enclosing rectangle")
+      W <- owin(W$xrange, W$yrange)
+      X$window <- W
+    }
   }
   
   # get arguments r for K
