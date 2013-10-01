@@ -129,26 +129,26 @@ estOnQuadrats <- function(X, type = NULL, quads, tquads,
   
   npts <- sapply(pplist, npoints)
                
-# <<< change  the structure later !!! >>> $ iso is just a workaround             
+# <<< change  the structure later !!! >>> 
   Klist <- list(npts = npts,
    # r = rr,
   #  foomean = Kmean,
     # fooarray = Kar,
-    foosample = Kars$iso,            
+    foosample = Kars,            
     footheo = Ktheo,    
     type = type
  #   ylab = ylab,
   #  xlab = xlab
     )
-  attr(Klist, "class") <- "foolist"
+  attr(Klist, "class") <- "eoqlist"
   return(Klist)
 }
 
 
 #' Plot a list of template K-functions estimated on quadrats
 #'  
-#' Plot a list of K-function estimates, as obtained by \code{\link{KhiddenOnQuadrats}}
-#' @param klist list of \eqn{K}-function estimates
+#' Plot a list of K-function estimates, as obtained by \code{\link{estOnQuadrats}}
+#' @param flist list of summary function estimates
 #' @param col,colquad colors for plotting mean and single estimates
 #' @param lwd,lwdquad line widths
 #' @param minn integer, minimal number of points on quadrat to allow for printing of
@@ -160,11 +160,13 @@ estOnQuadrats <- function(X, type = NULL, quads, tquads,
 #' @param lwdtheo,ltytheo,coltheo plot parameters for K-function of Poisson point process (CSR).
 #'        If lwdtheo=0, the curve is not plotted. Defaults: lwdtheo = 1, ltythgeo="dotted", coltheo="black". 
 #' @param labline numerical, where to plot the axis labels
+#' @details This method, as well as class \code{eoqlist}, is likely to be replaced in a future version
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
-#' @S3method plot foolist
+#' @S3method plot eoqlist
 #' @export
 
-plot.foolist <- function(flist,  
+plot.eoqlist <- function(flist,  
+                  corrections = "iso",       
                   col = "black", colquad = lightcol(col),
                   lwd = 2, lwdquad = 0.7, 
                   minn = 10, minm = 1,
@@ -177,8 +179,11 @@ plot.foolist <- function(flist,
   m <- sum(OK)
   if (m < minm) stop(paste("not enough subpatterns with at least minn=", minn, "points"))
   rr <- flist$r    
-  if (is.null(ylim)) ylim <- range(c(yrange(flist$footheo), yrange(flist$foosample)))
-  
+  if (is.null(ylim))
+  {
+    yfo <- sapply(corrections, function(x) yrange(flist$foosample[[x]]) )
+    ylim <- range(c(yrange(flist$footheo), range(yfo)))
+  }
  textline <- par("mgp")
   textline[1] <- labline
   
@@ -189,7 +194,16 @@ plot.foolist <- function(flist,
    }
     
   if(lwdquad > 0) 
-    summaryplot (flist$foosample, col = colquad, lwd = lwdquad, mgp = textline, ylim = ylim, ..., add = add)
+  {
+    for (ckey in corrections)
+      if (!is.null(flist$foosample[ckey]))
+      {
+        summaryplot (flist$foosample[[ckey]], col = colquad, lwd = lwdquad, 
+                     mgp = textline, ylim = ylim, ..., add = add)    
+        add <- TRUE
+      }  
+  }
+    
 }  
   
 
