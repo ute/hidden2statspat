@@ -153,7 +153,7 @@ estL <- function(...) {
 
 
 estK <- function (X, 
-                  type = c("w", "t", "s", "h", "hs"), 
+                  type, 
                   r = NULL,
                   correction = c("border", "isotropic", "Ripley", "translate"),
                   normpower = 0,

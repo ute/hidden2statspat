@@ -76,14 +76,13 @@ correctionkey <- function (correction)
 #' @keywords nonparametric
 #' @keywords ts    
 
-KestOnQuadrats <- function(X, type=NULL, quads, tquads,
+estOnQuadrats <- function(X, type = NULL, quads, tquads,
                         rmin = 0, rmax = 1.25, rlen = 100,
-                        correction = "isotropic",
                         Kfun = estK,
                         ...)
 {
-  corr <- correction[1]
-  ckey <- correctionkey(correction)
+  # corr <- correction[1]
+  # ckey <- correctionkey(correction)
   
   if (!is.null(type)) # type request
   {
@@ -104,40 +103,40 @@ KestOnQuadrats <- function(X, type=NULL, quads, tquads,
   
   pplist <- ppsplit(X, quads)
   npp <- length(pplist)
-  ckey <- correctionkey(correction)
   rr <- seq(rmin, rmax, length.out=rlen)
+
+  # KK serves to get relevant information from fv, a tiny waste of time...
+  KK <- Kfun(pplist[[1]], r = rr,  ...)
   
-  #Kar <- sapply(pplist, function(X) Kfun(X, r = rr, correction = corr, ...)[[ckey]])
-  # have read that sapply is inefficient (?)
-  
-  Kar <- array(0, c(rlen, length(pplist)))
-  KK <- Kfun(pplist[[1]], r = rr, correction = corr, ...)
-  Kar[ , 1] <- KK[[ckey]]
-  
-  # CSR-function and plot axis labels from info in KK
- # Ktheo <- KK$theo
+  xlab <- attr(KK, "xlab")
   ylab <- attr(KK, "ylab")
   if (is.call(ylab)) ylab <- do.call(expression, list(ylab))
   KKu <- attr(KK, "units")$singular
   xlab <- paste(attr(KK, "argu"), ifelse(KKu != "unit", paste("(", KKu, ")", sep=""), ""), sep=" ")
+  dotnames <- attr(KK, "dotnames")
+  estnames <- dotnames[! (dotnames %in% c(".id", "r", "theo"))]
   
-  # rest of estimates
-  if (npp > 1) 
-      for (j in 2 : npp)   Kar[ , j] <- Kfun(pplist[[j]], r = rr, correction = corr, ...)[[ckey]]
+  #Kar <- sapply(pplist, function(X) Kfun(X, r = rr, correction = corr, ...)[[ckey]])
+  # have read that sapply is inefficient (?)
   
+  Kar <- ldply(pplist, function(X) Kfun(X, r = rr, ...))
+  Kars <- llply(estnames, function(x) 
+    fdsample(rr, array(Kar[[x]], c(rlen, npp)), xlab = xlab, ylab=ylab))             
+  names(Kars) <- estnames
+
+  # CSR-function and plot axis labels from info in KK
   Ktheo <- fdsample(rr, KK$theo, xlab = xlab, ylab=ylab)
- # Kmean <- fdsample (rr, apply(Kar, 1, mean, na.rm=T), xlab = xlab, ylab=ylab)
-  Kars  <- fdsample (rr, Kar, xlab = xlab, ylab=ylab)
   
   npts <- sapply(pplist, npoints)
+               
+# <<< change  the structure later !!! >>> $ iso is just a workaround             
   Klist <- list(npts = npts,
    # r = rr,
   #  foomean = Kmean,
     # fooarray = Kar,
-    foosample = Kars,            
+    foosample = Kars$iso,            
     footheo = Ktheo,    
-    type = type,
-    correction = correction
+    type = type
  #   ylab = ylab,
   #  xlab = xlab
     )
