@@ -134,7 +134,7 @@ estOnQuadrats <- function(X, type = NULL, quads, tquads,
    # r = rr,
   #  foomean = Kmean,
     # fooarray = Kar,
-    foosample = Kars,            
+    fooli = Kars,            
     footheo = Ktheo,    
     type = type
  #   ylab = ylab,
@@ -148,62 +148,62 @@ estOnQuadrats <- function(X, type = NULL, quads, tquads,
 #' Plot a list of template K-functions estimated on quadrats
 #'  
 #' Plot a list of K-function estimates, as obtained by \code{\link{estOnQuadrats}}
-#' @param flist list of summary function estimates
-#' @param col,colquad colors for plotting mean and single estimates
-#' @param lwd,lwdquad line widths
+#' @param x list of summary function estimates, object of class \code{eoqlist}
+#' @param style optional list of plot options, as in \code{summaryplot.fdsample}
+# @param col,colquad colors for plotting mean and single estimates
+# @param lwd,lwdquad line widths
 #' @param minn integer, minimal number of points on quadrat to allow for printing of
 #'        the individual \eqn{K}-function, defaults to 10 
 #' @param minm integer, minimal number of "valid" quadrats with at least \code{minn} points
-#' @param ylim y axis limits for plotting
+# @param ylim y axis limits for plotting
 #' @param ... further arguments for \code{\link{plot}},
 #' @param add logical, whether to add to current plot. Defaults to FALSE.
-#' @param lwdtheo,ltytheo,coltheo plot parameters for K-function of Poisson point process (CSR).
-#'        If lwdtheo=0, the curve is not plotted. Defaults: lwdtheo = 1, ltythgeo="dotted", coltheo="black". 
+# @param lwdtheo,ltytheo,coltheo plot parameters for K-function of Poisson point process (CSR).
+#        If lwdtheo=0, the curve is not plotted. Defaults: lwdtheo = 1, ltythgeo="dotted", coltheo="black". 
+#' @param theostyle plot options for the summary function of a Poisson point process (CSR), a list with
+#' default elements \code{col}, \code{lwd} and \code{lty}, see \code{plot.fdsample}.
+#' If \code{theostyle == NULL}, the CSR-curve is not plotted.
 #' @param labline numerical, where to plot the axis labels
 #' @details This method, as well as class \code{eoqlist}, is likely to be replaced in a future version
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 #' @S3method plot eoqlist
 #' @export
 
-plot.eoqlist <- function(flist,  
+plot.eoqlist <- function(x,  
+                  style = NULL,
                   corrections = "iso",       
-                  col = "black", colquad = lightcol(col),
-                  lwd = 2, lwdquad = 0.7, 
                   minn = 10, minm = 1,
-                  ylim = NULL,
                   ..., add = FALSE, 
-                  lwdtheo = 1, ltytheo = "dotted", coltheo="black",
+                  theostyle = list(lwd = 1, lty = "dotted", col = "black"),
                   labline = 2.4)
 {
-  OK <- flist$npts >= minn
+  OK <- x$npts >= minn
   m <- sum(OK)
   if (m < minm) stop(paste("not enough subpatterns with at least minn=", minn, "points"))
-  rr <- flist$r    
-  if (is.null(ylim))
+  rr <- x$r    
+  dotargs <- list(...)
+  if (is.null(corrections)) corrections <- names(x$fooli)
+  if (is.null(dotargs$ylim))
   {
-    yfo <- sapply(corrections, function(x) yrange(flist$foosample[[x]]) )
-    ylim <- range(c(yrange(flist$footheo), range(yfo)))
+    yfo <- sapply(corrections, function(ckey) yrange(x$fooli[[ckey]]) )
+    ylim <- range(c(yrange(x$footheo), range(yfo)))
   }
  textline <- par("mgp")
-  textline[1] <- labline
+ textline[1] <- labline
   
   if (!add) {
-     if (lwdtheo > 0) { 
-       plot(flist$footheo, lwd = lwdtheo, lty = ltytheo, col = coltheo, ylim = ylim, mgp = textline);
+     if (!is.null(theostyle)) { 
+       do.call(plot.fdsample, c(list(x$footheo), list(theostyle), list(ylim = ylim, mgp = textline)));
        add <- TRUE }
    }
     
-  if(lwdquad > 0) 
-  {
-    for (ckey in corrections)
-      if (!is.null(flist$foosample[ckey]))
+  for (ckey in corrections)
+      if (!is.null(x$fooli[ckey]))
       {
-        summaryplot (flist$foosample[[ckey]], col = colquad, lwd = lwdquad, 
+        summaryplot (x$fooli[[ckey]], ploptions = style, 
                      mgp = textline, ylim = ylim, ..., add = add)    
         add <- TRUE
       }  
-  }
-    
 }  
   
 
