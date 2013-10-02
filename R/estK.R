@@ -373,7 +373,7 @@ estK <- function (X,
   
   formula(K) <- . ~ r
   nama <- rev(colnames(K))
-  nama <- nama[!(nama %in% c("r", "rip", "ls"))]
+  nama <- nama[nama != "r"] #!(nama %in% c("r", "rip", "ls"))]
   fvnames(K, ".") <- nama
   attr(K, "sostype") <- sostype
   if (typename == "s") unitname (K) = NULL else unitname(K) <- unitname(X)

@@ -156,68 +156,6 @@ estOnQuadrats <- function(X, type = NULL, quads, tquads,
 }
 
 
-#' Plot a list of template K-functions estimated on quadrats
-#'  
-#' Plot a list of K-function estimates, as obtained by \code{\link{estOnQuadrats}}
-#' @param x list of summary function estimates, object of class \code{eoqlist}
-#' @param style optional list of plot options, as in \code{summaryplot.fdsample}
-# @param col,colquad colors for plotting mean and single estimates
-# @param lwd,lwdquad line widths
-#' @param minn integer, minimal number of points on quadrat to allow for printing of
-#'        the individual \eqn{K}-function, defaults to 10 
-#' @param minm integer, minimal number of "valid" quadrats with at least \code{minn} points
-# @param ylim y axis limits for plotting
-#' @param ... further arguments for \code{\link{plot}},
-#' @param add logical, whether to add to current plot. Defaults to FALSE.
-# @param lwdtheo,ltytheo,coltheo plot parameters for K-function of Poisson point process (CSR).
-#        If lwdtheo=0, the curve is not plotted. Defaults: lwdtheo = 1, ltythgeo="dotted", coltheo="black". 
-#' @param theostyle plot options for the summary function of a Poisson point process (CSR), a list with
-#' default elements \code{col}, \code{lwd} and \code{lty}, see \code{plot.fdsample}.
-#' If \code{theostyle == NULL}, the CSR-curve is not plotted.
-#' @param labline numerical, where to plot the axis labels
-#' @details This method, as well as class \code{eoqlist}, is likely to be replaced in a future version
-#' @author Ute Hahn,  \email{ute@@imf.au.dk}
-#' @S3method plot eoqlist
-#' @export
-
-plot.eoqlist <- function(x,  
-                  style = NULL,
-                  corrections = "iso",       
-                  minn = 10, minm = 1,
-                  ..., add = FALSE, 
-                  theostyle = list(lwd = 1, lty = "dotted", col = "black"),
-                  labline = 2.4)
-{
-  OK <- x$npts >= minn
-  m <- sum(OK)
-  if (m < minm) stop(paste("not enough subpatterns with at least minn=", minn, "points"))
-  rr <- x$r    
-  dotargs <- list(...)
-  if (is.null(corrections)) corrections <- names(x$fooli)
-  ylim <- dotargs$.ylim
-  if (is.null(ylim))
-  {
-    yfo <- sapply(corrections, function(ckey) yrange(x$fooli[[ckey]]) )
-    ylim <- range(c(yrange(x$footheo), range(yfo)))
-  }
- textline <- par("mgp")
- textline[1] <- labline
-  
-  if (!add) {
-     if (!is.null(theostyle)) { 
-       do.call(plot.fdsample, c(list(x$footheo), list(theostyle), list(ylim = ylim, mgp = textline)));
-       add <- TRUE }
-   }
-    
-  for (ckey in corrections)
-      if (!is.null(x$fooli[ckey]))
-      {
-        summaryplot (x$fooli[[ckey]], ploptions = style, 
-                     mgp = textline, ylim = ylim, ..., add = add)    
-        add <- TRUE
-      }  
-}  
-  
 
 # from MakeHidden:
 .TYPENAMES  <- c("reweighted", "retransformed", "rescaled", "homogeneous", "homogeneous, scaled")
@@ -249,10 +187,10 @@ plot.eoqlist <- function(x,
 #' @param rmin optional, lower integration bound, defaults to 0; see `Details',
 #' @param rmax upper integration bound, see `Details',
 #' @param rlen optional, number of steps for numerical integration, defaults to 256; see `Details',
-#' @param Kfun optional \code{function}, the \eqn{K}-function to be used, either \code{\link{Khidden}} (default) or \code{\link{DeltaKdir}}
+#' @param Kfun optional \code{function}, the \eqn{K}-function to be used, either \code{\link{estK}} (default) or \code{\link{DeltaKdir}}
 #' @param correction a character vector giving the edge correction type, may be
 #'   any subset of \code{"border"},  \code{"isotropic"}, \code{"translate"}, \code{"none"}.
-#' @param ... further arguments for \code{\link{Khidden}}
+#' @param ... further arguments for \code{\link{Kfun}}
 #' @param use.tbar logical, defaults to \code{FALSE}. Whether to apply 
 #'   studentization after integration, see `Details'.
 #' @param nperm \code{NULL} or an integer giving the number of random 
@@ -312,7 +250,7 @@ Kpermute.test <- function(X, Y = NULL,
                       rmin = 0,
                       rmax,
                       rlen = 100,
-                      Kfun = Khidden, 
+                      Kfun = estK, 
                       correction = "iso",
                       ...,
                       use.tbar = FALSE,
@@ -326,7 +264,7 @@ Kpermute.test <- function(X, Y = NULL,
   if (!is.null(type)) # type request
   {
     type <- type[1]
-    if (!has.type(X, type)) X <- makehidden(X, type, ...)
+    if (!has.type(X, type)) X <- as.sostpp(X, type, ...)
   }
   else type <- currenttype(X)
   

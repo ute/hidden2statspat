@@ -64,16 +64,16 @@ DeltaKdir <- function (X,
   
   if (missing(type))   
   {
-    htype <- currenttype(X)
-    if (length(htype) == 0) 
+    sostype <- currenttype(X)
+    if (length(sostype) == 0) 
       {
          X <- ashomogeneous(X)
-         htype <- "h"
+         sostype <- "h"
       }
   }
   else {
-    htype <- type[1]
-    if (!has.type (X, htype)) X <- makehidden(X, type = htype, ...)
+    sostype <- type[1]
+    if (!has.type (X, sostype)) X <- makehidden(X, type = sostype, ...)
   }
     
   marx <- X$typemarks
@@ -90,15 +90,15 @@ DeltaKdir <- function (X,
   }
 
   # algorithms to be used
-  scaling <- htype %in% c("s", "hs")
-  homogen <- htype %in% c("t", "h")
-  weighted <- htype == "w"
+  scaling <- sostype %in% c("s", "hs")
+  homogen <- sostype %in% c("t", "h")
+  weighted <- sostype == "w"
   
   # modify point pattern to "become" the template, if retransformed or rescaled
   
   if (scaling) marx$lambda <- rep(1, npts) # refers to unit rate template
   
-  if (htype == "t") 
+  if (sostype == "t") 
   {
     X <- backtransformed (X)
     # make uniform lambdas
@@ -140,7 +140,7 @@ DeltaKdir <- function (X,
     alim <- c(0, min(rmax, rmaxdefault, max.ls.r))
   } 
   else { 
-    if(htype == "w") lamax <- max(marx$lambda) else lamax <- npts / area
+    if(sostype == "w") lamax <- max(marx$lambda) else lamax <- npts / area
     rmaxdefault <- rmax.rule("K", W, lamax)
     breaks <- handle.r.b.args(r, NULL, W, rmaxdefault = rmaxdefault)
     r <- breaks$r
@@ -151,9 +151,9 @@ DeltaKdir <- function (X,
   
   ### formalities ---------------------------------------------------------------------------------
   # name of the function and its estimates
-  typename = htype
-  # if (htype == "hs") typename ="s"
-  # if (htype == "h") typename ="w"
+  typename = sostype
+  # if (sostype == "hs") typename ="s"
+  # if (sostype == "h") typename ="w"
   
   Kname <- paste("Delta K[dir]^{(", typename, ")}", sep="")
   Krname <- paste("Delta K[dir]^{(", typename, ")}(r)", sep="")
@@ -209,10 +209,15 @@ DeltaKdir <- function (X,
                "cross Ripley isotropic correction estimate of %s", "iso")
   K <- rebadge.fv(K, Ktheolab, Khatname)
   K <- tweak.fv.entry(K, "iso", new.labl="paste(%s*(r),', ',scriptstyle(iso))") 
-       
+      
   
-  attr(K, "fmla") <- . ~ r
-  unitname(K) <- unitname(X)
+  formula(K) <- . ~ r
+  nama <- rev(colnames(K))
+  nama <- nama[nama != "r"] #!(nama %in% c("r", "rip", "ls"))]
+  fvnames(K, ".") <- nama
+  attr(K, "sostype") <- sostype
+  if (typename == "s") unitname (K) = NULL else unitname(K) <- unitname(X)
+  
   return(K) 
 }
 
