@@ -5,7 +5,7 @@
 # Rstudio stuff
 .Rproj.user
 .Rhistory
-.RData
+*.RData
 .Rbuildignore
 *.Rproj
 #

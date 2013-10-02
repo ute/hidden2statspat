@@ -7,8 +7,17 @@
 
 ppsplit <- function (X, quadrats)
 {
+  # names throw warnings in plyr. Remove all names that are not list names from quads  
+  unnamelist <- function(l)
+{
+  if (!is.list(l)) names(l) <- NULL
+  if (is.list(l)) for (i in 1:length(l)) l[[i]] <- unnamelist(l[[i]])
+  return(l)
+}
+
   if("tess" %in% class(quadrats)) quadrats <- tiles(quadrats)
-  return(lapply(quadrats, function(w) X[w]))
+  nonamequads <- unnamelist(quadrats)
+  return(lapply(nonamequads, function(w) X[w]))
 }
 
 # @param correction character
@@ -48,13 +57,14 @@ correctionkey <- function (correction)
 #' of \bold{spatstat}-class \code{\link{owin}} or an object of \bold{spatstat}-class \code{\link{tess}}.
 #' In the current version not used for retransformed used if \code{type != "t"}.
 #' @param tquads used instead of \code{quads} for the backtransformed pattern if \code{type != "t"}.
+#' @param fun the summary function to be applied 
 #' @param rmin optional, lower bound, defaults to 0,
 #' @param rmax upper bound for the radius,
 #' @param rlen optional, number of steps in argument vector, defaults to 256,
-#' @param correction a character vector giving the edge correction type, may be
+#'#' @param correction a character vector giving the edge correction type, may be
 #'   one of \code{"border"},  \code{"isotropic"}, \code{"translate"}, \code{"none"}.
-#' @param DeltaKdir logical, whether to return the Delta K_dir function instead 
-#' of the template K-function  
+# @param DeltaKdir logical, whether to return the Delta K_dir function instead 
+# of the template K-function  
 #' @param ... further arguments for \code{\link{estK}} or \code{\link{DeltaKdir}}
 #' @return An object of class \code{foolist}, which is a list with items
 #' \itemize{
@@ -77,8 +87,8 @@ correctionkey <- function (correction)
 #' @keywords ts    
 
 estOnQuadrats <- function(X, type = NULL, quads, tquads,
-                        rmin = 0, rmax = 1.25, rlen = 100,
-                        Kfun = estK,
+                          fun = estK,
+                          rmin = 0, rmax = 1.25, rlen = 100,
                         ...)
 {
   # corr <- correction[1]
@@ -101,12 +111,13 @@ estOnQuadrats <- function(X, type = NULL, quads, tquads,
     # transformation is dangerous for the split list: quadrats do likely not map onto themselves
     # causing a lot of trouble. Therefore make some shortcuts
   
+  # names throw warnings in plyr. Remove all names from quads
   pplist <- ppsplit(X, quads)
   npp <- length(pplist)
   rr <- seq(rmin, rmax, length.out=rlen)
 
   # KK serves to get relevant information from fv, a tiny waste of time...
-  KK <- Kfun(pplist[[1]], r = rr,  ...)
+  KK <- fun(pplist[[1]], r = rr,  ...)
   
   xlab <- attr(KK, "xlab")
   ylab <- attr(KK, "ylab")
@@ -119,7 +130,7 @@ estOnQuadrats <- function(X, type = NULL, quads, tquads,
   #Kar <- sapply(pplist, function(X) Kfun(X, r = rr, correction = corr, ...)[[ckey]])
   # have read that sapply is inefficient (?)
   
-  Kar <- ldply(pplist, function(X) Kfun(X, r = rr, ...))
+  Kar <- ldply(pplist, function(X) fun(X, r = rr, ...))
   Kars <- llply(estnames, function(x) 
     fdsample(rr, array(Kar[[x]], c(rlen, npp)), xlab = xlab, ylab=ylab))             
   names(Kars) <- estnames
@@ -183,7 +194,8 @@ plot.eoqlist <- function(x,
   rr <- x$r    
   dotargs <- list(...)
   if (is.null(corrections)) corrections <- names(x$fooli)
-  if (is.null(dotargs$ylim))
+  ylim <- dotargs$.ylim
+  if (is.null(ylim))
   {
     yfo <- sapply(corrections, function(ckey) yrange(x$fooli[[ckey]]) )
     ylim <- range(c(yrange(x$footheo), range(yfo)))
