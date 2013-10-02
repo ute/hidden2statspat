@@ -23,7 +23,7 @@
 #'    \code{"isotropic"} is supported.
 #' @param normpower an integer between 0 and 2. If \code{normpower} > 0, the 
 #'  intensity is normalized, see the Details.
-#' @param ... optional arguments passed to \code{\link{makehidden}}   
+#' @param ... optional arguments passed to \code{\link{as.sostpp}}   
 #' @param rescaledangle logical, indicating whether to rescale the directional 
 #'   \eqn{K}-functions as to represent the full circle
 #' @param max.ls.r upper limit for argument \eqn{r}. The default 3 is quite large - note
@@ -73,7 +73,7 @@ DeltaKdir <- function (X,
   }
   else {
     sostype <- type[1]
-    if (!has.type (X, sostype)) X <- makehidden(X, type = sostype, ...)
+    if (!has.type (X, sostype)) X <- as.sostpp(X, type = sostype, ...)
   }
     
   marx <- X$typemarks
