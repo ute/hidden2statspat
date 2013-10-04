@@ -6,12 +6,11 @@ Author: Ute Hahn <ute@imf.au.dk>
 Creator: Ute Hahn
 Maintainer: Ute Hahn <ute@imf.au.dk>
 Depends:
-    R (>= 2.15),
-    spatstat (>= 1.25),
-    fdsamples
+    R (>= 2.15)
 Imports:
-    spatstat,
-    fdsamples
+    spatstat (>= 1.25),
+    fdnonpar,
+    plyr
 Description: A package on top of spatstat, contributing functions for
     the analysis of homogeneous and inhomogeneous spatial point patterns 
     with hidden second-order stationarity.

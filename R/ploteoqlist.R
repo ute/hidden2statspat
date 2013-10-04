@@ -41,9 +41,9 @@ plot.eoqlist <- function(x,
   OK <- x$npts >= minn
   m <- sum(OK)
   if (m < minm) stop(paste("not enough subpatterns with at least minn=", minn, "points"))
-  rr <- x$r    
+ # rr <- x$r    
   dotargs <- list(...)
-  xopt <- getoptions(x, c(style, dotargs))
+  xopt <- getoptions(x$footheo, c(style, dotargs))
   allopt <- uniquelist(c(xopt, unusedoptions(xopt, dotargs)))
   plotargs <- updateoptions(.plotparams, allopt)
   
@@ -60,7 +60,7 @@ plot.eoqlist <- function(x,
   if (!add) {
     if (!is.null(theostyle)) { 
       plotargstheo <- uniquelist(c(theostyle, plotargs) )
-      do.call(plot.fdsample, c(list(x$footheo), list(plotargstheo), list(ylim = ylim, mgp = textline)));
+      do.call(plot, c(list(x$footheo), list(plotargstheo), list(ylim = ylim, mgp = textline)));
       add <- TRUE }
   }
   
