@@ -200,19 +200,20 @@ estOnQuadrats <- function(X, type = NULL, quads, tquads,
 #'   if \code{Y} is given, the \eqn{K}-functions of the two point patterns \code{X} and {Y} 
 #'   are compared, otherwise a test of hidden second-order stationarity is carried out on \code{X}.
 #'   
-#'   !!!!!!!!!!!!!!!!!!!!! change this !!!!!!!!
-#'   Test statistics are integral means of studentized square distances 
-#'   between the group means. The test statistics are closely related, but not 
-#'   equal to Hotelling's two-sample T-squared statistic. It is assumed that 
-#'   the functions all have the same, equidistant arguments. Depending on the 
-#'   value of \code{use.tbar}, the test statistic is either
-#'   \itemize{
-#'   \item \eqn{T = mean [ (mu_1(x)-mu_2(x))^2 / (s_1^2(x)/m_1 + s_2^2(x)/m_2) ]}    or
-#'   \item \eqn{Tbar = mean [ (mu_1(x)-mu_2(x))^2 ] / mean[ s_1^2(x)/m_1 + s_2^2(x)/m_2 ]}
+#'   The test is a permutation test, as proposed in Hahn(2012) and Hahn & Jensen (2013). 
+#'   Which test statistic is used, is controlled by 
+#'   \code{use.tbar}:
+#'     \itemize{
+#'   \item \eqn{T = mean [ (K_1(r)-K_2(r))^2 / (s_1^2(r)/m_1 + s_2^2(r)/m_2), ]} if \code{use.tbar==FALSE}    or
+#'   \item \eqn{Tbar = mean [ (K_1(r)-K_2(r))^2 ] / mean[ s_1^2(r)/m_1 + s_2^2(r)/m_2, ]} if\code{use.tbar==TRUE},
 #'   }
-#'   where \eqn{mu_1(x), mu_2(x)} and \eqn{s_1^2(x), s_2^2(x)} are within group 
-#'   means and variances at a fixed argument \eqn{x}, and the overall
-#'   the mean is taken over all \eqn{n} arguments \eqn{x}.
+#'   where \eqn{K_1(r)} and \eqn{K_2(r)} are the group means, and 
+#'    \eqn{s_1^2(r), s_2^2(r)} are within group 
+#'   variances at a fixed argument \eqn{r}. 
+#'   The mean is taken over the interval \code{[rmin, rmax]}.
+#'   Note that test statistic \eqn{T} differs slightly from the statistics
+#'   given in the above papers, in that the integral is replaced by the mean here.
+#'   
 #'   
 #'   If \code{nperm == NULL}, the exact test with all permutations is used
 #'   (combinations, for symmetry reasons). This may cause memory or computing 
@@ -230,13 +231,14 @@ estOnQuadrats <- function(X, type = NULL, quads, tquads,
 #'    
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 #' @export
-#' @source Hahn(2012), with slight modification (using the mean instead of the 
-#'    integral, in order to avoid having to pass the arguments of the functions)
+# @source Hahn(2012), with slight modification (using the mean instead of the 
+#    integral, in order to avoid having to pass the arguments of the functions)
 #' @references Hahn, U. (2012) A Studentized Permutation Test for the Comparison 
 #' of Spatial Point Patterns. \emph{Journal of the American Statistical 
 #' Association},  \bold{107} (498), 754--764.
 #' @references Hahn, U. and Jensen, E. B. V. (2013)
 #' Inhomogeneous spatial point processes with hidden second-order stationarity.
+#' \emph{CSGB preprint} 2013-07, \url{http://data.imf.au.dk/publications/csgb/2013/math-csgb-2013-07.pdf}
 #' @keywords htest
 #' @keywords robust
 #' @keywords spatial
@@ -290,8 +292,17 @@ Kpermute.test <- function(X, Y = NULL,
   rr <- seq(rmin, rmax, length.out=rlen)
   Kar1 <- sapply(pplist1, function(X) Kfun(X, r = rr, correction = corr, ...)[[ckey]])
   Kar2 <- sapply(pplist2, function(X) Kfun(X, r = rr, correction = corr, ...)[[ckey]])
-  if (use.tbar) testerg <- studpermut.test((Kar1 / rr)[rr>0, ], (Kar2 / rr)[rr>0, ], use.tbar = TRUE, nperm = nperm)
-  else  testerg <- studpermut.test(Kar1, Kar2, use.tbar = FALSE, nperm = nperm)
+  if (use.tbar)
+  {  
+    Ksample1 <- fdsample(rr[rr>0], (Kar1 / rr)[rr>0, ])
+    Ksample2 <- fdsample(rr[rr>0], (Kar2 / rr)[rr>0, ])
+  } 
+  else
+  {  
+    Ksample1 <- fdsample(rr, Kar1)
+    Ksample2 <- fdsample(rr, Kar2)
+  } 
+  testerg <-tL2.permtest(Ksample1, Ksample2, nperm = nperm, use.tbar = use.tbar) 
   if (is.null(Y))  {
     method <- c(paste("Studentized permutation test of",
                               .TYPENAMESX[tindex]," hidden second-order stationarity,"),
