@@ -130,6 +130,7 @@ estL <- function(...) {
 #'    Hahn, U. and Jensen, E. B. V. (2013)
 #'    Inhomogeneous spatial point processes with hidden second-order stationarity.
 #'    \emph{CSGB preprint} 2013-7. 
+#'    \url{http://data.imf.au.dk/publications/csgb/2013/math-csgb-2013-07.pdf}
 #'    
 #' @examples
 #' # compare homogeneous version of estK and spatstat's Kest

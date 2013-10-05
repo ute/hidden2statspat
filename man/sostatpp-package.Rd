@@ -6,37 +6,44 @@
 \description{
   The package \pkg{sostatpp} is a collection of statistical
   tools for the analysis of homogeneous and inhomogeneous
-  second-order stationary spatial point patterns, on top of
-  the \pkg{spatstat} package.
+  spatial point patterns, with particular focus on (hidden)
+  second-order stationarity. It supplements the very
+  comprehensive \pkg{spatstat} package.
 }
 \details{
   The package \pkg{sostatpp} deals with the statistical
-  analysis of homogeneous and inhomogeneous point patterns
-  that are supposed to originate from a reweighted,
-  retransformed or rescaled second-order stationary point
-  process. For a definition of these classes of spatial
-  point processes, see the paper Hahn & Jensen (2013). It
-  implements methods from the papers \emph{A studentized
-  permutation test for the comparison of spatial point
-  patterns} and \emph{Inhomogeneous spatial point processes
-  with hidden second-order stationarity} by Ute Hahn and
-  Eva B. Vedel Jensen.
+  analysis of homogeneous and inhomogeneous second-order
+  stationary point patterns. It implements methods from the
+  papers \emph{A studentized permutation test for the
+  comparison of spatial point patterns} and
+  \emph{Inhomogeneous spatial point processes with hidden
+  second-order stationarity} by Ute Hahn and Eva B. Vedel
+  Jensen.
 
-  The \pkg{sostatpp} package is build on top of the package
-  \pkg{spatstat}, and makes use of its data formats.
-  \pkg{sostatpp} currently provides \itemize{ \item
-  estimates of the template \eqn{K}- and \eqn{L}-functions
-  and of the directional \eqn{K}-function \item model tests
-  of the type of hidden second-order stationarity that can
-  also be used to compare two point patterns. }
+  Hahn & Jensen (2013) introduce the term "hidden
+  second-order stationarity" as an umbrella of several
+  classes of inhomogeneous models, viz. reweighted,
+  retransformed or rescaled second-order stationary point
+  processes. These model classes all come with their own
+  sensible definition of an inhomogenous "template" version
+  to second-order summary statistics, such as the
+  \eqn{K}-function.
+
+  The \pkg{sostatpp} package is meant as an extension of
+  the package \pkg{spatstat}, and makes use of its data
+  formats. \pkg{sostatpp} currently provides \itemize{
+  \item estimates of the template \eqn{K}- and
+  \eqn{L}-functions and of the \eqn{Delta K_dir}-function,
+  described in H & J (2013) \item model tests of the type
+  of hidden second-order stationarity that can also be used
+  to compare two point patterns. }
 
   The three different types of second-order stationarity
   show many similarities. In order to stress this aspect,
   the statistical analysis is unified by assigning the
   stationarity type to the data beforehand. To this end,
-  \pkg{sostatpp} declares a class \code{sostpp} of
-  second-order stationarity typed point patterns, see
-  \link{sostpp.object}.
+  \pkg{sostatpp} declares a class \code{\link{sostpp}} of
+  second-order stationarity typed point patterns.
 }
 \section{Assigning and retrieving the type of second-order stationarity}{
   Any spatstat or sostatpp point pattern (object of class
@@ -110,12 +117,17 @@ Ks1 <- estOnQuadrats(scholtzia, fun = estK, type="s", lambda=scholtzia.intens,
 
 Ks2 <- estOnQuadrats(scholtzia, fun = estK, type="s", lambda=scholtzia.intens,
                      quads = quads2, rmax = 1.25)
+
 ####### plot the estimated K_functions ##################################
+
 plot(Ks1, col = "red", light = .5,
     ylim=c(0, 6),  main=" rescaled, original intensity")
 plot(Ks2, col = "blue", light = .5, add=TRUE)
 
-##################  test  ##############################################
+#########  test s.-o. rescaled stationarity ###########################
+
+Kpermute.test(scholtzia, type="s", quads1 = quads1, quads2 = quads2,
+                 rmax = 1.25, lambda=scholtzia.intens, use.tbar = TRUE)
 }
 \author{
   Ute Hahn, \email{ute@imf.au.dk}
@@ -129,6 +141,7 @@ plot(Ks2, col = "blue", light = .5, add=TRUE)
   Hahn, U. and Jensen, E. B. V. (2013) Inhomogeneous
   spatial point processes with hidden second-order
   stationarity.  \emph{CSGB preprint} 2013-7.
+  \url{http://data.imf.au.dk/publications/csgb/2013/math-csgb-2013-07.pdf}
 }
 \seealso{
   The \code{\link[spatstat:spatstat-package]{spatstat}}
