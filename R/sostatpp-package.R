@@ -37,9 +37,9 @@
 #'makes use of its data formats. \pkg{sostatpp} currently provides 
 #'\itemize{
 #'  \item estimates of the template \eqn{K}- and \eqn{L}-functions and of 
-#'   the \eqn{Delta K_dir}-function, described in H & J (2013)
+#'   the \eqn{\Delta K_{dir}}-function, described in H&J(2013)
 #' \item model tests of the type of hidden second-order stationarity that can 
-#' also be used to compare two point patterns.
+#' also be used to compare two point patterns, as in H(2012).
 #' }
 #' 
 #' The three different types of second-order stationarity show many similarities.
@@ -63,7 +63,7 @@
 #'  stationarity. To retrieve the type(s) of an \code{sostpp}, apply
 #'  \tabular{ll}{
 #'  \code{\link{has.type}} \tab check for a particular type 
-#'  \cr \code{\link{currenttype}} \tab the s.o.s.-type that will be used for analysis
+#'  \cr\code{\link{currenttype}} \tab the s.o.s.-type that will be used for analysis
 #'  }
 #'@section Statistical analysis:
 #'\subsection{Second order summary functions}{
