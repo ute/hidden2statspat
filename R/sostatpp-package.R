@@ -5,6 +5,8 @@
 #'
 #'
 #'@import fdnonpar
+#'@import spatstat
+#'@import plyr
 # require(fdnonpar)
 #'
 #'
@@ -43,7 +45,7 @@
 #' patterns, see \link{sostpp.object}.
 #' 
 #' 
-#' @section {Assigning and retrieving the type of second-order stationarity}{
+#' @section Assigning and retrieving the type of second-order stationarity:
 #'  Any spatstat or sostatpp point pattern (object of class \code{ppp} or \code{sostpp}) 
 #'  can be converted into a second-order stationarity typed point pattern 
 #'  (object of class \code{sostpp}), using 
@@ -59,23 +61,22 @@
 #'  \code{\link{has.type}} \tab check for a particular type 
 #'  \cr \code{\link{currenttype}} \tab the s.o.s.-type that will be used for analysis
 #'  }
-#'}
-#'@section {Statistical analysis}{
+#'@section Statistical analysis:
 #'\subsection{Second order summary functions}{
 #' \tabular{ll}{    
-#' \code{\link{Khidden}} \tab estimates the \eqn{K}-function, according to type
-#' \cr\code{\link{Lhidden}} \tab estimates the \eqn{L}-function,
-#' \cr\code{\link{DeltaKDir}} \tab estimates the \eqn{\Delta K_{dir}}-function
-#' }
+#' \code{\link{estK}} \tab estimates the \eqn{K}-function, according to type
+#' \cr\code{\link{estL}} \tab estimates the \eqn{L}-function,
+#' \cr\code{\link{DeltaKdir}} \tab estimates the \eqn{\Delta K_{dir}}-function
 #' }
 #' \subsection{Tests}{
 #' \tabular{ll}{
-#' \code{\link{Kpermute.test}} \tab test type of s.o.s, using \eqn{K}-function on subsamples
-#' \cr\code{\link{Kaniso.test}} \tab test of local anisotropy, using \eqn{\Delta K_{dir}}-function
+#' \code{\link{Kpermute.test}} \tab test type of s.o.s or local anisotropy, 
+#'    using \eqn{K}-function on subsamples
+# \cr\code{\link{Kaniso.test}} \tab test of local anisotropy, using \eqn{\Delta K_{dir}}-function
 #'}
 #'}
 #'}
-#' @section{Coordinate transformation}{
+#' @section Coordinate transformation:
 #'   Arbitrary coordinate transformation on \pkg{spatstat} objects can be done with
 #'     \code{\link{coordTransform}}, currently supporting
 #'\tabular{ll}{
@@ -87,7 +88,6 @@
 #'\code{\link{backtransformed}} \tab returnes the backtransform of a retransformed s.o.s. point pattern
 #'\cr
 #'    }
-#'}
 #'@author Ute Hahn, \email{ute@@imf.au.dk}
 #'
 #'@references 
@@ -111,7 +111,9 @@
 #'  r.ls <- seq(0,1.25,0.002)
 #'  r.inhom <- r.ls / sqrt(meanintens)
 #'   
-#'############### Testing hypotheses #######################################
+#'############### Exploring and testing hypotheses #############################
+#'
+#'######################### subsample ####################################
 #'
 #'medy <- median(scholtzia$y)
 #'W1 <- owin(c(0, 22), c(0, medy), unitname=c("metre", "metres"))
@@ -119,11 +121,17 @@
 #'quads1 <- tiles(quadrats(W1, nx=4, ny=1))
 #'quads2 <- tiles(quadrats(W2, nx=2, ny=2))
 #'
+#'############### estimate K on subsamples ###############################
+#'
 #'Ks1 <- estOnQuadrats(scholtzia, fun = estK, type="s", lambda=scholtzia.intens, 
 #'                      quads = quads1, rmax = 1.25)
 #'                      
 #'Ks2 <- estOnQuadrats(scholtzia, fun = estK, type="s", lambda=scholtzia.intens, 
 #'                      quads = quads2, rmax = 1.25)
-#'plot(Ks1, col = "red", ylim=c(0, 6),  main=" rescaled, original intensity")
-#'plot(Ks2, col = "blue", add=T, )
+#'####### plot the estimated K_functions ##################################
+#'plot(Ks1, col = "red", light = .5,
+#'     ylim=c(0, 6),  main=" rescaled, original intensity")
+#'plot(Ks2, col = "blue", light = .5, add=TRUE)
+#'
+#'##################  test  ##############################################
 NA

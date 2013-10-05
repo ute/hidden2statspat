@@ -11,6 +11,7 @@
 #' Plot a list of K-function estimates, as obtained by \code{\link{estOnQuadrats}}
 #' @param x list of summary function estimates, object of class \code{eoqlist}
 #' @param style optional list of plot options, as in \code{summaryplot.fdsample}
+#' @param corrections character, which edge-corrected version to pick
 # @param col,colquad colors for plotting mean and single estimates
 # @param lwd,lwdquad line widths
 #' @param minn integer, minimal number of points on quadrat to allow for printing of
@@ -28,7 +29,8 @@
 #' @details This method, as well as class \code{eoqlist}, is likely to be replaced in a future version
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 #' @S3method plot eoqlist
-#' @export
+#' @method plot eoqlist
+# @export
 
 plot.eoqlist <- function(x,  
                          style = NULL,

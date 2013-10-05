@@ -9,7 +9,7 @@
 #' @param x an R-object, currently of class \code{"ppp"} of \code{"sostpp"}
 #' @param type character giving the type of second order stationarity. One of
 #'    "w", "t", "s", "h", "hs" (or "none").
-#' @param further arguments    
+#' @param ... further arguments    
 #' @return an object of class \code{"sostpp"}, but with no type information.
 #' @seealso \code{\link{sostpp.object}} for details on the class.
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
@@ -27,7 +27,8 @@ as.sostpp <- function(x, type = "h", ...)
 #' second-order stationarity.
 #'
 #' @S3method as.sostpp ppp
-#' @export
+#' @method as.sostpp ppp
+# @export
 #' @param x an object of class \code{"ppp"}
 #' @param type character giving the type of second order stationarity. One of
 #'    "w", "t", "s", "h", "hs" (or "none").
@@ -66,7 +67,8 @@ as.sostpp.ppp <- function(x, type = "h", ...)
 #' second-order stationarity.
 #'
 #' @S3method as.sostpp sostpp
-#' @export
+#' @method as.sostpp sostpp
+# @export
 #' @param x an object of class \code{"sostpp"}
 #' @param type character giving the type of second order stationarity. One of
 #'    "w", "t", "s", "h", or "hs".
@@ -97,7 +99,7 @@ as.sostpp.sostpp <- function(x, type = "h", ...)
 #' 
 #' Add type information for reweighted second-order stationary point processes.
 #' 
-#' @param x the original point pattern, an object of class \code{"ppp"} or \code{"sostpp"}
+#' @param X the original point pattern, an object of class \code{"ppp"} or \code{"sostpp"}
 #' @param lambda optional. The estimated intensity function, can be either 
 #' \itemize{
 #'   \item a single number,
@@ -130,14 +132,14 @@ as.sostpp.sostpp <- function(x, type = "h", ...)
 #' @seealso \code{\link{sostpp.object}} for details on the class.
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 
-reweighted <- function (X, lambda = NULL, ..., normpower = 0)
+reweighted <- function (X, lambda = NULL, ...)#, normpower = 0)
 {
   if(!is.sostpp(X)) X <- as.sostpp.ppp(X, "none") 
   npts <- npoints(X)
   marx <- X$typemarks
   if (npts > 0){
     if (is.null(lambda) && !is.null(marx$invscale)) lambda <- marx$invscale^2
-    la <- getIntensity(X, lambda, ...,  normpower = normpower)
+    la <- getIntensity(X, lambda, ...)#,  normpower = normpower)
     if (!is.null (marx$lambda)) marx$lambda <- la 
     else marx <- as.data.frame(cbind(marx, lambda = la))
     # now marx is really a data frame
@@ -166,7 +168,7 @@ reweighted <- function (X, lambda = NULL, ..., normpower = 0)
 # @param normpower an integer between 0 and 2. If \code{normpower} > 0 and \code{invscale} is missing, 
 #   the intensity \code{lambda} is normalized,
 #   see the Details.
-#' @return A rescaled s.o.s. typed point pattern (object of class \code{\link{"sostpp"}}), having typemarks 
+#' @return A rescaled s.o.s. typed point pattern (object of class \code{"\link{sostpp}"}), having typemarks 
 #'   with   an element  \code{invscale} (square root of estimated intensity) 
 #' @details
 #'   If \code{invscale} is empty, the square root of the intensity \code{lambda} is used instead.
@@ -244,7 +246,7 @@ rescaled <- function (X,  invscale = NULL, lambda = NULL, ...)
 #'    and is valid at each point of \code{X}. The inverse of \code{trafo}, 
 #' is used by function \code{"\link{backtransformed}"} to transform the window. 
 #' @param ... optional extra parameters for \code{trafo}, if this is given as a \code{function}.
-#' @return A retransformed s.o.s. typed point pattern (object of class \code{\link{"sostpp"}}), having typemarks 
+#' @return A retransformed s.o.s. typed point pattern (object of class \code{"\link{sostpp}"}), having typemarks 
 #'   with  elements \code{x0} and  \code{y0} (backtransformed points), and extra information
 #'   about the backtransform. 
 #' @seealso related functions: \code{\link{reweighted}}, \code{\link{rescaled}}, \code{\link{ashomogeneous}}     
@@ -261,7 +263,7 @@ rescaled <- function (X,  invscale = NULL, lambda = NULL, ...)
 #'   If additionally the intensity \code{lambda} is given, the gradient back transform is calculated from \code{lambda}.
 #'   
 #'   The function \code{invtrafo} is applied to the window when the pattern is backtransformed
-#'   using \code{\link{"backtransformed"}}. If not given, linear interpolation is used, however
+#'   using \code{"\link{backtransformed}"}. If not given, linear interpolation is used, however
 #'   currently only for gradient transformations (\code{trafo = "gradx"} or \code{trafo = "grady"}).
 #' @export
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
@@ -285,13 +287,13 @@ retransformed <- function (X, trafo = identxy, lambda = NULL, invtrafo = NULL, .
       {
         if (trafo == "gradx") {
           xlims <- X$window$xrange
-          oo <- rank(X$x, ties="first")
+          oo <- rank(X$x, ties.method = "first")
           x0 <- (xlims[1] + diff(xlims) * (0.5 + (1:npts)) / (npts+1))[oo]
           y0 <- X$y
         }
         else {
           ylims <- X$window$yrange
-          oo <- rank(X$y, ties="first")
+          oo <- rank(X$y, ties.method = "first")
           y0 <- (ylims[1] + diff(ylims) * (0.5 + (1:npts)) / (npts+1))[oo]
           x0 <- X$x
         }
@@ -378,7 +380,7 @@ retransformed <- function (X, trafo = identxy, lambda = NULL, invtrafo = NULL, .
 #' @param type optional character. If set to "hs", the patterns is preferentially
 #'   evaluated as "rescaled", otherwise as "reweighted" (default).
 #' @param lambda optional, constant lambda.   
-#' @return A homogeneous s.o.s. typed point pattern (object of class \code{\link{"sostpp"}}), having typemarks 
+#' @return A homogeneous s.o.s. typed point pattern (object of class \code{"\link{sostpp}"}), having typemarks 
 #'   with   elements \code{lambda} (estimated intensity) and
 #'   \code{invscale} (square root of lambda).
 #' @seealso related functions: \code{\link{rescaled}}, \code{\link{retransformed}}, \code{\link{reweighted}}

@@ -24,7 +24,7 @@
 #' @param normpower an integer between 0 and 2. If \code{normpower} > 0, the 
 #'  intensity is normalized, see the Details.
 #' @param ... optional arguments passed to \code{\link{as.sostpp}}   
-#' @param rescaledangle logical, indicating whether to rescale the directional 
+#' @param rescaleangle logical, indicating whether to rescale the directional 
 #'   \eqn{K}-functions as to represent the full circle
 #' @param max.ls.r upper limit for argument \eqn{r}. The default 3 is quite large - note
 #'  that the argument of the locally rescaled \eqn{K}-function corresponds to

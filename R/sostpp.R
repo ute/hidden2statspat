@@ -20,15 +20,16 @@ is.sostpp <- function(x) inherits(x, "sostpp")
 #' 
 #' @rdname Extract.sostpp
 #' @S3method [ sostpp
-#' @export
+#' @method [ sostpp
+# @export
 #' @param x a sos-typed point pattern, object of class \code{"sostpp"}. 
-#' @param i subset index, see spatstat \code{\link{Extract.ppp}}.
-#' @param j,drop ignored.
+#' @param i subset index, see spatstat \code{\link{[<-.ppp}}.
+# @param j,drop ignored.
 #' @seealso \code{\link{sostpp.object}} for details on the class.
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 
 
-"[.sostpp" <- function(x, i, j, drop, ...) 
+"[.sostpp" <- function(x, i) #, j, drop, ...) 
   {
     # attach typemarks to marks
     marx <- as.data.frame(marks(x))
@@ -55,15 +56,17 @@ is.sostpp <- function(x) inherits(x, "sostpp")
 
 #' @rdname Extract.sostpp
 #' @S3method [<- sostpp
+#'@usage \method{[}{sostpp} (x, i) <- value 
 #' @export
 #' @param value Replacement for the subset, a sos-typed point pattern of same type. 
 
 "[<-.sostpp" <-
-  function(x, i, j, value) {
+  function(x, i, value) #j, value) 
+{
     
     stopifnot(is.sostpp(value))
     
-    if(missing(i) && missing(j))
+    if(missing(i)) # && missing(j))
       return(value)
     
     #check if both have same sos-type
@@ -106,10 +109,11 @@ is.sostpp <- function(x) inherits(x, "sostpp")
 #' 
 #' Extends spatstat method \code{\link{print.ppp}} by type of second-order stationarity.
 #' 
-#' @S3method print sostpp
 #' @param x sos-typed point pattern.
 #' @param ... ignored
-#' @export
+#' @S3method print sostpp
+#' @method print sostpp
+# @export
 #' @seealso \code{\link{print.ppp}} for the print method of class ancestor \code{ppp}.
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 

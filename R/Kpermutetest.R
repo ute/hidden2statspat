@@ -61,8 +61,8 @@ correctionkey <- function (correction)
 #' @param rmin optional, lower bound, defaults to 0,
 #' @param rmax upper bound for the radius,
 #' @param rlen optional, number of steps in argument vector, defaults to 256,
-#'#' @param correction a character vector giving the edge correction type, may be
-#'   one of \code{"border"},  \code{"isotropic"}, \code{"translate"}, \code{"none"}.
+# @param correction a character vector giving the edge correction type, may be
+#   one of \code{"border"},  \code{"isotropic"}, \code{"translate"}, \code{"none"}.
 # @param DeltaKdir logical, whether to return the Delta K_dir function instead 
 # of the template K-function  
 #' @param ... further arguments for \code{\link{estK}} or \code{\link{DeltaKdir}}
@@ -190,7 +190,7 @@ estOnQuadrats <- function(X, type = NULL, quads, tquads,
 #' @param Kfun optional \code{function}, the \eqn{K}-function to be used, either \code{\link{estK}} (default) or \code{\link{DeltaKdir}}
 #' @param correction a character vector giving the edge correction type, may be
 #'   any subset of \code{"border"},  \code{"isotropic"}, \code{"translate"}, \code{"none"}.
-#' @param ... further arguments for \code{\link{Kfun}}
+#' @param ... further arguments for \code{Kfun}
 #' @param use.tbar logical, defaults to \code{FALSE}. Whether to apply 
 #'   studentization after integration, see `Details'.
 #' @param nperm \code{NULL} or an integer giving the number of random 

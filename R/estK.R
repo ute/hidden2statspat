@@ -70,7 +70,7 @@ estL <- function(...) {
 #'   any subset of \code{"border"},  \code{"isotropic"}, \code{"translate"}, \code{"none"}.
 #' @param normpower an integer between 0 and 2. If \code{normpower} > 0, the 
 #'  intensity is normalized, see the Details.
-#' @param ... optional arguments passed to \code{\link{makehidden}}   
+#' @param ... optional arguments passed to \code{\link{as.sostpp}}   
 #' @param max.ls.r optional, upper limit for argument \eqn{r} if \code{type="s"}. 
 #'
 #' @details
@@ -79,7 +79,7 @@ estL <- function(...) {
 #' If \code{X} has no type of second-order stationarity, it is assumed to be homogeneous.
 #' 
 #' If \code{type} is given, but does not match the type of \code{X}, the function
-#' \code{\link{makehidden}} is called with arguments ldots to ensure the correct
+#' \code{\link{as.sostpp}} is called with arguments ldots to ensure the correct
 #' hidden second-order information.
 #' 
 #' If  \code{normpower} > 0, the intensity is renormalized, so that \code{\link{estK}} yields similar results as
@@ -117,7 +117,7 @@ estL <- function(...) {
 #' @export
 #' @seealso the \pkg{spatstat} functions \code{\link{Kest}}, \code{\link{Kinhom}}, \code{\link{Kscaled}}
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
-#' @references{
+#' @references 
 #'    Prokesova, M., Hahn, U. and Vedel Jensen, E.B. (2006) 
 #'    Statistics for locally scaled point patterns. 
 #'    In A. Baddeley, P. Gregori, J. Mateu, R. Stoica and D. Stoyan (eds.) 
@@ -130,7 +130,7 @@ estL <- function(...) {
 #'    Hahn, U. and Jensen, E. B. V. (2013)
 #'    Inhomogeneous spatial point processes with hidden second-order stationarity.
 #'    \emph{CSGB preprint} 2013-7. 
-#'    }
+#'    
 #' @examples
 #' # compare homogeneous version of estK and spatstat's Kest
 #' # bronzefilter data are not marked as hidden second-order stationary

@@ -51,6 +51,7 @@ peripolyxy <- function (poly)
 # @param poly list or dataframe with elements \code{x} and \code{y}
 # @param newlen maximal length of edges in refined polygon
 #' @rdname sostatpp-internal
+# @export
 #' @keywords internal
 
 subdivpolyxy <- function (poly, newlen)
@@ -147,7 +148,8 @@ coordTransform <- function(X,  ...)
 #' @keywords spatial
 #' @keywords manip
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
-#' @export
+# @export
+#' @method coordTransform im
 #' @S3method coordTransform im
 #' @examples
 #' # transformation of the polygonal window letterR from the spatstat package
@@ -156,7 +158,7 @@ coordTransform <- function(X,  ...)
 #' invtrafo <- function(x, y) list(x = (x - y) ^(1/1.5), y = y*2)
 #' imR <- as.im(letterR)
 #' plot(imR)
-#' plot(coordTransform.im(imR, trafo, invtrafo))
+#' plot(coordTransform(imR, trafo, invtrafo))
 
 coordTransform.im <- function (X, trafoxy = identxy, invtrafoxy = identxy, ...) 
 {
@@ -196,7 +198,7 @@ coordTransform.im <- function (X, trafoxy = identxy, invtrafoxy = identxy, ...)
 #' @param isAffine If true, no subdivision of rectangles or polygons, see the `Details'.
 #' @param \ldots Optional arguments passed to \code{\link{as.mask}} controlling the 
 #'      pixel resolution of the transformed window, if \code{X} is a binary pixel 
-#'      mask, or to \code{\link{subdivpoly}}, if \code{X} is a polygon or a 
+#'      mask, or to \code{\link{refinepoly}}, if \code{X} is a polygon or a 
 #'      rectangle, see the `Details'. 
 #' @details  The functions \code{trafoxy} (and \code{invtrafoxy}) take one 
 #'     or two arguments. In the latter case, both arguments are vectors of 
@@ -206,7 +208,7 @@ coordTransform.im <- function (X, trafoxy = identxy, invtrafoxy = identxy, ...)
 #'      In a future version, ... may transport arguments to the transformation function
 #'      
 #'      If the window is a rectangle or polygon, it is converted into a 
-#'      polygon which is subsequently refined using \code{\link{subdivpoly}}, 
+#'      polygon which is subsequently refined using \code{\link{refinepoly}}, 
 #'      unless \code{isAffine = TRUE}. This is only necessary if the coordinate 
 #'      transform is not affine, in order to achieve a better approximation of 
 #'      the transformed window. Note however that \code{coordTransform.owin} does 
@@ -215,7 +217,8 @@ coordTransform.im <- function (X, trafoxy = identxy, invtrafoxy = identxy, ...)
 #'      computation time when transforming xy-rectangles with a transformation 
 #'      that preserves axe-parallel rectangles.
 #' @seealso \code{\link{coordTransform.im}}, which is called if \code{X} is a pixel image. 
-#' @export
+# @export
+#' @method coordTransform owin
 #' @S3method coordTransform owin
 #' @keywords manip
 #' @keywords spatial
@@ -230,13 +233,13 @@ coordTransform.im <- function (X, trafoxy = identxy, invtrafoxy = identxy, ...)
 #' # dummy variable for silent return
 #' plot(letterR)
 #' dummy <- lapply(letterR$bdry, points, col = "red")
-#' mappedR <- coordTransform.owin(letterR, trafo, edgelen = 0.1)
+#' mappedR <- coordTransform(letterR, trafo, edgelen = 0.1)
 #' plot(mappedR)
 #' dummy <- lapply(mappedR$bdry, points, col = "red")
 #' 
 #' # no refinement, assuming that trafo is affine
 #
-#' mappedRcoarse <- coordTransform.owin(letterR, trafo, isAffine = TRUE)
+#' mappedRcoarse <- coordTransform(letterR, trafo, isAffine = TRUE)
 #' plot(mappedRcoarse, add = TRUE)
 #' dummy <- lapply(mappedRcoarse$bdry, points, col = "green")
 #' # not much of a difference, though...
@@ -245,7 +248,7 @@ coordTransform.im <- function (X, trafoxy = identxy, invtrafoxy = identxy, ...)
 #' 
 #' invtrafo <- function(xy) list(x = (xy$x - xy$y) ^(1/1.5), y = xy$y*2)
 #' wimR <- as.owin(as.im(letterR))
-#' mappedimR <- coordTransform.owin(wimR, trafo, invtrafo)
+#' mappedimR <- coordTransform(wimR, trafo, invtrafo)
 #' plot(mappedimR) 
 #' # compare with the polygonal window from before
 #' plot(mappedR, col = "green", add = TRUE)
@@ -269,7 +272,7 @@ coordTransform.owin <- function (X, trafoxy = identxy, invtrafoxy = NULL, isAffi
         return(P)
        }  else if (X$type == "mask") {
          stopifnot(!is.null(invtrafoxy))
-         return(as.owin(coordTransform.im(as.im(X), trafoxy, invtrafoxy, ...))) 
+         return(as.owin(coordTransform(as.im(X), trafoxy, invtrafoxy, ...))) 
        } else stop("Unrecognised window type")
 }
 
@@ -295,7 +298,8 @@ coordTransform.owin <- function (X, trafoxy = identxy, invtrafoxy = NULL, isAffi
 #'      If the window of $X$ is a pixel mask, an additional inverse transformation
 #'      has to be provided, see \code{\link{coordTransform.owin}}.
 #' @seealso \code{\link{coordTransform.owin}} for the transformation of windows     
-#' @export
+# @export
+#' @method coordTransform ppp
 #' @S3method coordTransform ppp
 #' @keywords manip
 #' @keywords spatial
@@ -310,7 +314,7 @@ coordTransform.owin <- function (X, trafoxy = identxy, invtrafoxy = NULL, isAffi
 #'   }
 #'
 #' pp <- rpoispp(100, win = shift(square(2), c(-1,-1)))
-#' ppstar <- coordTransform.ppp(pp, galaxytrafo)
+#' ppstar <- coordTransform(pp, galaxytrafo)
 #' plot(pp, pch = 16, cex = .5)
 #' plot(ppstar, pch = 16, cex = .5)
 
