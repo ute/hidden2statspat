@@ -35,6 +35,7 @@
 #' @seealso \code{\link{Kest}}, \code{\link{Kinhom}}, \code{\link{Kscaled}}
 #' @examples
 #' # The bronzefilter pattern is quite isotropic. Compare two halves:
+#' data(bronzefilter)
 #' X <- rescaled(bronzefilter)                 
 #' W1 <- owin(c(0,9), c(0,7))
 #' W2 <- owin(c(9,18), c(0,7))
@@ -47,7 +48,7 @@
 #' lines(rr, DeltaKdir (Y[W1], r = rr)$iso,  col= c("red"), lty = "dotted")
 #' lines(rr, DeltaKdir (Y[W2], r = rr)$iso, col="blue", lty = "dotted" ) 
 
-DeltaKdir <- function (X, 
+estDeltaKdir <- function (X, 
                        type = c("s", "t", "w", "h", "hs"),      
                        dphi = pi/4, # half angle!!! in contrast to the above
                        r = NULL,

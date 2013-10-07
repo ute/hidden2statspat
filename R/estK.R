@@ -87,17 +87,14 @@ estL <- function(...) {
 #' \deqn{c^{normpower/2}}{c^(normpower/2),} where 
 #' \deqn{c = area(W)/sum_i(1/\lambda(x_i))}{c = area(W)/sum[i](1/lambda(x[i])).}
 #' 
-#' \cr
 #' The hidden \eqn{K}-function for \strong{reweighted} s.o. stationary point processes
 #' delivers the same result as {spatstat}'s function \code{\link{Kinhom}}, up to a subtle
 #' difference for the border correction: \code{estK} does not use fast optimized code.
-#' 
-#' 
+#' #' 
 #' If \code{X} is typed \strong{retransformed} s.o. stationary, the \eqn{K}-function of
 #' the \code{\link{backtransformed}} point pattern is returned, which corresponds to
 #' {spatstat}'s function \code{\link{Kest}}
-#' 
-#' 
+#' #' 
 #' For \strong{locally rescaled} s.o. stationarity, the locally scaled interpoint 
 #' distances are computed using an approximation proposed by Hahn (2007): 
 #' The Euclidean distance between two points is multiplied by the 
@@ -112,8 +109,7 @@ estL <- function(...) {
 #' Note that the argument of the locally rescaled \eqn{K}-function corresponds to
 #'  \deqn{r/\sqrt{\lambda}}{r / sqrt(lambda)} in the non scaled case.
 #'  The default maximum \code{max.ls.r} = 3 is thus quite large.
-#' 
-#' 
+#' #' 
 #' @export
 #' @seealso the \pkg{spatstat} functions \code{\link{Kest}}, \code{\link{Kinhom}}, \code{\link{Kscaled}}
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}

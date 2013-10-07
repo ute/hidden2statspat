@@ -3,13 +3,11 @@ Version: 0.65
 Date: 2013-10-05
 Title: Analysis of hidden second-order stationary point processes
 Author: Ute Hahn <ute@imf.au.dk>
-Creator: Ute Hahn
 Maintainer: Ute Hahn <ute@imf.au.dk>
 Depends:
     R (>= 2.15),
-    spatstat (>= 1.25)
+    spatstat (>= 1.25)  
 Imports:
-    spatstat (>= 1.25),
     fdnonpar,
     plyr
 Description: A package on top of spatstat, contributing functions for

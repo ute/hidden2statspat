@@ -38,10 +38,9 @@ correctionkey <- function (correction)
                          multi=TRUE) 
 
 
-#' Template K-function, or Delta K_dir, estimated on quadrats
+#' Estimate summary function on quadrats
 #'  
-#' Estimate the template \eqn{K}-function, or the \eqn{Delta K}-function, 
-#' on subsamples of a point pattern
+#' Estimate  a  summary function on subsamples of a point pattern.
 #' 
 #' @param X point pattern, object of  \bold{spatstat}-class \code{\link{ppp}}
 #' @param type optional character, the type of second-order stationarity assumed: 
@@ -61,11 +60,7 @@ correctionkey <- function (correction)
 #' @param rmin optional, lower bound, defaults to 0,
 #' @param rmax upper bound for the radius,
 #' @param rlen optional, number of steps in argument vector, defaults to 256,
-# @param correction a character vector giving the edge correction type, may be
-#   one of \code{"border"},  \code{"isotropic"}, \code{"translate"}, \code{"none"}.
-# @param DeltaKdir logical, whether to return the Delta K_dir function instead 
-# of the template K-function  
-#' @param ... further arguments for \code{\link{estK}} or \code{\link{DeltaKdir}}
+#' @param ... further arguments passed to \code{fun}
 #' @return An object of class \code{foolist}, which is a list with items
 #' \itemize{
 #'    \item \code{npts} number of points on the quadrats
@@ -187,7 +182,8 @@ estOnQuadrats <- function(X, type = NULL, quads, tquads,
 #' @param rmin optional, lower integration bound, defaults to 0; see `Details',
 #' @param rmax upper integration bound, see `Details',
 #' @param rlen optional, number of steps for numerical integration, defaults to 256; see `Details',
-#' @param Kfun optional \code{function}, the \eqn{K}-function to be used, either \code{\link{estK}} (default) or \code{\link{DeltaKdir}}
+#' @param Kfun optional \code{function}, the \eqn{K}-function to be used, 
+#'  either \code{\link{estK}} (default) or \code{\link{DeltaKdir}}
 #' @param correction a character vector giving the edge correction type, may be
 #'   any subset of \code{"border"},  \code{"isotropic"}, \code{"translate"}, \code{"none"}.
 #' @param ... further arguments for \code{Kfun}
@@ -258,7 +254,7 @@ Kpermute.test <- function(X, Y = NULL,
                       use.tbar = FALSE,
                       nperm = 25000)
 {
-  AnisTest <- identical(Kfun, DeltaKdir)
+  AnisTest <- identical(Kfun, estDeltaKdir)
   
   dataname <- if(is.null(Y)) paste( "point pattern",deparse(substitute(X)))
               else paste( "point patterns",deparse(substitute(X)), "and" ,deparse(substitute(Y)))

@@ -12,7 +12,8 @@
 # .lightcoldefault <- .66
 
 #' @title Plot of point pattern with test quadrats  
-#' @description Plot a point pattern with coloured test quadrats
+#' @description Plot a point pattern with two sets of coloured test quadrats, 
+#' meant as a visualisation supplement for the function \code{\link{Kpermute.test}}.
 #' @param x point pattern, object of class \code{\link{sostpp}} or \pkg{spatstat} class \code{\link{ppp}}
 #' @param quads1,quads2 test quadrats, a list of windows (\code{"\link{owin}"}) 
 #' or a tessellation (\pkg{spatstat}-object \code{"\link{tess}"})
@@ -92,6 +93,11 @@ quadratsplot <- function (x, quads1, quads2,
   if("tess" %in% class(quads2)) quads2 <- tiles(quads2)
   if("tess" %in% class(quads0)) quads0 <- tiles(quads0)
 
+  # don't plot dashed or dotted borders
+  
+  style1$lty <- "solid"
+  style2$lty <- "solid"
+  if (!is.null(style0)) style0$lty <- "solid"
   
   for (w in quads1) do.call(plot, c(list(w), graphopt(style1, bgcol1)))
   for (w in quads2) do.call(plot, c(list(w), graphopt(style2, bgcol2)))
