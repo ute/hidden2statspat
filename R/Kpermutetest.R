@@ -60,7 +60,7 @@ correctionkey <- function (correction)
 #' @param rmin optional, lower bound, defaults to 0,
 #' @param rmax upper bound for the radius,
 #' @param rlen optional, number of steps in argument vector, defaults to 256,
-#' @param ... further arguments passed to \code{fun}
+#' @param ... further arguments passed to \code{"fun"} or for type-tagging of the point pattern \code{X}
 #' @return An object of class \code{foolist}, which is a list with items
 #' \itemize{
 #'    \item \code{npts} number of points on the quadrats
@@ -72,7 +72,7 @@ correctionkey <- function (correction)
 #'    \item \code{correction} character, the correction used
 #'    \item \code{xlab, ylab} labels for plotting
 #' }
-#' @seealso \code{\link{estK}}, \code{\link{DeltaKdir}}
+#' @seealso \code{\link{estK}}, \code{\link{estDeltaKdir}}
 #'    for estimation of the template \eqn{K}-function or of Delta K_dir.
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 #' @export
@@ -183,7 +183,7 @@ estOnQuadrats <- function(X, type = NULL, quads, tquads,
 #' @param rmax upper integration bound, see `Details',
 #' @param rlen optional, number of steps for numerical integration, defaults to 256; see `Details',
 #' @param Kfun optional \code{function}, the \eqn{K}-function to be used, 
-#'  either \code{\link{estK}} (default) or \code{\link{DeltaKdir}}
+#'  either \code{\link{estK}} (default) or \code{\link{estDeltaKdir}}
 #' @param correction a character vector giving the edge correction type, may be
 #'   any subset of \code{"border"},  \code{"isotropic"}, \code{"translate"}, \code{"none"}.
 #' @param ... further arguments for \code{Kfun}

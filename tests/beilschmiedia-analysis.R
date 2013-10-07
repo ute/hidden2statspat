@@ -4,6 +4,8 @@
 #                                                                      #
 ########################################################################
 #
+# 07 october 2013, Ute Hahn (ute@imf.au.dk)
+#
 #
 # The methods proposed in Hahn & Jensen (2013) are bundled in package
 # sostatpp. It is available on R-forge, and depends on fdnonpar and spatstat.

@@ -70,7 +70,7 @@
 #' \tabular{ll}{    
 #' \code{\link{estK}} \tab estimates the \eqn{K}-function, according to type
 #' \cr\code{\link{estL}} \tab estimates the \eqn{L}-function,
-#' \cr\code{\link{DeltaKdir}} \tab estimates the \eqn{\Delta K_{dir}}-function
+#' \cr\code{\link{estDeltaKdir}} \tab estimates the \eqn{\Delta K_{dir}}-function
 #' }
 #' \subsection{Tests}{
 #' \tabular{ll}{

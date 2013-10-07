@@ -4,6 +4,8 @@
 #                                                                      #
 ########################################################################
 #
+# 07 october 2013, Ute Hahn (ute@imf.au.dk)
+#
 #
 # The methods proposed in Hahn & Jensen (2013) are bundled in package
 # sostatpp. It is available on R-forge, and depends on fdnonpar and spatstat.
@@ -46,7 +48,7 @@ style2 <- list(col = "blue", light = .6)
 # style1 <- list(col = "black", lty = "solid", light = .6)
 # style2 <- list(col = "black", lty = "dashed", light = .8)
 
-quadratsplot(bronzw, quads1, quads2, style1, style2, pch=16, cex=.5)
+quadratsplot(bronzefilter, quads1, quads2, style1, style2, pch=16, cex=.5)
 
 
 ##### ----------  analysis as rescaled second-order stationary  --------
