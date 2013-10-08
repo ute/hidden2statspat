@@ -7,7 +7,6 @@
 #'@import fdnonpar
 #'@import spatstat
 #'@import plyr
-# require(fdnonpar)
 #'
 #'
 #'@name sostatpp-package

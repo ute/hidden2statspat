@@ -21,8 +21,8 @@ NAMESPACE
 *.Rd
 !scholtzia.Rd
 !intensities.Rd
-!*-package.Rd
-!*.object.Rd
+#!*-package.Rd
+#!*.object.Rd
 #
 # all figures, testkram und anderes
 #

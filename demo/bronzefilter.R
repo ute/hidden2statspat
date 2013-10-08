@@ -3,21 +3,8 @@
 # Analysis of the Bronze Filter Data Set as in Hahn & Jensen (2013)    #
 #                                                                      #
 ########################################################################
-#
-# 07 october 2013, Ute Hahn (ute@imf.au.dk)
-#
-#
-# The methods proposed in Hahn & Jensen (2013) are bundled in package
-# sostatpp. It is available on R-forge, and depends on fdnonpar and spatstat.
-# To run this code, first install spatstat from CRAN, then fnonpar and sostatpp
-# from R-forge, by issuing the commands
-#
-# install.packages("spatstat")
-# install.packages(c("fdnonpar", "sostatpp"), repos="http://R-Forge.R-project.org")
-#
-#
 
-library(sostatpp)
+data(bronzefilter)
 
 # intensity estimate assuming a gradient in x direction, 
 # with spatstat function rhohat

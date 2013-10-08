@@ -3,21 +3,6 @@
 # Analysis of the Beilschmiedia Data Set as in Hahn & Jensen (2013)    #
 #                                                                      #
 ########################################################################
-#
-# 07 october 2013, Ute Hahn (ute@imf.au.dk)
-#
-#
-# The methods proposed in Hahn & Jensen (2013) are bundled in package
-# sostatpp. It is available on R-forge, and depends on fdnonpar and spatstat.
-# To run this code, first install spatstat from CRAN, then fnonpar and sostatpp
-# from R-forge, by issuing the commands
-#
-# install.packages("spatstat")
-# install.packages(c("fdnonpar", "sostatpp"), repos="http://R-Forge.R-project.org")
-#
-#
-
-library(sostatpp)
 
 # load the beilschmiedia data from spatstat, 
 # and the intensity estimates used in H&J(2013) from sostatpp
