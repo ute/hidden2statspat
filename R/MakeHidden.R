@@ -94,8 +94,6 @@ as.sostyppp.sostyppp <- function(x, type = "h", ...)
 }
 
 
-
-
 #' Make point pattern reweighted 2nd-order stationary
 #' 
 #' Add type information for reweighted second-order stationary point processes.
@@ -110,8 +108,8 @@ as.sostyppp.sostyppp <- function(x, type = "h", ...)
 #'   }
 #' @param \ldots optional extra parameters. If \code{intensity} is given as a function, \ldots may contain extra parameters,
 #'   if \code{intensity} is empty, these are parameters passed to the \bold{spatstat}-function \code{\link{density.ppp}}.
-#' @return A reweighted s.o.s. typed point pattern (object of class \code{{"sostyppp"}}), having typemarks 
-#'   with  an element \code{intensity} (estimated intensity) 
+#' @return A reweighted s.o.s. typed point pattern (object of class \code{{"sostyppp"}}), 
+#' having typemarks  with  an element \code{intensity} (estimated intensity) 
 #' @export
 #' @details
 #'   If  \code{intensity} is missing, the function will check if the pattern \code{X} 
@@ -188,7 +186,12 @@ reweighted <- function (X, intensity = NULL, ...)#, normpower = 0)
 #' @seealso \code{\link{sostyppp.object}} for details on the class.
 #' @export
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
-
+#'@references 
+#'Hahn, U. and Jensen, E. B. V. (2013)
+#'  Inhomogeneous spatial point processes with hidden second-order stationarity.
+#'  \emph{CSGB preprint} 2013-7.
+#'  \url{http://data.imf.au.dk/publications/csgb/2013/math-csgb-2013-07.pdf} 
+#'
 
 rescaled <- function (X,  invscale = NULL, intensity = NULL, ...)
 {
@@ -245,30 +248,34 @@ rescaled <- function (X,  invscale = NULL, intensity = NULL, ...)
 #'   }  
 #' @param trafo optional; a \code{function(x,y)} that returns a data frame or list with elements \code{x} and \code{y}
 #'    and is valid at each point of \code{X}. The inverse of \code{backtrafo}, 
-#' is used by function \code{"\link{backtransformed}"} to transform the window if it is of spatstat-class \code{link{im}}. 
+#' is used by function \code{"\link{backtransformed}"} to transform the window if it is a binary mask.
 #' @param ... optional extra parameters for \code{backtrafo}, if this is given as a \code{function}.
-#' @return A retransformed s.o.s. typed point pattern (object of class \code{"\link{sostyppp}"}), having typemarks 
-#'   with  elements \code{x0} and  \code{y0} (backtransformed points), and extra information
-#'   about the backtransform. 
+#' @return A retransformed s.o.s. typed point pattern (object of class \code{"\link{sostyppp}"})
+#' with information about the backtransform. 
 #' @seealso related functions: \code{\link{reweighted}}, \code{\link{rescaled}}, \code{\link{ashomogeneous}}     
 #' @seealso \code{\link{sostyppp.object}} for details on the class.
 #' @details
-#'   It is assumed that the transformation is one-to-one, in the sense that the observation window is mapped to itself.
-#'   Whether this is true is \emph{not} checked. If you need to analyse transformations that are not one-to-one,
-#'   this can be accomplished manually by applying the function \code{\link{coordTransform}} to the pattern \code{X},
-#'   and analysing the resulting pattern as a homogeneous point pattern.
+#'   If \code{backtrafo = "gradx"} or \code{backtrafo = "grady"}, the backtransformation is obtained 
+#'   from the  data by inverse cdf transform, affecting only the \eqn{x}- or \eqn{y}-coordinate, 
+#'   respectively. For these gradient transformations, it is assumed that the 
+#'   transformation is one-to-one, in the sense that the observation window is mapped to itself. 
+#'   If additionally the intensity \code{intensity} is given, the gradient back transform is 
+#'   calculated from \code{intensity} as described in Hahn & Jensen (2013).
 #'   
-#'   If \code{backtrafo = "gradx"} or \code{backtrafo = "grady"}, the backtransformation is obtained from the 
-#'   data by inverse cdf transform, under
-#'   the assumption that the transformation function affects only the \eqn{x}- or \eqn{y}-coordinate, respectively.
-#'   If additionally the intensity \code{intensity} is given, the gradient back transform is calculated from \code{intensity}.
-#'   
-#'   The function \code{invtrafo} is applied to the window when the pattern is backtransformed
-#'   using \code{"\link{backtransformed}"}. If not given, linear interpolation is used, however
-#'   currently only for gradient transformations (\code{backtrafo = "gradx"} or \code{backtrafo = "grady"}).
+#'   The \code{tinfo} element in the resulting \code{sostyppp}-object contains two functions
+#'   \code{transform} and \code{backtransform}. They are used when the pattern is backtransformed to
+#'   homogeneity by function with \code{"\link{backtransformed}"}. 
+#'   In the case of gradient transformations, these functions are obtained by linear transformation
+#'   with (\code{\link{approxfun}}). The reverse of \code{backtransform} is needed when the window is
+#'   a binary mask, see \link{spatstat::owin}, and has to be given as argument {\code{trafo}}.
 #' @export
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
-
+#'@references 
+#'Hahn, U. and Jensen, E. B. V. (2013)
+#'  Inhomogeneous spatial point processes with hidden second-order stationarity.
+#'  \emph{CSGB preprint} 2013-7.
+#'  \url{http://data.imf.au.dk/publications/csgb/2013/math-csgb-2013-07.pdf} 
+#
 # look at akima, function interp
 
 retransformed <- function (X, backtrafo = identxy, intensity = NULL, trafo = NULL, ...)
@@ -278,9 +285,8 @@ retransformed <- function (X, backtrafo = identxy, intensity = NULL, trafo = NUL
   if (npts > 0){
     if (is.function(backtrafo))
     {
- #     xy <- trafo(X$x, X$y, ...)
-#      x0 <- xy$x
-#      y0 <- xy$y
+      if (is.mask(X$window)) if (!is.function(trafo)) 
+         warning("retransformed point pattern with binary mask, but function trafo not given")
       X$tinfo$backtransform <- backtrafo
       X$tinfo$transform <- trafo
     } 
@@ -308,7 +314,8 @@ retransformed <- function (X, backtrafo = identxy, intensity = NULL, trafo = NUL
         la <- getIntensity(X, intensity, ...)
         if(backtrafo == "gradx") {
           z <- X$x; zrange <- X$window$xrange
-        } else {
+        } 
+        else {
           z <- X$y; zrange <- X$window$yrange
         }
         oo <- order(z)
@@ -360,30 +367,14 @@ retransformed <- function (X, backtrafo = identxy, intensity = NULL, trafo = NUL
     else stop(paste(sQuote("trafo"),
       "should be a function, or one of the character strings",
       dQuote("gradx"),"or", dQuote("grady")))
-    
- #   marx <- X$tinfo$tmarks
-    # gave a funny name for old marks in the old version using marks(X)  
-#    if (!is.null (marx$x0)) marx$x0 <- x0
- #   else marx <-  as.data.frame(cbind(marx, x0 = x0))
-#    if (!is.null (marx$y0)) marx$y0 <- y0
-#    else marx <-  cbind(marx, y0 = y0)
-#    X$tinfo$tmarks <-  marx
-   }
-  # now get backtransform
-#  if (is.function(backtrafo)) 
-#      { itra <- backtrafo 
-#        otra <- trafo  }
+ 
+  }  
   }
   X$sostype <- .settype("t", X$sostype)
   X$tinfo$trafo <- trafo
   X$tinfo$intensity <- intensity
-# X$extra$trafo <- trafo
-#  X$extra$intensity <- intensity
-#  X$extra$trafoo <- otra
-#  X$extra$invtrafo <- itra
   return(X)
-}  
-
+}
 
 #' Mark point pattern as homogeneous
 #' 

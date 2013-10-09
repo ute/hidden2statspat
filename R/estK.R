@@ -70,7 +70,7 @@ estL <- function(...) {
 #'   any subset of \code{"border"},  \code{"isotropic"}, \code{"translate"}, \code{"none"}.
 #' @param normpower an integer between 0 and 2. If \code{normpower} > 0, the 
 #'  intensity is normalized, see the Details.
-#' @param ... optional arguments passed to \code{\link{as.sostpp}}   
+#' @param ... optional arguments passed to \code{\link{as.sostyppp}}   
 #' @param max.ls.r optional, upper limit for argument \eqn{r} if \code{type="s"}. 
 #'
 #' @details
@@ -79,11 +79,11 @@ estL <- function(...) {
 #' If \code{X} has no type of second-order stationarity, it is assumed to be homogeneous.
 #' 
 #' If \code{type} is given, but does not match the type of \code{X}, the function
-#' \code{\link{as.sostpp}} is called with arguments ldots to ensure the correct
+#' \code{\link{as.sostyppp}} is called with arguments ldots to ensure the correct
 #' hidden second-order information.
 #' 
 #' If  \code{normpower} > 0, the intensity is renormalized, so that \code{\link{estK}} yields similar results as
-#' the \bold{spatstat}-function \code{\link{Kinhom}}. The intensity values are then multiplied by 
+#' the \bold{spatstat}-function \code{\link{Kinhom}}. The intensity values \eqn{\lambda} are then multiplied by 
 #' \deqn{c^{normpower/2}}{c^(normpower/2),} where 
 #' \deqn{c = area(W)/sum_i(1/\lambda(x_i))}{c = area(W)/sum[i](1/lambda(x[i])).}
 #' 
@@ -165,7 +165,7 @@ estK <- function (X,
   
   if (missing(type)) 
   {
-    if(is.sostpp(X)) sostype <- currenttype(X) else sostype <- NULL
+    if(is.sostyppp(X)) sostype <- currenttype(X) else sostype <- NULL
     if (length(sostype) == 0) 
       {
          X <- ashomogeneous(X)
@@ -174,15 +174,15 @@ estK <- function (X,
   }
   else {
     sostype <- type[1]
-    X <- as.sostpp(X, type = sostype, ...)
+    X <- as.sostyppp(X, type = sostype, ...)
   }
     
-  marx <- X$typemarks
+  marx <- X$tinfo$tmarks
   if (normpower != 0) {
     stopifnot ((1 <= normpower) & (normpower <= 2)) 
-    if (!is.null(marx$lambda)){  
-      renorm.factor <-  (sum(1 / marx$lambda) / (area.owin(X)))^(normpower / 2) 
-      marx$lambda <- marx$lambda * renorm.factor
+    if (!is.null(marx$intensity)){  
+      renorm.factor <-  (sum(1 / marx$intensity) / (area.owin(X)))^(normpower / 2) 
+      marx$intensity <- marx$intensity * renorm.factor
     }
     if(!is.null(marx$invscale)){
       renorm.factor <-  (sum(1 / marx$invscale^2) / (area.owin(X)))^(normpower / 4) 
@@ -197,13 +197,13 @@ estK <- function (X,
   
   # modify point pattern to "become" the template, if retransformed or rescaled
   
-  if (scaling) marx$lambda <- rep(1, npts) # refers to unit rate template
+  if (scaling) marx$intensity <- rep(1, npts) # refers to unit rate template
   
   if (sostype == "t") 
   {
     X <- backtransformed (X)
-    # make uniform lambdas
-    marx$lambda <- npts / area
+    # make uniform intensities
+    marx$intensity <- npts / area
   }
   
   
@@ -234,7 +234,7 @@ estK <- function (X,
     alim <- c(0, min(rmax, rmaxdefault, max.ls.r))
   } 
   else { 
-    if(sostype == "w") lamax <- max(marx$lambda) else lamax <- npts / area
+    if(sostype == "w") lamax <- max(marx$intensity) else lamax <- npts / area
     rmaxdefault <- rmax.rule("K", W, lamax)
     breaks <- handle.r.b.args(r, NULL, W, rmaxdefault = rmaxdefault)
     r <- breaks$r
@@ -304,12 +304,12 @@ estK <- function (X,
   XI <- X[I]
   XJ <- X[J]
   
-# lambdaweights. No worries, mate, lambdas are one if we deal with scaled processes.
+# intensityweights. No worries, mate, intensities are one if we deal with scaled processes.
 # we use them here in the homogeneous / scaled case, too, and implement implicitely that
 # infamous Poisson lambda^2 estimator n*(n-1)/area^2  
   
-  if (weighted) wIJ <- 1 / (marx$lambda[J] * marx$lambda[I])
-  else wIJ <- 1 / marx$lambda[J] * area / (npts - 1)
+  if (weighted) wIJ <- 1 / (marx$intensity[J] * marx$intensity[I])
+  else wIJ <- 1 / marx$intensity[J] * area / (npts - 1)
       
  
   if (any(correction == "none")) {
@@ -325,7 +325,7 @@ estK <- function (X,
     bI <- b[I]
     newwIJ <- wIJ 
     if(scaling) newwIJ <- newwIJ * npts / area
-    RS <- Kwtsum(dIJ, bI, newwIJ, b, w = 1/marx$lambda, breaks)
+    RS <- Kwtsum(dIJ, bI, newwIJ, b, w = 1/marx$intensity, breaks)
     if (any(correction == "border")) {
       Kb <- RS$ratio
       K <- bind.fv(K, data.frame(border=Kb),"%s*(r)", # "%s[bord](r)",

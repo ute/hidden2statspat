@@ -40,7 +40,7 @@ quadratsplot(bronzefilter, quads1, quads2, style1, style2, pch=16, cex=.5)
 
 ##### ----------  analysis as rescaled second-order stationary  --------
 
-bronzs <- rescaled(bronzefilter, lambda = lambda)
+bronzs <- rescaled(bronzefilter, intensity = lambda)
 
 # testing the hypothesis that the pattern is rescaled second-order stationary
 #
