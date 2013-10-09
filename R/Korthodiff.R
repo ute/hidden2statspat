@@ -29,6 +29,8 @@
 #' @param max.ls.r upper limit for argument \eqn{r}. The default 3 is quite large - note
 #'  that the argument of the locally rescaled \eqn{K}-function corresponds to
 #'  \deqn{r/\sqrt{\lambda}, \lambda=intensity}{r / sqrt(intensity)} in the non scaled case.
+#'  @param warn.backtransformed logical, if \code{TRUE} issue a warning for retransformed DeltaKdir-function,
+#'  when the backtransformed  window is approximated its enclosing rectangle.
 #'
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 #' @export
@@ -56,11 +58,10 @@ estDeltaKdir <- function (X,
                        normpower = 0,
                        ...,
                        rescaleangle = TRUE, # rescale to full angle
-                       max.ls.r = 3.0) 
+                       max.ls.r = 3.0,
+                       warn.backtransformed = FALSE) 
 {  
   npts <- npoints(X)
-  W <- X$window
-  area <- area.owin(W)
   stopifnot(npts > 1)
   
   if (missing(type))   
@@ -103,16 +104,19 @@ estDeltaKdir <- function (X,
   {
     X <- backtransformed (X)
     # make uniform intensities
-    marx$intens <- npts / area
+    marx <- X$tinfo$tmarks
     # approximate window, if not a rectangle
     W <- X$window
     if (!is.rectangle(W))
     {
-      warning("window of backtransformed pattern approximated by its enclosing rectangle")
+      if (warn.backtransformed) warning("window of backtransformed pattern approximated by its enclosing rectangle")
       W <- owin(W$xrange, W$yrange)
       X$window <- W
     }
   }
+  
+  W <- X$window
+  area <- area.owin(W)
   
   # get arguments r for K
   

@@ -120,7 +120,7 @@ plot(estOnQuadrats(bronzt, fun = estK, quads = quads2, rmax = 0.5),
 
 Kpermute.test(bronzt, quads1 = quads1, quads2 = quads2, rmax=.5, 
               nperm = nperm)
-Kpermute.test(bronzt, tquads1 = quadt1, tquads2 = quadt2, rmax=.5, 
+Kpermute.test(bronzt, quads1 = quads1, quads2 = quads2, rmax=.5, 
               nperm = nperm, use.tbar = TRUE)
 
 
@@ -128,15 +128,15 @@ Kpermute.test(bronzt, tquads1 = quadt1, tquads2 = quadt2, rmax=.5,
 
 # Figure 14, left part, and test
 
-plot(estOnQuadrats(bronzt, fun = estDeltaKdir, tquads = quadt1, rmax = 0.6), 
+plot(estOnQuadrats(bronzt, fun = estDeltaKdir, quads = quads1, rmax = 0.6), 
      style = style1, ylim = c(-.5, .5))
-plot(estOnQuadrats(bronzt, fun = estDeltaKdir, tquads = quadt2, rmax = 0.6), 
+plot(estOnQuadrats(bronzt, fun = estDeltaKdir, quads = quads2, rmax = 0.6), 
      style = style2, add = TRUE)
 
-Kpermute.test(bronzt, Kfun = estDeltaKdir, tquads1 = quadt1, tquads2 = quadt2, 
+Kpermute.test(bronzt, Kfun = estDeltaKdir, quads1 = quads1, quads2 = quads2, 
               rmax=.5, use.tbar = FALSE, nperm = nperm)
 
-Kpermute.test(bronzt, Kfun = estDeltaKdir, tquads1 = quadt1, tquads2 = quadt2, 
+Kpermute.test(bronzt, Kfun = estDeltaKdir, quads1 = quads1, quads2 = quads2, 
               rmax=.5, use.tbar = TRUE, nperm = nperm)
 
 
