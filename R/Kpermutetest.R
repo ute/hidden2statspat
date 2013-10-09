@@ -54,8 +54,8 @@ correctionkey <- function (correction)
 #'   Only the first match is used. 
 #' @param quads quadrats for subsampling \code{X}. A \code{list} of objects
 #' of \bold{spatstat}-class \code{\link{owin}} or an object of \bold{spatstat}-class \code{\link{tess}}.
-#' In the current version not used for retransformed used if \code{type != "t"}.
-#' @param tquads used instead of \code{quads} for the backtransformed pattern if \code{type != "t"}.
+# In the current version not used for retransformed used if \code{type != "t"}.
+# @param tquads used instead of \code{quads} for the backtransformed pattern if \code{type != "t"}.
 #' @param fun the summary function to be applied 
 #' @param rmin optional, lower bound, defaults to 0,
 #' @param rmax upper bound for the radius,
@@ -81,7 +81,7 @@ correctionkey <- function (correction)
 #' @keywords nonparametric
 #' @keywords ts    
 
-estOnQuadrats <- function(X, type = NULL, quads, tquads,
+estOnQuadrats <- function(X, type = NULL, quads, 
                           fun = estK,
                           rmin = 0, rmax = 1.25, rlen = 100,
                         ...)
@@ -92,7 +92,7 @@ estOnQuadrats <- function(X, type = NULL, quads, tquads,
   if (!is.null(type)) # type request
   {
     type <- type[1]
-    if (!has.type(X, type)) X <- as.sostpp(X, type, ...)
+    if (!has.type(X, type)) X <- as.sostyppp(X, type, ...)
   }
   else type <- currenttype(X)
   
@@ -101,10 +101,6 @@ estOnQuadrats <- function(X, type = NULL, quads, tquads,
   if (length(type) == 0) stop ("no type of hidden 2nd order stationarity given")
   
   tindex <-  which(.TYPES == type)
-  
-  if (type=="t")  {X <- retransformed(backtransformed(X)); quads <- tquads}
-    # transformation is dangerous for the split list: quadrats do likely not map onto themselves
-    # causing a lot of trouble. Therefore make some shortcuts
   
   # names throw warnings in plyr. Remove all names from quads
   pplist <- ppsplit(X, quads)
@@ -176,9 +172,9 @@ estOnQuadrats <- function(X, type = NULL, quads, tquads,
 #'   Only the first match is used. 
 #' @param quads1,quads2 quadrats for subsampling \code{X} (and \code{Y}). A \code{list} of objects
 #' of \bold{spatstat}-class \code{\link{owin}} or an object of \bold{spatstat}-class \code{\link{tess}}.
-#' In the current version not used for retransformed used if \code{type != "t"}.
-#' @param tquads1,tquads2 used instead of \code{quads1} and \code{quads2} for 
-#'      the backtransformed pattern if \code{type != "t"}.
+# In the current version not used for retransformed used if \code{type != "t"}.
+# @param tquads1,tquads2 used instead of \code{quads1} and \code{quads2} for 
+#      the backtransformed pattern if \code{type != "t"}.
 #' @param rmin optional, lower integration bound, defaults to 0; see `Details',
 #' @param rmax upper integration bound, see `Details',
 #' @param rlen optional, number of steps for numerical integration, defaults to 256; see `Details',
@@ -244,7 +240,7 @@ estOnQuadrats <- function(X, type = NULL, quads, tquads,
 Kpermute.test <- function(X, Y = NULL,
                       type = NULL,
                       quads1, quads2,
-                      tquads1, tquads2,
+                    #  tquads1, tquads2,
                       rmin = 0,
                       rmax,
                       rlen = 100,
@@ -262,7 +258,7 @@ Kpermute.test <- function(X, Y = NULL,
   if (!is.null(type)) # type request
   {
     type <- type[1]
-    if (!has.type(X, type)) X <- as.sostpp(X, type, ...)
+    if (!has.type(X, type)) X <- as.sostyppp(X, type, ...)
   }
   else type <- currenttype(X)
   
@@ -271,15 +267,6 @@ Kpermute.test <- function(X, Y = NULL,
   if (length(type) == 0) stop ("no type of hidden 2nd order stationarity given")
   
   tindex <-  which(.TYPES == type)
-  
-  if (type=="t")  
-  {
-    # transformation is dangerous for the split list: quadrats do likely not map onto themselves
-    # causing a lot of trouble. Therefore make some shortcuts
-    X <- retransformed(backtransformed(X)) 
-    if(!is.null(Y)) Y <- retransformed(backtransformed(Y)) 
-    quads1 <- tquads1; quads2 <- tquads2
-  }  
   
   pplist1 <- ppsplit(X, quads1)
   pplist2 <-  if(is.null(Y)) ppsplit(X, quads2) else ppsplit(Y, quads2)

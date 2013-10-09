@@ -1,13 +1,13 @@
-# basic methods for sostpp, like print, extract and replace 
+# basic methods for sostyppp, like print, extract and replace 
 
 #' Check whether an object is a second-order stationarity typed point pattern
 #' 
-#' Checks if an object belongs to class \code{"sostpp"}.
+#' Checks if an object belongs to class \code{"sostyppp"}.
 #' 
 #' @param x any \code{R} object
-#' @return \code{TRUE} if \code{x} belongs to class \code{"sostpp"}, otherwise \code{FALSE}.
+#' @return \code{TRUE} if \code{x} belongs to class \code{"sostyppp"}, otherwise \code{FALSE}.
 #' @export
-#' @seealso \code{\link{sostpp.object}} for details on the class.
+#' @seealso \code{\link{sostyppp.object}} for details on the class.
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 
 is.sostyppp <- function(x) inherits(x, "sostyppp")
@@ -18,48 +18,60 @@ is.sostyppp <- function(x) inherits(x, "sostyppp")
 #' An analogon to extraction an replacement of points in an ordinary 
 #' point pattern, i.e. a spatstat-object of class \code{ppp}.
 #' 
-#' @rdname Extract.sostpp
+#' @rdname Extract.sostyppp
 #' @S3method [ sostyppp
 #' @method [ sostyppp
 # @export
 #' @param x a sos-typed point pattern, object of class \code{"sostyppp"}. 
 #' @param i subset index, see spatstat \code{\link{[<-.ppp}}.
 # @param j,drop ignored.
-#' @seealso \code{\link{sostpp.object}} for details on the class.
+#' @seealso \code{\link{sostyppp.object}} for details on the class.
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 
 
 "[.sostyppp" <- function(x, i) #, j, drop, ...) 
   {
+    need.to.rescue.tmarks <- (!is.null(x$tinfo$tmarks))
     # attach typemarks to marks
-    marx <- as.data.frame(marks(x))
-    male <- dim(marx)[2]
-    if (male>0) marx <- cbind(marx, x$tinfo$tmarks)  else marx <- x$tinfo$tmarks
-    x$marks <- marx
-    y <- NextMethod()
-    y <- as.sostyppp.ppp(y)
-    marx <- y$marks
-    if (male > 0) {
-      marks(y) <- marx[, (1:male)] # has to come first, function marks will destroy typemarks!
-      y$tinfo$tmarks <- as.data.frame(marx[, -(1 : male)]) 
+    if (need.to.rescue.tmarks)
+    {
+      marx <- as.data.frame(marks(x))
+      male <- dim(marx)[2]
+      if (male>0) marx <- cbind(marx, x$tinfo$tmarks)  else marx <- x$tinfo$tmarks
+      x$marks <- marx
+      y <- NextMethod()
+      y <- as.sostyppp.ppp(y)
+      y$tinfo <- x$tinfo
+      marx <- y$marks
+      if (male > 0) {
+        marks(y) <- marx[, (1:male)] # has to come first, function marks will destroy typemarks!
+        y$tinfo$tmarks <- as.data.frame(marx[, -(1 : male)]) 
+      }
+      else {
+        marks(y) <- NULL
+        y$tinfo$tmarks <- as.data.frame(marx)
+      }
+      names(y$tinfo$tmarks) <- names(x$tinfo$tmarks)
     }
-    else {
-      marks(y) <- NULL
-      y$tinfo$tmarks <- as.data.frame(marx)
-    }
+    else 
+    {  
+      y <- NextMethod()
+      y <- as.sostyppp.ppp(y)
+      y$tinfo <- x$tinfo
+    }  
     y$sostype <- x$sostype
     y$extra <- x$extra
-    names(y$tinfo$tmarks) <- names(x$tinfo$tmarks)
-    class(y)<- c("sostpp", class(y))
+    class(y)<- c("sostyppp", class(y))
     return(y)
   }
 
-#' @rdname Extract.sostpp
-#' @S3method [<- sostpp
-#'@usage \method{[}{sostpp} (x, i) <- value 
+#' @rdname Extract.sostyppp
+#' @S3method [<- sostyppp
+#'@usage \method{[}{sostyppp} (x, i) <- value 
 #' @export
 #' @param value Replacement for the subset, a sos-typed point pattern of same type. 
-
+#' @details Replacing a subset in a gradient retransformed point patterns does not make much sense
+#' since the transformation was calculated from the original data.
 "[<-.sostyppp" <-
   function(x, i, value) #j, value) 
 {
@@ -71,31 +83,42 @@ is.sostyppp <- function(x) inherits(x, "sostyppp")
     #check if both have same sos-type
     stopifnot(has.type(x, currenttype(value)))
     
-    #attach typemarks to marks in order to use spatstats replace mechanism
-    marx <- as.data.frame(marks(x))
-    male <- dim(marx)[2]
-    if (male>0) marx <- cbind(marx, x$tinfo$tmarks)  else marx <- x$tinfo$tmarks
-    mary <- as.data.frame(marks(value))
-    maly <- dim(mary)[2]
-    if (maly>0) mary <- cbind(mary, value$tinfo$tmarks)  else mary <- value$tinfo$tmarks
-   
-    # marks function is not inheritable - securing valuables before using it...
-    tmarknames <- names(x$tinfo$tmarks)
-    sostyp <- x$sostype
-    xtras <- x$extra
     
-    marks(x) <- marx
-    marks(value) <- mary
-    y <- NextMethod()
-    
-    marx <- y$marks
-    if (male > 0) {
-      marks(y) <- marx[, (1:male)] # has to come first, function marks will destroy typemarks!
-      y$tinfo$tmarks <- as.data.frame(marx[, -(1 : male)]) 
+    need.to.rescue.tmarks <- (!is.null(x$tinfo$tmarks))
+    if (need.to.rescue.tmarks)
+    {  
+      #attach typemarks to marks in order to use spatstats replace mechanism
+      marx <- as.data.frame(marks(x))
+      male <- dim(marx)[2]
+      if (male>0) marx <- cbind(marx, x$tinfo$tmarks)  else marx <- x$tinfo$tmarks
+      mary <- as.data.frame(marks(value))
+      maly <- dim(mary)[2]
+      if (maly>0) mary <- cbind(mary, value$tinfo$tmarks)  else mary <- value$tinfo$tmarks
+      
+      # marks function is not inheritable - securing valuables before using it...
+      tmarknames <- names(x$tinfo$tmarks)
+      sostyp <- x$sostype
+      xtras <- x$extra
+      
+      marks(x) <- marx
+      marks(value) <- mary
+      y <- NextMethod()
+      
+      marx <- y$marks
+      if (male > 0) {
+        marks(y) <- marx[, (1:male)] # has to come first, function marks will destroy typemarks!
+        y$tinfo$tmarks <- as.data.frame(marx[, -(1 : male)]) 
+      }
+      else {
+        marks(y) <- NULL
+        y$tinfo$tmarks <- as.data.frame(marx)    
+      }
     }
-    else {
-      marks(y) <- NULL
-      y$tinfo$tmarks <- as.data.frame(marx)    
+    else 
+    {
+      y <- NextMethod()
+      y <- as.sostyppp.ppp(y)
+      y$tinfo <- x$tinfo
     }
     y$sostype <- sostyp
     y$extra <- xtras
@@ -110,8 +133,8 @@ is.sostyppp <- function(x) inherits(x, "sostyppp")
 #' 
 #' @param x sos-typed point pattern.
 #' @param ... ignored
-#' @S3method print sostpp
-#' @method print sostpp
+#' @S3method print sostyppp
+#' @method print sostyppp
 # @export
 #' @seealso \code{\link{print.ppp}} for the print method of class ancestor \code{ppp}.
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
@@ -129,13 +152,13 @@ print.sostyppp <- function(x, ...)
 #' Manipulate s.o.s. type information
 #' 
 #' Access the encrypted type information of second-order stationarity typed point
-#' patterns, objects of class \code{sostpp}.
-#' @param x point pattern, of class sostpp
-#' @param type character, type of second-order stationarity. See \code{\link{sostpp.object}}
+#' patterns, objects of class \code{sostyppp}.
+#' @param x point pattern, of class sostyppp
+#' @param type character, type of second-order stationarity. See \code{\link{sostyppp.object}}
 #' for details.
 # @return logical
 #' @export
-# @rdname sostpp-types
+# @rdname sostyppp-types
 # @alias sos-type functions
 # @keywords internal
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
@@ -148,10 +171,10 @@ has.type <- function (x, type = .TYPES)
 }
 
 
-# @param x point pattern, of class sostpp
+# @param x point pattern, of class sostyppp
 # @return character, giving the last second-order stationarity type X was assigned to
 # if several types are present, the last one is picked
-# @rdname sostpp-types
+# @rdname sostyppp-types
 # @keywords internal
 #' @export
 # @alias sos-type functions
@@ -163,7 +186,7 @@ currenttype <- function (x)
 }
 
 # @return integer, index number of second-order stationarity type
-# @rdname sostpp-types
+# @rdname sostyppp-types
 #' @rdname sostatpp-internal
 #' @keywords internal
 # @export
@@ -174,10 +197,10 @@ currenttypeno <- function (x)
 }
 
 
-# @param x point pattern, of class sostpp
+# @param x point pattern, of class sostyppp
 # @return vector of type numbers, all but the current type
 # if several types are present, the last one is picked
-# @rdname sostpp-types
+# @rdname sostyppp-types
 #' @rdname sostatpp-internal
 #' @keywords internal
 # @export

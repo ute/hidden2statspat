@@ -80,9 +80,9 @@ estDeltaKdir <- function (X,
   marx <- X$tinfo$tmarks
   if (normpower != 0) {
     stopifnot ((1 <= normpower) & (normpower <= 2)) 
-    if (!is.null(marx$intensity)){  
-      renorm.factor <-  (sum(1 / marx$intensity) / (area.owin(X)))^(normpower / 2) 
-      marx$intensity <- marx$intensity * renorm.factor
+    if (!is.null(marx$intens)){  
+      renorm.factor <-  (sum(1 / marx$intens) / (area.owin(X)))^(normpower / 2) 
+      marx$intens <- marx$intens * renorm.factor
     }
     if(!is.null(marx$invscale)){
       renorm.factor <-  (sum(1 / marx$invscale^2) / (area.owin(X)))^(normpower / 4) 
@@ -97,13 +97,13 @@ estDeltaKdir <- function (X,
   
   # modify point pattern to "become" the template, if retransformed or rescaled
   
-  if (scaling) marx$intensity <- rep(1, npts) # refers to unit rate template
+  if (scaling) marx$intens <- rep(1, npts) # refers to unit rate template
   
   if (sostype == "t") 
   {
     X <- backtransformed (X)
     # make uniform intensities
-    marx$intensity <- npts / area
+    marx$intens <- npts / area
     # approximate window, if not a rectangle
     W <- X$window
     if (!is.rectangle(W))
@@ -141,7 +141,7 @@ estDeltaKdir <- function (X,
     alim <- c(0, min(rmax, rmaxdefault, max.ls.r))
   } 
   else { 
-    if(sostype == "w") lamax <- max(marx$intensity) else lamax <- npts / area
+    if(sostype == "w") lamax <- max(marx$intens) else lamax <- npts / area
     rmaxdefault <- rmax.rule("K", W, lamax)
     breaks <- handle.r.b.args(r, NULL, W, rmaxdefault = rmaxdefault)
     r <- breaks$r
@@ -195,8 +195,8 @@ estDeltaKdir <- function (X,
   XI <- X[I]
   XJ <- X[J]
   
-  if (weighted) wIJ <- 1 / (marx$intensity[J] * marx$intensity[I])
-  else  wIJ <- 1 / marx$intensity[J] * area / (npts - 1)
+  if (weighted) wIJ <- 1 / (marx$intens[J] * marx$intens[I])
+  else  wIJ <- 1 / marx$intens[J] * area / (npts - 1)
 
   
   edgewts <- edgecross.Ripley(XI, r = matrix(eudIJ, ncol = 1), dphi = dphi)

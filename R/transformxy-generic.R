@@ -63,8 +63,8 @@ subdivpolyxy <- function (poly, newlen)
   dy <- diff(c(yy, yy[1]))
   lengths <- sqrt(dx^2 + dy^2)
   ndiv <- ceiling(lengths / newlen) 
-  xnew <- unlist(mapply(addi, xx, dx, ndiv))
-  ynew <- unlist(mapply(addi, yy, dy, ndiv))
+  xnew <- as.vector(unlist(mapply(addi, xx, dx, ndiv)))
+  ynew <- as.vector(unlist(mapply(addi, yy, dy, ndiv)))
   poly$x <- xnew
   poly$y <- ynew
   poly$perimeter <- sum(lengths)

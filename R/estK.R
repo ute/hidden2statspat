@@ -159,8 +159,6 @@ estK <- function (X,
 {
   # verifyclass(X, "ppp")
   npts <- npoints(X)
-  W <- X$window
-  area <- area.owin(W)
   stopifnot(npts > 1)
   
   if (missing(type)) 
@@ -180,9 +178,9 @@ estK <- function (X,
   marx <- X$tinfo$tmarks
   if (normpower != 0) {
     stopifnot ((1 <= normpower) & (normpower <= 2)) 
-    if (!is.null(marx$intensity)){  
-      renorm.factor <-  (sum(1 / marx$intensity) / (area.owin(X)))^(normpower / 2) 
-      marx$intensity <- marx$intensity * renorm.factor
+    if (!is.null(marx$intens)){  
+      renorm.factor <-  (sum(1 / marx$intens) / (area.owin(X)))^(normpower / 2) 
+      marx$intens <- marx$intens * renorm.factor
     }
     if(!is.null(marx$invscale)){
       renorm.factor <-  (sum(1 / marx$invscale^2) / (area.owin(X)))^(normpower / 4) 
@@ -197,14 +195,18 @@ estK <- function (X,
   
   # modify point pattern to "become" the template, if retransformed or rescaled
   
-  if (scaling) marx$intensity <- rep(1, npts) # refers to unit rate template
+  if (scaling) marx$intens <- rep(1, npts) # refers to unit rate template
   
   if (sostype == "t") 
   {
     X <- backtransformed (X)
     # make uniform intensities
-    marx$intensity <- npts / area
+    # marx$intens <- rep(npts / area, npts)
+    marx <- X$tinfo$tmarks
   }
+  
+  W <- X$window
+  area <- area.owin(W)
   
   
   # get arguments r for K
@@ -234,7 +236,7 @@ estK <- function (X,
     alim <- c(0, min(rmax, rmaxdefault, max.ls.r))
   } 
   else { 
-    if(sostype == "w") lamax <- max(marx$intensity) else lamax <- npts / area
+    if(sostype == "w") lamax <- max(marx$intens) else lamax <- npts / area
     rmaxdefault <- rmax.rule("K", W, lamax)
     breaks <- handle.r.b.args(r, NULL, W, rmaxdefault = rmaxdefault)
     r <- breaks$r
@@ -308,8 +310,8 @@ estK <- function (X,
 # we use them here in the homogeneous / scaled case, too, and implement implicitely that
 # infamous Poisson lambda^2 estimator n*(n-1)/area^2  
   
-  if (weighted) wIJ <- 1 / (marx$intensity[J] * marx$intensity[I])
-  else wIJ <- 1 / marx$intensity[J] * area / (npts - 1)
+  if (weighted) wIJ <- 1 / (marx$intens[J] * marx$intens[I])
+  else wIJ <- 1 / marx$intens[J] * area / (npts - 1)
       
  
   if (any(correction == "none")) {
@@ -325,7 +327,7 @@ estK <- function (X,
     bI <- b[I]
     newwIJ <- wIJ 
     if(scaling) newwIJ <- newwIJ * npts / area
-    RS <- Kwtsum(dIJ, bI, newwIJ, b, w = 1/marx$intensity, breaks)
+    RS <- Kwtsum(dIJ, bI, newwIJ, b, w = 1/marx$intens, breaks)
     if (any(correction == "border")) {
       Kb <- RS$ratio
       K <- bind.fv(K, data.frame(border=Kb),"%s*(r)", # "%s[bord](r)",

@@ -14,7 +14,7 @@
 #' @title Plot of point pattern with test quadrats  
 #' @description Plot a point pattern with two sets of coloured test quadrats, 
 #' meant as a visualisation supplement for the function \code{\link{Kpermute.test}}.
-#' @param x point pattern, object of class \code{\link{sostpp}} or \pkg{spatstat} class \code{\link{ppp}}
+#' @param x point pattern, object of class \code{\link{sostyppp}} or \pkg{spatstat} class \code{\link{ppp}}
 #' @param quads1,quads2 test quadrats, a list of windows (\code{"\link{owin}"}) 
 #' or a tessellation (\pkg{spatstat}-object \code{"\link{tess}"})
 #' @param quads0 optional unused test quadrats

@@ -144,6 +144,7 @@ reweighted <- function (X, intensity = NULL, ...)#, normpower = 0)
     # now marx is really a data frame
     X$tinfo$tmarks <-  marx
   }
+  X$tinfo$intensity <- intensity
   X$sostype <- .settype("w", X$sostype)
   return(X)
 }
@@ -224,6 +225,8 @@ rescaled <- function (X,  invscale = NULL, intensity = NULL, ...)
   else marx <- as.data.frame(cbind(marx, invscale = iscale))
    X$tinfo$tmarks <-  marx
   }
+  X$tinfo$invscale <- invscale
+  X$tinfo$intensity <- intensity
   X$sostype <- .settype("s", X$sostype)
   return(X)
 }
@@ -400,13 +403,14 @@ ashomogeneous <- function (X,  type="h", intensity = NULL)
   if (npts > 0){
     if (is.null(intensity)) la <- npts / area.owin(X$window) else la <- intensity[1]
     if (!is.null(marx$intens)) marx$intens <- la
-    else marx <-  as.data.frame(cbind(marx, intensity = rep(la, npts)))
+    else marx <-  as.data.frame(cbind(marx, intens = rep(la, npts)))
     if (!is.null(marx$invscale)) marx$invscale <- sqrt(la)
     else marx <-  cbind(marx, invscale = sqrt(la))
     # make sure last type is set to given argument:
     X$tinfo$tmarks <-  marx
   }
-  X$sostype  <- .settype(type, .settype("h", .settype("hs", NULL)))
+  X$tinfo$intensity <- intensity
+    X$sostype  <- .settype(type, .settype("h", .settype("hs", NULL)))
   return(X)
 }
 
@@ -420,13 +424,17 @@ ashomogeneous <- function (X,  type="h", intensity = NULL)
 #'  with points in \code{x0} and \code{y0}.
 #'  The type of the result is set to both  homogeneous and scaled-homogeneous,
 #'  and is typemarked with constant intensity and constant inverse scale factor.
-#' @details As retransformed s.o.s. typed point pattern, \code{X} has an element \code{extra}, 
+#'  
+#'  The window of the resulting pattern is polygonal if the original was a rectangle or polygonal;
+#'  it is a binary mask if the original window was a binary mask.
+#' @details As retransformed s.o.s. typed point pattern, \code{X} has an element \code{tinfo}, 
 #' a list containing information about the transformation. If this list contains
-#' an element \code{invtrafo}, this element is taken to be a function and used 
+#' an element \code{backtransform}, this element is taken to be a function and used 
 #' to backtransform the window. If the original transformation was a gradient transformation,
 #' the coordinates of the window are interpolated. Currently, no saftey precautions if 
-#' \code{invtrafo} returns rubbish.
-#' If no element \code{invtrafo} is present in \code{X$extra}, the original window is retained, which also might result in rubbish.
+#' \code{backtransform} returns rubbish.
+#' 
+# If no element \code{invtrafo} is present in \code{X$extra}, the original window is retained, which also might result in rubbish.
 #' @export
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 #' @examples
@@ -435,22 +443,13 @@ ashomogeneous <- function (X,  type="h", intensity = NULL)
 #' plot(bronzetemplate, use.marks = FALSE)
 backtransformed <- function(X)
 {
-  #tmarx <- X$tinfo$tmarks
-   # stopifnot (!is.null (tmarx$x0), !is.null (tmarx$y0))
-  # if inverse transform is not given, the original window is taken. This
-  # can lead to problems if the transformation did not preserve the window,
-  # or if the point pattern was subsampled.
-  # if the trafo was gradx or grady, the result can only be approximated.
-#  W <- X$window
- # itra <- X$extra$invtrafo
-#  otra <- X$extra$trafoo
- # if (!is.null(itra) &!is.null(otra)) W <- coordTransform.owin(W, itra, otra)
-#  Y <- ashomogeneous(ppp(tmarx$x0, tmarx$y0, window = W, marks=X$marks))
   stopifnot(is.sostyppp(X))
   stopifnot(has.type(X, type= "t"))
-  if (is.null(btrafo <- X$tinfo$backtransform)) stop ("no backtransform given")
-  Y <- ashomogeneous(coordTransform(as.ppp(X, X$tinfo$backtransform)))
-  return(Y)
+  if (is.null(X$tinfo$backtransform)) stop ("no backtransform given")
+  if (is.function(X$tinfo$transform))  
+    Y <- coordTransform(as.ppp(X), trafoxy = X$tinfo$backtransform, invtrafoxy = X$tinfo$transform)
+  else Y <- coordTransform(as.ppp(X), trafoxy = X$tinfo$backtransform)                                 
+  return(ashomogeneous(Y))
 }
 
 
