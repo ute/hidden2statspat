@@ -285,96 +285,94 @@ retransformed <- function (X, backtrafo = identxy, intensity = NULL, trafo = NUL
 {
   if(!is.sostyppp(X)) X <- as.sostyppp.ppp(X, "none") 
   npts <- npoints(X)
+  isGradTrafo <- (backtrafo %in% c("gradx", "grady"))
   if (npts > 0){
-    if (is.function(backtrafo))
-    {
+    if (is.function(backtrafo)){
       if (is.mask(X$window)) if (!is.function(trafo)) 
          warning("retransformed point pattern with binary mask, but function trafo not given")
-      X$tinfo$backtransform <- backtrafo
-      X$tinfo$transform <- trafo
     } 
 
 # gradient transform    
     
-    else if (backtrafo %in% c("gradx", "grady"))
-    {    
-      if (is.null(intensity))  # just an ordinary inverse cdf transformation
-      {
-        if (backtrafo == "gradx") {
-          xlims <- X$window$xrange
-          oo <- rank(X$x, ties.method = "first")
-          x0 <- (xlims[1] + diff(xlims) * (0.5 + (1:npts)) / (npts+1))[oo]
-          y0 <- X$y
-        }
-        else {
-          ylims <- X$window$yrange
-          oo <- rank(X$y, ties.method = "first")
-          y0 <- (ylims[1] + diff(ylims) * (0.5 + (1:npts)) / (npts+1))[oo]
-          x0 <- X$x
-        }
-      } 
-      else {
-        la <- getIntensity(X, intensity, ...)
-        if(backtrafo == "gradx") {
-          z <- X$x; zrange <- X$window$xrange
+    else {
+      if (isGradTrafo) {
+        if (is.null(intensity)){  # just an ordinary inverse cdf transformation
+          if (backtrafo == "gradx") {
+            xlims <- X$window$xrange
+            oo <- rank(X$x, ties.method = "first")
+            x0 <- (xlims[1] + diff(xlims) * (0.5 + (1:npts)) / (npts+1))[oo]
+            y0 <- X$y
+          }
+          else {
+            ylims <- X$window$yrange
+            oo <- rank(X$y, ties.method = "first")
+            y0 <- (ylims[1] + diff(ylims) * (0.5 + (1:npts)) / (npts+1))[oo]
+            x0 <- X$x
+          }
         } 
         else {
-          z <- X$y; zrange <- X$window$yrange
+          la <- getIntensity(X, intensity, ...)
+          if(backtrafo == "gradx") {
+            z <- X$x; zrange <- X$window$xrange
+          } 
+          else {
+            z <- X$y; zrange <- X$window$yrange
+          }
+          oo <- order(z)
+          rk <- rank(z)  
+          n <- length(z)  
+          zz <- c(zrange[1], z[oo], zrange[2] )
+          lam <- (c(la[oo], la[oo[n]]) + c(la[oo[1]], la[oo])) / 2
+          intlam <- cumsum(c(0, lam * diff(zz)))
+          znew <- zrange[1] + intlam / max(intlam) * diff(zrange)
+          z <- znew[-c(1, n+2)][rk] 
+          if (backtrafo == "gradx") {
+            x0 <- z
+            y0 <- X$y
+          } else {
+            y0 <- z
+            x0 <- X$x
+          }
+        }  
+        
+        if (backtrafo == "gradx") 
+        {
+          xw <- X$window$xrange
+          xx0 <- c(xw[1], x0, xw[2])
+          xx <- c(xw[1], X$x, xw[2])
+          trafo <- function(x, y = NULL) {
+            if (is.null(y)) return(data.frame(x = approxfun(xx0, xx, ties = mean)(x$x), y = x$y))
+            else return (data.frame(x = approxfun(xx0, xx, ties = mean)(x), y = y))
+          }
+          backtrafo  <- function(x, y = NULL) {
+            if (is.null(y)) return(data.frame(x = approxfun(xx, xx0, ties = mean)(x$x), y = x$y))
+            else return (data.frame(x = approxfun(xx, xx0, ties = mean)(x), y = y))
+          }
         }
-        oo <- order(z)
-        rk <- rank(z)  
-        n <- length(z)  
-        zz <- c(zrange[1], z[oo], zrange[2] )
-        lam <- (c(la[oo], la[oo[n]]) + c(la[oo[1]], la[oo])) / 2
-        intlam <- cumsum(c(0, lam * diff(zz)))
-        znew <- zrange[1] + intlam / max(intlam) * diff(zrange)
-        z <- znew[-c(1, n+2)][rk] 
-        if (backtrafo == "gradx") {
-          x0 <- z
-          y0 <- X$y
-        } else {
-          y0 <- z
-          x0 <- X$x
+        else
+        {
+          yw <- X$window$yrange
+          yy0 <- c(yw[1], y0, yw[2])
+          yy <- c(yw[1], X$y, yw[2])
+          trafo  <- function(x, y = NULL) {
+            if (is.null(y)) return(data.frame(x = x$x, y = approxfun(yy0, yy)(x$y)))
+            else return (data.frame(x = x, y = approxfun(yy0, yy)(y)))
+          }
+          backtrafo  <- function(x, y = NULL) {
+            if (is.null(y)) return(data.frame(x = x$x, y = approxfun(yy, yy0)(x$y)))
+            else return(data.frame(x = x, y = approxfun(yy, yy0)(y)))
+          }
         }
       }  
-    
-      if (backtrafo == "gradx") 
-      {
-        xw <- X$window$xrange
-        xx0 <- c(xw[1], x0, xw[2])
-        xx <- c(xw[1], X$x, xw[2])
-        X$tinfo$transform <- function(x, y = NULL) {
-          if (is.null(y)) return(data.frame(x = approxfun(xx0, xx, ties = mean)(x$x), y = x$y))
-          else return (data.frame(x = approxfun(xx0, xx, ties = mean)(x), y = y))
-        }
-        X$tinfo$backtransform  <- function(x, y = NULL) {
-          if (is.null(y)) return(data.frame(x = approxfun(xx, xx0, ties = mean)(x$x), y = x$y))
-          else return (data.frame(x = approxfun(xx, xx0, ties = mean)(x), y = y))
-        }
-      }
-      else if (trafo == "grady") 
-      {
-        yw <- X$window$yrange
-        yy0 <- c(yw[1], y0, yw[2])
-        yy <- c(yw[1], X$y, yw[2])
-        X$tinfo$transform  <- function(x, y = NULL) {
-          if (is.null(y)) return(data.frame(x = x$x, y = approxfun(yy0, yy)(x$y)))
-          else return (data.frame(x = x, y = approxfun(yy0, yy)(y)))
-        }
-        X$tinfo$backtransform  <- function(x, y = NULL) {
-          if (is.null(y)) return(data.frame(x = x$x, y = approxfun(yy, yy0)(x$y)))
-          else return(data.frame(x = x, y = approxfun(yy, yy0)(y)))
-        }
-    
-    }
-    else stop(paste(sQuote("trafo"),
-      "should be a function, or one of the character strings",
-      dQuote("gradx"),"or", dQuote("grady")))
- 
-  }  
+      else stop(paste(sQuote("trafo"),
+                      "should be a function, or one of the character strings",
+                      dQuote("gradx"),"or", dQuote("grady")))
   }
+  }
+  X$tinfo$backtransform <- backtrafo
+  X$tinfo$transform <- trafo
+  X$tinfo$isGradTrafo <- isGradTrafo
   X$sostype <- .settype("t", X$sostype)
-  X$tinfo$trafo <- trafo
   X$tinfo$intensity <- intensity
   return(X)
 }
@@ -446,9 +444,15 @@ backtransformed <- function(X)
   stopifnot(is.sostyppp(X))
   stopifnot(has.type(X, type= "t"))
   if (is.null(X$tinfo$backtransform)) stop ("no backtransform given")
+  preserveRectangle <- is.rectangle(X$window) & X$tinfo$isGradTrafo
   if (is.function(X$tinfo$transform))  
-    Y <- coordTransform(as.ppp(X), trafoxy = X$tinfo$backtransform, invtrafoxy = X$tinfo$transform)
-  else Y <- coordTransform(as.ppp(X), trafoxy = X$tinfo$backtransform)                                 
+    Y <- coordTransform(as.ppp(X), 
+                        trafoxy = X$tinfo$backtransform, 
+                        invtrafoxy = X$tinfo$transform,
+                        subdivideBorder = !preserveRectangle)
+  else Y <- coordTransform(as.ppp(X), 
+                           trafoxy = X$tinfo$backtransform,
+                           subdivideBorder = !preserveRectangle)                                 
   return(ashomogeneous(Y))
 }
 

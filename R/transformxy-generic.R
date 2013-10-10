@@ -195,7 +195,8 @@ coordTransform.im <- function (X, trafoxy = identxy, invtrafoxy = identxy, ...)
 #'        map \code{\link{identxy}}, see also `Details'.
 #' @param invtrafoxy The inverse to \code{trafoxy}, defaults to the identical map 
 #'       \code{\link{identxy}}. Only needed if \code{X} is a pixel image.
-#' @param isAffine If true, no subdivision of rectangles or polygons, see the `Details'.
+#' @param subdivideBorder If TRUE, subdivision of rectangle or polygon borders to achieve better precision, 
+#' see the `Details'.
 #' @param \ldots Optional arguments passed to \code{\link{as.mask}} controlling the 
 #'      pixel resolution of the transformed window, if \code{X} is a binary pixel 
 #'      mask, or to \code{\link{refinepoly}}, if \code{X} is a polygon or a 
@@ -209,11 +210,11 @@ coordTransform.im <- function (X, trafoxy = identxy, invtrafoxy = identxy, ...)
 #'      
 #'      If the window is a rectangle or polygon, it is converted into a 
 #'      polygon which is subsequently refined using \code{\link{refinepoly}}, 
-#'      unless \code{isAffine = TRUE}. This is only necessary if the coordinate 
+#'      unless \code{subdivideBorder = FALSE}. This is only necessary if the coordinate 
 #'      transform is not affine, in order to achieve a better approximation of 
 #'      the transformed window. Note however that \code{coordTransform.owin} does 
 #'      not check whether \code{trafoxy} really is affine. The option 
-#'      \code{isAffine = TRUE} may therefore also be used to save memory and 
+#'      \code{subdivideBorder = FALSE} may therefore also be used to save memory and 
 #'      computation time when transforming xy-rectangles with a transformation 
 #'      that preserves axe-parallel rectangles.
 #' @seealso \code{\link{coordTransform.im}}, which is called if \code{X} is a pixel image. 
@@ -239,7 +240,7 @@ coordTransform.im <- function (X, trafoxy = identxy, invtrafoxy = identxy, ...)
 #' 
 #' # no refinement, assuming that trafo is affine
 #
-#' mappedRcoarse <- coordTransform(letterR, trafo, isAffine = TRUE)
+#' mappedRcoarse <- coordTransform(letterR, trafo, subdivideBorder = FALSE)
 #' plot(mappedRcoarse, add = TRUE)
 #' dummy <- lapply(mappedRcoarse$bdry, points, col = "green")
 #' # not much of a difference, though...
@@ -254,12 +255,12 @@ coordTransform.im <- function (X, trafoxy = identxy, invtrafoxy = identxy, ...)
 #' plot(mappedR, col = "green", add = TRUE)
 
 
-coordTransform.owin <- function (X, trafoxy = identxy, invtrafoxy = NULL, isAffine = FALSE, ...)
+coordTransform.owin <- function (X, trafoxy = identxy, invtrafoxy = NULL, subdivideBorder = TRUE, ...)
 {
     verifyclass(X, "owin")
     if (X$type %in% c("rectangle", "polygonal"))
       {
-        P <- if(isAffine) as.polygonal(X) else refinepoly(X, ...)
+        P <- if(!subdivideBorder) as.polygonal(X) else refinepoly(X, ...)
         newbdry <- lapply(P$bdry, mapstructxy, mapxy = trafoxy)
         # recalculate areas
         newerbdry <- lapply(newbdry, 
@@ -268,7 +269,7 @@ coordTransform.owin <- function (X, trafoxy = identxy, invtrafoxy = NULL, isAffi
         P$bdry <- newerbdry
         P$xrange <- range(sapply(P$bdry, function(p) p$x))
         P$yrange <- range(sapply(P$bdry, function(p) p$y))
-        if(isAffine & (X$type == "rectangle")) P <- as.rectangle(P)
+        if(!subdivideBorder & (X$type == "rectangle")) P <- as.rectangle(P)
         return(P)
        }  else if (X$type == "mask") {
          stopifnot(!is.null(invtrafoxy))
@@ -319,9 +320,9 @@ coordTransform.owin <- function (X, trafoxy = identxy, invtrafoxy = NULL, isAffi
 #' plot(ppstar, pch = 16, cex = .5)
 
 
-coordTransform.ppp <- function(X, trafoxy = identxy,  ...)#invtrafoxy=NULL, isAffine = FALSE, ...)
+coordTransform.ppp <- function(X, trafoxy = identxy,  ...)#invtrafoxy=NULL, subdivideBorder = FALSE, ...)
 {
   Pnew <- mapstructxy(X, trafoxy)
-  Pnew$window <- coordTransform.owin(X$window, trafoxy,  ...)#invtrafoxy, isAffine, ...)
+  Pnew$window <- coordTransform.owin(X$window, trafoxy,  ...)#invtrafoxy, subdivideBorder, ...)
   return(Pnew)
 }
