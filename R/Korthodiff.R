@@ -46,7 +46,7 @@
 #' lines(rr, estDeltaKdir (X[W2],r = rr)$iso, col="blue") 
 #'
 #' # the backtransformed pattern shows anisotropy
-#' Y <- backtransformed(retransformed(bronzefilter, trafo = "gradx"))                 
+#' Y <- backtransformed(retransformed(bronzefilter, backtrafo = "gradx"))                 
 #' lines(rr, estDeltaKdir (Y[W1], r = rr)$iso,  col= c("red"), lty = "dotted")
 #' lines(rr, estDeltaKdir (Y[W2], r = rr)$iso, col="blue", lty = "dotted" ) 
 

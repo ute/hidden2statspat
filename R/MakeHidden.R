@@ -270,7 +270,7 @@ rescaled <- function (X,  invscale = NULL, intensity = NULL, ...)
 #'   homogeneity by function with \code{"\link{backtransformed}"}. 
 #'   In the case of gradient transformations, these functions are obtained by linear transformation
 #'   with (\code{\link{approxfun}}). The reverse of \code{backtransform} is needed when the window is
-#'   a binary mask, see \link{spatstat::owin}, and has to be given as argument {\code{trafo}}.
+#'   a binary mask, see \link{owin}, and has to be given as argument {\code{trafo}}.
 #' @export
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 #'@references 
@@ -286,6 +286,7 @@ retransformed <- function (X, backtrafo = identxy, intensity = NULL, trafo = NUL
   if(!is.sostyppp(X)) X <- as.sostyppp.ppp(X, "none") 
   npts <- npoints(X)
   isGradTrafo <- (backtrafo %in% c("gradx", "grady"))
+  gradient <- ifelse(isGradTrafo, backtrafo, NULL)
   if (npts > 0){
     if (is.function(backtrafo)){
       if (is.mask(X$window)) if (!is.function(trafo)) 
@@ -371,7 +372,8 @@ retransformed <- function (X, backtrafo = identxy, intensity = NULL, trafo = NUL
   }
   X$tinfo$backtransform <- backtrafo
   X$tinfo$transform <- trafo
-  X$tinfo$isGradTrafo <- isGradTrafo
+  # X$tinfo$isGradTrafo <- isGradTrafo
+  X$tinfo$gradient <- gradient
   X$sostype <- .settype("t", X$sostype)
   X$tinfo$intensity <- intensity
   return(X)
@@ -444,7 +446,7 @@ backtransformed <- function(X)
   stopifnot(is.sostyppp(X))
   stopifnot(has.type(X, type= "t"))
   if (is.null(X$tinfo$backtransform)) stop ("no backtransform given")
-  preserveRectangle <- is.rectangle(X$window) & X$tinfo$isGradTrafo
+  preserveRectangle <- is.rectangle(X$window) & !is.null(X$tinfo$gradient)
   if (is.function(X$tinfo$transform))  
     Y <- coordTransform(as.ppp(X), 
                         trafoxy = X$tinfo$backtransform, 
