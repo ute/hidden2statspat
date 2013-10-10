@@ -1,0 +1,21 @@
+    CHANGES IN sostatpp VERSION 0.8.3
+
+OVERVIEW
+
+    o transition to new class for s.o.s. planar point patterns
+
+    o improved backtransformation of retransformed s.o.s. point processes
+
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o class sostyppp
+    The class definition for second-order stationarity type tagged planar point 
+    patterns has been largely reorganized, therefore the name change from 
+    sostpp to sostyppp
+
+    o no argument tquads in functions estOnQuadrats and Kpermute.test 
+    Due to improvement in retrieving the original window in function backtransform,
+    it is no longer necessary to provide the backtransformed window in functions
+    estOnQuadrats and Kpermute.test
+    
