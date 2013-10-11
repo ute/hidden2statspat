@@ -40,7 +40,7 @@ retagList <- function (arglist, tagnames)
   names(result) <- tagnames
   # provide space for the unnamed ones
   result$... <- list() 
-  for(i in 1 : length(arglist))
+  if (length(arglist) > 0) for(i in 1 : length(arglist))
   {
     arg <- arglist[[i]]
     
@@ -93,14 +93,9 @@ lplot <- function (objects=NULL, allinone = TRUE, ...)
 {
   stopifnot(is.list(objects))
   
-  # slow!
   # check whether objects have plot methods
   plotmethods <- methods(plot)
-  plotmethods <- plotmethods[attr(plotmethods,"info")$visible]
-  # adding <-  sapply(plotmethods, function(met) "add" %in%  names(formals(met)))
-  # also others do plot
   plottingclasses <- sapply(plotmethods, function(s) substr(s, 6, 200))
-             #{ss <- unlist(strsplit(s, "[.]")); paste(ss[-1],sep=".")})
   canplot <- function(obj) any(class(obj) %in% plottingclasses)
   objects <- objects[sapply(objects, canplot)]
  
@@ -118,7 +113,7 @@ lplot <- function (objects=NULL, allinone = TRUE, ...)
   do.call(plot, c(list(objects[[1]]), orderedArgs[[1]], 
                   orderedArgs[["..."]], add = addfirst))
   
-  for (i in 2:length(objects))
+  if (nobjects > 1) for (i in 2 : nobjects)
      do.call(plot, c(list(objects[[i]]), orderedArgs[[i]], 
        orderedArgs[["..."]], add = allinone))
 }
