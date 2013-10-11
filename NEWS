@@ -1,18 +1,23 @@
-    CHANGES IN sostatpp VERSION 0.8.3
+  CHANGES IN sostatpp VERSION 0.8.4
+    
+    o new function lplot: plotting objects in a list
+    plot arguments may be also given as named lists, thus assigning the designated
+    parameters to the objects in the list.
+    
+    o helper function retagList
+    
 
-OVERVIEW
+  CHANGES IN sostatpp VERSION 0.8.3
 
     o transition to new class for s.o.s. planar point patterns
-
-    o improved backtransformation of retransformed s.o.s. point processes
-
-
-SIGNIFICANT USER-VISIBLE CHANGES
-
-    o class sostyppp
     The class definition for second-order stationarity type tagged planar point 
     patterns has been largely reorganized, therefore the name change from 
     sostpp to sostyppp
+
+    o improved backtransformation of retransformed s.o.s. point processes
+    When a point pattern is tagged retransformed with gradient, the transform and
+    backtransform are approximated by interpolation (using approxfun)
+    Rectangular windows are preserved in gradient transformation. 
 
     o no argument tquads in functions estOnQuadrats and Kpermute.test 
     Due to improvement in retrieving the original window in function backtransform,
