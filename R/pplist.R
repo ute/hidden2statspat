@@ -41,9 +41,21 @@ quadratsubsample <- function (pp, quads = NULL, ...)
 #  attr(ppsample, "npoints") <- npts too dangerous if manipulated
 #  attr(ppsample, "area") <- areas
 #  attr(ppsample, "intensity") <- npts / areas
-  class(ppsample) <- c("ppsample", class(ppsample))
+  if(!("ppsample" %in% class(ppsample))) class(ppsample) <- c("ppsample", class(ppsample))
   return(ppsample)
 }
+
+#' Check whether an object is a sample of point patterns
+#'
+#' Checks if an object belongs to class \code{"ppsample"}.
+#'
+#' @param x any \code{R} object
+#' @return \code{TRUE} if \code{x} belongs to class \code{"ppsample"}, otherwise \code{FALSE}.
+#' @export
+# @seealso \code{\link{sostyppp.object}} for details on the class.
+# @author Ute Hahn,  \email{ute@@imf.au.dk}
+
+is.ppsample <- function(x) inherits(x, "ppsample")
 
 
 #'Estimated intensities of a point pattern sample
@@ -79,7 +91,41 @@ intensity.ppsample <- function(X) sapply(X, npoints)/ sapply(X, area.owin)
 #'@seealso \code{\link{ppsubsample}} for creating \code{ppsample} objects, 
 #'\code{intensity.ppsample} for estimating the empirical intensity, 
 #'\code{\link{npoints}} for spatstats generic function.
-#@examples
+#@exampl 
 
 npoints.ppsample <- function(X) sapply(X, npoints)
 
+#' Backtransformed a list of point pattern
+#'
+#' Backtransform all point patterns in a sample, as well as the parent window.
+#'
+#' @param X a sample of retransformed s.o.s. typed point patterns, object of class \code{{ppsample}}.
+#' @return a \code{ppsample} object consisiting of homogeneous s.o.s. typed point patterns.
+#' @details The parent window is also retransformed. For more details, see the function 
+#' \code{\link{backtransformed}} for single point patterns.
+#' @export
+#' @author Ute Hahn,  \email{ute@@imf.au.dk}
+# @examples
+# bronzetra <- retransformed(bronzefilter, "gradx")
+# bronzetemplate <- backtransformed(bronzetra)
+# plot(bronzetemplate, use.marks = FALSE)
+backtransformed.ppsample <- function(X)
+{
+  stopifnot(is.ppsample(X))
+  if (length(X) == 0) stop ("does not contain anything")    
+  X1 <- X[[1]]
+  stopifnot(is.sostyppp(X1))
+  stopifnot(has.type(X1, type= "t"))
+  W <- attr(X, "parentwindow")
+  if (!is.null(W))
+      W <- coordTransform(W, 
+                          trafoxy = X1$sostinfo$backtransform,
+                          invtrafoxy = X1$sostinfo$transform,
+                          subdivideBorder = !is.rectangle(W) | is.null(X1$sostinfo$gradient))
+  Y <- lapply(X, backtransformed)
+  attr(Y, "parentwindow") <- W
+  if(!("ppsample" %in% class(Y))) class(Y) <- c("ppsample", class(Y))
+  return(Y)    
+}
+  
+  

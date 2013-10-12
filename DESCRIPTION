@@ -1,7 +1,9 @@
 Package: sostatpp
-Version: 0.9
+Version: 0.9.1
 Date: 2013-10-12
 Title: Analysis of hidden second-order stationary point processes
+Authors@R: c(person("Ute", "Hahn", role = c("aut", "cre"),
+    email = "ute@imf.au.dk"))
 Author: Ute Hahn <ute@imf.au.dk>
 Maintainer: Ute Hahn <ute@imf.au.dk>
 Depends:
@@ -22,3 +24,4 @@ Description: A package on top of spatstat, contributing functions for
 License: GPL (>= 2)
 NeedsCompilation: yes
 LazyData: true
+BugReports:
