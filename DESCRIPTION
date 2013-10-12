@@ -1,6 +1,6 @@
 Package: sostatpp
-Version: 0.8.4
-Date: 2013-10-11
+Version: 0.9
+Date: 2013-10-12
 Title: Analysis of hidden second-order stationary point processes
 Author: Ute Hahn <ute@imf.au.dk>
 Maintainer: Ute Hahn <ute@imf.au.dk>
