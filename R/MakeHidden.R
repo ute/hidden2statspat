@@ -48,8 +48,7 @@ as.sostyppp <- function(x, type = "h", ...)
 as.sostyppp.ppp <- function(x, type = "h", ...)
 {
   X <- x
-  if(!("sostyppp" %in% class(x))) class(x) <-  c("sostyppp", class(x))
-
+  if (!("sostyppp" %in% class(X))) class(X) <-  c("sostyppp", class(X))
   X$sostinfo <- list()
   if (type == "none") { X$sostinfo$tmarks <- NULL;  X$sostype <- NULL }
   else { if (type == "w") X <- reweighted(X, ...)

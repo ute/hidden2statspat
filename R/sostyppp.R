@@ -61,7 +61,6 @@ is.sostyppp <- function(x) inherits(x, "sostyppp")
     }
     y$sostype <- x$sostype
     y$extra <- x$extra
-    class(y)<- c("sostyppp", class(y))
     return(y)
   }
 
@@ -103,7 +102,8 @@ is.sostyppp <- function(x) inherits(x, "sostyppp")
       marks(x) <- marx
       marks(value) <- mary
       y <- NextMethod()
-
+      y <- as.sostyppp.ppp(y)
+      
       marx <- y$marks
       if (male > 0) {
         marks(y) <- marx[, (1:male)] # has to come first, function marks will destroy typemarks!
@@ -123,7 +123,6 @@ is.sostyppp <- function(x) inherits(x, "sostyppp")
     y$sostype <- sostyp
     y$extra <- xtras
     names(y$sostinfo$tmarks) <- tmarknames
-    class(y)<- c("sostyppp", class(y))
     invisible(y)
 }
 
