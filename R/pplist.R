@@ -109,6 +109,7 @@ npoints.ppsample <- function(X) sapply(X, npoints)
 # bronzetra <- retransformed(bronzefilter, "gradx")
 # bronzetemplate <- backtransformed(bronzetra)
 # plot(bronzetemplate, use.marks = FALSE)
+
 backtransformed.ppsample <- function(X)
 {
   stopifnot(is.ppsample(X))

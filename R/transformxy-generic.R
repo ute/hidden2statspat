@@ -28,10 +28,15 @@ identxy <- function (x, y = NULL)
 #' documented in the source code
 #' @rdname sostatpp-internal
 #' @keywords internal
-mapstructxy <- function(X, mapxy = identxy)
+mapstructxy <- function(X, mapxy = identxy, ...)
 {
-  onearg <- is.null(formals(mapxy)$y)
-  newxy <- if(onearg) mapxy(X) else mapxy(X$x, X$y)
+  mapargs <- formals(mapxy)
+  onearg <- is.null(mapargs$y)
+  dotargs <- list(...)
+  if (length(dotargs) > 0) 
+    dotargs <- dotargs[!is.na(match(names(dotargs), names(mapargs)))]
+  newxy <- if(onearg) do.call(mapxy, c(list(X), dotargs)) 
+          else do.call(mapxy, c(list(X$x, X$y), dotargs))
   X$x <- newxy$x
   X$y <- newxy$y
   return(X)
@@ -92,8 +97,7 @@ subdivpolyxy <- function (poly, newlen)
 #' summary(fineR)
 #' plot(fineR)
 
-refinepoly <- function (X, edgelen = NULL) 
-{
+refinepoly <- function (X, edgelen = NULL) {
   verifyclass(X, "owin")
   poly <- as.polygonal(X)
   if (is.null(edgelen)) edgelen <- max(sapply(poly$bdry, peripolyxy)) / 50
@@ -109,7 +113,7 @@ refinepoly <- function (X, edgelen = NULL)
 #'
 #' @param X Object to be transformed, currently of class \code{"\link{im}"}, 
 #'        \code{"\link{owin}"} or \code{"\link{ppp}"}.
-#' @param \ldots arguments passed to class methods. 
+#' @param ... arguments passed to class methods. 
 #' @export
 #' @details The functions \code{trafoxy} (and \code{invtrafoxy}) take one 
 #'     or two arguments. In the latter case, both arguments are vectors of 
@@ -122,10 +126,7 @@ refinepoly <- function (X, edgelen = NULL)
 #' @seealso \code{\link{coordTransform.im}}, \code{\link{coordTransform.owin}},
 #' \code{\link{coordTransform.ppp}}
 
-coordTransform <- function(X,  ...)
-{
-  UseMethod("coordTransform", X)
-}
+coordTransform <- function(X,  ...) UseMethod("coordTransform", X)
 
 
 #' Apply Coordinate Transformation to a Pixel Image
@@ -139,8 +140,9 @@ coordTransform <- function(X,  ...)
 #'  map \code{\link{identxy}}, see `Details'.
 #' @param invtrafoxy the inverse to \code{trafoxy}, defaults to the identical 
 #'  map \code{\link{identxy}}.
-#' @param ... Optional arguments passed to \code{\link{as.mask}} controlling the 
-#'  pixel resolution of the transformed image. 
+#' @param ... Optional arguments passed to \code{trafoxy} and \code{ivtrafoxy}, 
+#'   and to \code{\link{as.mask}}, then controlling the pixel resolution of the 
+#'   transformed image. 
 #' @details The mappings are given by \code{trafoxy} (and \code{invtrafoxy}), 
 #'      a \code{function(x)} or \code{function(x, y)}. The functions have to return a
 #'      list or data frame with elements elements \code{x} and \code{y}. In the case with only one argument,
@@ -160,26 +162,27 @@ coordTransform <- function(X,  ...)
 #' plot(imR)
 #' plot(coordTransform(imR, trafo, invtrafo))
 
-coordTransform.im <- function (X, trafoxy = identxy, invtrafoxy = identxy, ...) 
-{
+coordTransform.im <- function (X, trafoxy = identxy, invtrafoxy = identxy, ...) {
   verifyclass(X, "im")
-  {
-    newcorns <- mapstructxy(corners(X), trafoxy)
-    newframe <- bounding.box.xy(newcorns)
-    W <- if (length(list(...)) > 0) 
-      as.mask(newframe, ...)
-    else as.mask(newframe, eps = with(X, min(xstep, ystep)))
-    naval <- switch(X$type, factor = {factor(NA, levels = levels(X))}, 
-      integer = NA_integer_, logical = as.logical(NA_integer_), 
-      real = NA_real_, complex = NA_complex_, character = NA_character_, 
-      NA)
-    Y <- as.im(W, value = naval)
-    xx <- as.vector(rasterx.im(Y))
-    yy <- as.vector(rastery.im(Y))
-    pre <- mapstructxy(list(x = xx, y = yy), invtrafoxy)
-    Y$v[] <- lookup.im(X, pre$x, pre$y, naok = TRUE)
-    return(Y)
-  }
+  newcorns <- mapstructxy(corners(X), trafoxy, ...)
+  newframe <- bounding.box.xy(newcorns)
+  
+  dotargs <- list(...)
+  if (length(dotargs) > 0) 
+    dotargs <- dotargs[!is.na(match(names(dotargs), names(formals(as.mask))))]
+  
+  W <- if (length(dotargs) > 0) do.call(as.mask, c(list(newframe), dotargs))
+       else as.mask(newframe, eps = with(X, min(xstep, ystep)))
+  naval <- switch(X$type, factor = {factor(NA, levels = levels(X))}, 
+                  integer = NA_integer_, logical = as.logical(NA_integer_), 
+                  real = NA_real_, complex = NA_complex_, character = NA_character_, 
+                  NA)
+  Y <- as.im(W, value = naval)
+  xx <- as.vector(rasterx.im(Y))
+  yy <- as.vector(rastery.im(Y))
+  pre <- mapstructxy(list(x = xx, y = yy), invtrafoxy, ...)
+  Y$v[] <- lookup.im(X, pre$x, pre$y, naok = TRUE)
+  return(Y)
 }  
 
 
@@ -197,16 +200,16 @@ coordTransform.im <- function (X, trafoxy = identxy, invtrafoxy = identxy, ...)
 #'       \code{\link{identxy}}. Only needed if \code{X} is a pixel image.
 #' @param subdivideBorder If TRUE, subdivision of rectangle or polygon borders to achieve better precision, 
 #' see the `Details'.
-#' @param \ldots Optional arguments passed to \code{\link{as.mask}} controlling the 
+#' @param ... Optional arguments passed to \code{trafoxy} and \code{invtrafoxy}, 
+#'      and / or to  \code{\link{as.mask}} controlling the 
 #'      pixel resolution of the transformed window, if \code{X} is a binary pixel 
-#'      mask, or to \code{\link{refinepoly}}, if \code{X} is a polygon or a 
+#'      mask, and / or to \code{\link{refinepoly}}, if \code{X} is a polygon or a 
 #'      rectangle, see the `Details'. 
 #' @details  The functions \code{trafoxy} (and \code{invtrafoxy}) take one 
 #'     or two arguments. In the latter case, both arguments are vectors of 
 #'     same length (not checked!), and the second argument has to be named \code{y}.
 #'     If only one argument is given, it is a list or a data frame with elements 
 #'     \code{x} and \code{y}. 
-#'      In a future version, ... may transport arguments to the transformation function
 #'      
 #'      If the window is a rectangle or polygon, it is converted into a 
 #'      polygon which is subsequently refined using \code{\link{refinepoly}}, 
@@ -228,13 +231,13 @@ coordTransform.im <- function (X, trafoxy = identxy, invtrafoxy = identxy, ...)
 #' # transformation of the polygonal window letterR from spatstat
 #' 
 #' # a nonlinear transformation 
-#' trafo <- function(xy) list(x = xy$x^1.5 + 0.5*xy$y, y = xy$y*.5)
+#' trafo <- function(xy, a = 1.5) list(x = xy$x^a + 0.5*xy$y, y = xy$y*.5)
 #' 
 #' # transform letterR and mark the boundary corners, 
 #' # dummy variable for silent return
 #' plot(letterR)
 #' dummy <- lapply(letterR$bdry, points, col = "red")
-#' mappedR <- coordTransform(letterR, trafo, edgelen = 0.1)
+#' mappedR <- coordTransform(letterR, trafo, edgelen = 0.1, a=1.2)
 #' plot(mappedR)
 #' dummy <- lapply(mappedR$bdry, points, col = "red")
 #' 
@@ -247,34 +250,35 @@ coordTransform.im <- function (X, trafoxy = identxy, invtrafoxy = identxy, ...)
 #' 
 #' # now as mask image. We need the inverse transformation, too
 #' 
-#' invtrafo <- function(xy) list(x = (xy$x - xy$y) ^(1/1.5), y = xy$y*2)
+#' invtrafo <- function(xy, a = 1.5) list(x = (xy$x - xy$y) ^(1/a), y = xy$y*2)
 #' wimR <- as.owin(as.im(letterR))
-#' mappedimR <- coordTransform(wimR, trafo, invtrafo)
+#' # eps controlles the pixel size of the transformed image, via as.mask
+#' mappedimR <- coordTransform(wimR, trafo, invtrafo, a = 1.2, eps = 0.02)
 #' plot(mappedimR) 
 #' # compare with the polygonal window from before
 #' plot(mappedR, col = "green", add = TRUE)
 
 
-coordTransform.owin <- function (X, trafoxy = identxy, invtrafoxy = NULL, subdivideBorder = TRUE, ...)
-{
-    verifyclass(X, "owin")
-    if (X$type %in% c("rectangle", "polygonal"))
-      {
-        P <- if(!subdivideBorder) as.polygonal(X) else refinepoly(X, ...)
-        newbdry <- lapply(P$bdry, mapstructxy, mapxy = trafoxy)
-        # recalculate areas
-        newerbdry <- lapply(newbdry, 
-                function(b) {b$area <-NULL; b$perimeter <- NULL;
-                         b$area <- area.xypolygon(b); return(b)})  
-        P$bdry <- newerbdry
-        P$xrange <- range(sapply(P$bdry, function(p) p$x))
-        P$yrange <- range(sapply(P$bdry, function(p) p$y))
-        if(!subdivideBorder & (X$type == "rectangle")) P <- as.rectangle(P)
-        return(P)
-       }  else if (X$type == "mask") {
-         stopifnot(!is.null(invtrafoxy))
-         return(as.owin(coordTransform(as.im(X), trafoxy, invtrafoxy, ...))) 
-       } else stop("Unrecognised window type")
+coordTransform.owin <- function(X, trafoxy = identxy, invtrafoxy = NULL, 
+                                subdivideBorder = TRUE, ...) {
+  verifyclass(X, "owin")
+  if (X$type %in% c("rectangle", "polygonal")){
+    dotargs <- list(...)
+    P <- if(!subdivideBorder) as.polygonal(X) else refinepoly(X, edgelen = dotargs$edgelen)
+    newbdry <- lapply(P$bdry, mapstructxy, mapxy = trafoxy, ...)
+    # recalculate areas
+    newerbdry <- lapply(newbdry, 
+                        function(b) {b$area <-NULL; b$perimeter <- NULL;
+                                     b$area <- area.xypolygon(b); return(b)})  
+    P$bdry <- newerbdry
+    P$xrange <- range(sapply(P$bdry, function(p) p$x))
+    P$yrange <- range(sapply(P$bdry, function(p) p$y))
+    if(!subdivideBorder & (X$type == "rectangle")) P <- as.rectangle(P)
+    return(P)
+  } else if (X$type == "mask") {
+    stopifnot(!is.null(invtrafoxy))
+    return(as.owin(coordTransform(as.im(X), trafoxy, invtrafoxy, ...))) 
+  } else stop("Unrecognised window type")
 }
 
 
@@ -288,13 +292,13 @@ coordTransform.owin <- function (X, trafoxy = identxy, invtrafoxy = NULL, subdiv
 #' @param X a point pattern (object of class \code{"ppp"}).
 #' @param trafoxy the coordinate transformation function, defaults to the identical 
 #'        map \code{\link{identxy}}, see also `Details'.
-#' @param \ldots Optional arguments passed to \code{\link{coordTransform.owin}}. 
+#' @param ... Optional arguments passed \code{trafoxy}, and to 
+#'      \code{\link{coordTransform.owin}}. 
 #' @details  The functions \code{trafoxy} (and \code{invtrafoxy}) take one 
 #'     or two arguments. In the latter case, both arguments are vectors of 
 #'     same length (not checked!), and the second argument has to be named \code{y}.
 #'     If only one argument is given, it is a list or a data frame with elements 
 #'     \code{x} and \code{y}. 
-#'      In a future version, ... may transport arguments to the transformation function
 #'      
 #'      If the window of $X$ is a pixel mask, an additional inverse transformation
 #'      has to be provided, see \code{\link{coordTransform.owin}}.
@@ -320,9 +324,8 @@ coordTransform.owin <- function (X, trafoxy = identxy, invtrafoxy = NULL, subdiv
 #' plot(ppstar, pch = 16, cex = .5)
 
 
-coordTransform.ppp <- function(X, trafoxy = identxy,  ...)#invtrafoxy=NULL, subdivideBorder = FALSE, ...)
-{
-  Pnew <- mapstructxy(X, trafoxy)
+coordTransform.ppp <- function(X, trafoxy = identxy, ...) {
+  Pnew <- mapstructxy(X, trafoxy, ...)
   Pnew$window <- coordTransform.owin(X$window, trafoxy,  ...)#invtrafoxy, subdivideBorder, ...)
   return(Pnew)
 }
