@@ -1,6 +1,6 @@
 Package: sostatpp
-Version: 0.9.1
-Date: 2013-10-12
+Version: 0.10.0
+Date: 2013-10-15
 Title: Analysis of hidden second-order stationary point processes
 Authors@R: c(person("Ute", "Hahn", role = c("aut", "cre"),
     email = "ute@imf.au.dk"))

@@ -5,8 +5,9 @@
 #'
 #'
 #'@import fdnonpar
-#'@import spatstat
+#'@import plottools
 #'@import plyr
+#'@import spatstat
 #'
 #'
 #'@name sostatpp-package
