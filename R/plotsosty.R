@@ -6,6 +6,8 @@
 #' @param main title text 
 #' @param ... arguments passed to \code{\link{plot.ppp}}
 #' @param col.win color of the plot window
+#' @param alpha.win numeric between 0 and 1, alpha-value of window color, see
+#'   \code{\link{alphacol}}
 #' @S3method plot sostyppp
 #' @method plot sostyppp
 # @export

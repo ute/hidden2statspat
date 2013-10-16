@@ -6,6 +6,10 @@
     o new methods for ppsample:
       plot
       subsampling with [
+
+    o quadratsubsample renamed to ppsubsample
+    
+    o a number of fixes
  
   CHANGES IN sostatpp VERSION 0.9.2
   

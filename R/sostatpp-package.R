@@ -112,9 +112,8 @@
 #' data(scholtzia)
 #' data(intensities) # same intensity estimate as in the article
 #' # compare estimates of reweighted and rescaled template K-function
-#'  meanintens <- npoints(scholtzia) / area.owin(scholtzia)
 #'  r.ls <- seq(0,1.25,0.002)
-#'  r.inhom <- r.ls / sqrt(meanintens)
+#'  r.inhom <- r.ls / sqrt(intensity(scholtzia))
 #'   
 #'############### Exploring and testing hypotheses #############################
 #'
@@ -126,22 +125,26 @@
 #'quads1 <- tiles(quadrats(W1, nx=4, ny=1))
 #'quads2 <- tiles(quadrats(W2, nx=2, ny=2))
 #'
-#'############### estimate K on subsamples ###############################
+#'sscholtzia <- rescaled(scholtzia, intensity = scholtzia.intens)
 #'
-#'Ks1 <- estOnQuadrats(scholtzia, fun = estK, type="s", lambda=scholtzia.intens, 
-#'                      quads = quads1, rmax = 1.25)
-#'                      
-#'Ks2 <- estOnQuadrats(scholtzia, fun = estK, type="s", lambda=scholtzia.intens, 
-#'                      quads = quads2, rmax = 1.25)
-#'                      
-#'####### plot the estimated K_functions ##################################
-#'
-#'plot(Ks1, col = "red", light = .5,
-#'     ylim=c(0, 6),  main=" rescaled, original intensity")
-#'plot(Ks2, col = "blue", light = .5, add=TRUE)
-#'
-#'#########  test s.-o. rescaled stationarity ###########################
-#'
-#'Kpermute.test(scholtzia, type="s", quads1 = quads1, quads2 = quads2, 
-#'                  rmax = 1.25, lambda=scholtzia.intens, use.tbar = TRUE)
+#'ssample <- list(hi = ppsubsample(sscholtzia, quads1), 
+#'                lo = ppsubsample(sscholtzia, quads2))
+################ estimate K on subsamples ###############################
+#
+## Ks1 <- estOnQuadrats(scholtzia, fun = estK, type="s", lambda=scholtzia.intens, 
+##                      quads = quads1, rmax = 1.25)
+#                      
+##Ks2 <- estOnQuadrats(scholtzia, fun = estK, type="s", lambda=scholtzia.intens, 
+##                      quads = quads2, rmax = 1.25)
+#                      
+######## plot the estimated K_functions ##################################
+#
+#plot(Ks1, col = "red", light = .5,
+#     ylim=c(0, 6),  main=" rescaled, original intensity")
+#plot(Ks2, col = "blue", light = .5, add=TRUE)
+#
+##########  test s.-o. rescaled stationarity ###########################
+#
+#Kpermute.test(scholtzia, type="s", quads1 = quads1, quads2 = quads2, 
+#                  rmax = 1.25, lambda=scholtzia.intens, use.tbar = TRUE)
 NA

@@ -8,9 +8,10 @@ Author: Ute Hahn <ute@imf.au.dk>
 Maintainer: Ute Hahn <ute@imf.au.dk>
 Depends:
     R (>= 2.15),
-    spatstat (>= 1.25)  
+    spatstat (>= 1.25)
 Imports:
     fdnonpar,
+    plottools,
     plyr
 Description: A package on top of spatstat, contributing functions for
     the analysis of homogeneous and inhomogeneous spatial point patterns 

@@ -195,7 +195,7 @@ reweighted <- function (X, intensity = NULL, ...)#, normpower = 0)
 
 rescaled <- function (X,  invscale = NULL, intensity = NULL, ...)
 {
-  if(!is.sostyppp(X)) X <- as.sostyppp.ppp(X)
+  if(!is.sostyppp(X)) X <- as.sostyppp.ppp(X, "none")
 
   npts <- npoints(X)
   marx <- X$sostinfo$tmarks
@@ -269,7 +269,7 @@ rescaled <- function (X,  invscale = NULL, intensity = NULL, ...)
 #'   homogeneity by function with \code{"\link{backtransformed}"}.
 #'   In the case of gradient transformations, these functions are obtained by linear transformation
 #'   with (\code{\link{approxfun}}). The reverse of \code{backtransform} is needed when the window is
-#'   a binary mask, see \link{spatstat::owin}, and has to be given as argument {\code{trafo}}.
+#'   a binary mask, see \code{spatstat}'s \code{\link{owin}}, and has to be given as argument {\code{trafo}}.
 #' @export
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 #'@references

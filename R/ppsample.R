@@ -2,17 +2,18 @@
 
 
 #'@title Subsample a point pattern
-#'@description Subsample a point pattern on quadrats, generating a list of 
+#@aliases ppsubsample
+#'@description Subsample a point pattern on quadrats, generating a list of
 #'point patterns (\code{\link{sostyppp}} objects)
-#'@param pp object of class \code{\link{sostyppp}} or spatstat-class \code{\link{ppp}}, 
+#'@param pp object of class \code{\link{sostyppp}} or spatstat-class \code{\link{ppp}},
 #'the point pattern to be subsampled
 #'@param quads optional a list of objects of spatstat-class \code{\link{owin}} or a
 #'spatstat - \code{\link{tess}} object
 #'@param ... arguments passed to spatstat-function \code{\link{quadrats}}
-#'or an object of spatstat-class \code{\link{tess}}, the quadrats for subsampling \code{pp}. 
+#'or an object of spatstat-class \code{\link{tess}}, the quadrats for subsampling \code{pp}.
 #or a named list containing lists of \code{owin}s or \code{tess} objects, see the Details.
-#'@return a \code{\link{ppsample}} object: a list of objects of same class as the input \code{pp}.
-#'@details If \code{quads} is not given, the quadrats are determined by spatstat-function 
+#'@return a \code{ppsample} object: a list of objects of same class as the input \code{pp}.
+#'@details If \code{quads} is not given, the quadrats are determined by spatstat-function
 #'\code{\link{quadrats}}.
 #'
 #'The \code{ppsample} can be plotted, and number of points or estimated intensity
@@ -20,14 +21,14 @@
 #'@export
 #
 
-quadratsubsample <- function (pp, quads = NULL, ...)
+ppsubsample <- function (pp, quads = NULL, ...)
 {
-  # names throw warnings in plyr, if used later. 
-  # Remove all names that are not list names from quads  
+  # names throw warnings in plyr, if used later.
+  # Remove all names that are not list names from quads
   unnamelist <- function(l)
 {
   if (!is.list(l)) names(l) <- NULL
-  if (is.list(l)) for (i in 1:length(l)) l[[i]] <- unnamelist(l[[i]])
+  if (is.list(l)) for (i in seq_along(l)) l[[i]] <- unnamelist(l[[i]])
   return(l)
 }
 
@@ -63,37 +64,38 @@ is.ppsample <- function(x) inherits(x, "ppsample")
 #'The estimated intensities for all point patterns contained in the data set.
 #'
 #'@param X a sample of point patterns, object of class \code{ppsample}
+#'@param ... ignored, only for compatibility with generic method in \code{spatstat}
 #'@return A numeric vector of estimated intensities.
 #'@details
 #'The intensities are estimated as the number of points divided by the area.
 #'@S3method intensity ppsample
-#'@method intensity ppsample 
+#'@method intensity ppsample
 #@export
 # @author Ute Hahn,  \email{ute@@imf.au.dk}
-#'@seealso \code{\link{ppsubsample}} for creating \code{ppsample} objects, 
+#'@seealso \code{\link{ppsubsample}} for creating \code{ppsample} objects,
 #'\code{\link{npoints.ppsample}} for obtaining the number of points,
 #'\code{\link{intensity}} for spatstats generic function.
 #@examples
 
-intensity.ppsample <- function(X) sapply(X, npoints)/ sapply(X, area.owin)
+intensity.ppsample <- function(X, ...) sapply(X, npoints)/ sapply(X, area.owin)
 
 
 #'Number of points in a point pattern sample
 #'
 #'Retrieves the number of points for all point patterns contained in the data set.
 #'
-#'@param X a sample of point patterns, object of class \code{ppsample}
+#'@param x a sample of point patterns, object of class \code{ppsample}
 #'@return integer vector, the number of points in each pattern contained in \code{X}
 #'@S3method npoints ppsample
-#'@method npoints ppsample 
+#'@method npoints ppsample
 #@export
 # @author Ute Hahn,  \email{ute@@imf.au.dk}
-#'@seealso \code{\link{ppsubsample}} for creating \code{ppsample} objects, 
-#'\code{intensity.ppsample} for estimating the empirical intensity, 
+#'@seealso \code{\link{ppsubsample}} for creating \code{ppsample} objects,
+#'\code{intensity.ppsample} for estimating the empirical intensity,
 #'\code{\link{npoints}} for spatstats generic function.
-#@exampl 
+#@exampl
 
-npoints.ppsample <- function(X) sapply(X, npoints)
+npoints.ppsample <- function(x) sapply(x, npoints)
 
 #' Backtransformed a list of point pattern
 #'
@@ -101,7 +103,7 @@ npoints.ppsample <- function(X) sapply(X, npoints)
 #'
 #' @param X a sample of retransformed s.o.s. typed point patterns, object of class \code{{ppsample}}.
 #' @return a \code{ppsample} object consisiting of homogeneous s.o.s. typed point patterns.
-#' @details The parent window is also retransformed. For more details, see the function 
+#' @details The parent window is also retransformed. For more details, see the function
 #' \code{\link{backtransformed}} for single point patterns.
 #' @export
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
@@ -113,26 +115,27 @@ npoints.ppsample <- function(X) sapply(X, npoints)
 backtransformed.ppsample <- function(X)
 {
   stopifnot(is.ppsample(X))
-  if (length(X) == 0) stop ("does not contain anything")    
+  if (length(X) == 0) stop ("does not contain anything")
   X1 <- X[[1]]
   stopifnot(is.sostyppp(X1))
   stopifnot(has.type(X1, type= "t"))
   W <- attr(X, "parentwindow")
   if (!is.null(W))
-      W <- coordTransform(W, 
+      W <- coordTransform(W,
                           trafoxy = X1$sostinfo$backtransform,
                           invtrafoxy = X1$sostinfo$transform,
                           subdivideBorder = !is.rectangle(W) | is.null(X1$sostinfo$gradient))
   Y <- lapply(X, backtransformed)
   attr(Y, "parentwindow") <- W
   if(!("ppsample" %in% class(Y))) class(Y) <- c("ppsample", class(Y))
-  return(Y)    
+  return(Y)
 }
-  
+
 
 
 #' @title Extract subset of a point pattern sample
-#'
+#' @aliases [.ppsample
+#' @name Subset_ppsample
 #' @description Subsample a point pattern sample, retaining information about
 #' the original pattern's window.
 #'
@@ -150,5 +153,5 @@ backtransformed.ppsample <- function(X)
   y <- NextMethod()
   attr(y, "parentwindow") <- attr(x, "parentwindow")
   class(y) <- class(x)
-  y    
+  y
 }
