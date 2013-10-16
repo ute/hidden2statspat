@@ -129,4 +129,26 @@ backtransformed.ppsample <- function(X)
   return(Y)    
 }
   
-  
+
+
+#' @title Extract subset of a point pattern sample
+#'
+#' @description Subsample a point pattern sample, retaining information about
+#' the original pattern's window.
+#'
+#' @return A \code{ppsample} object.
+# @S3method [ ppsample
+#' @method [ ppsample
+#' @export
+#' @param x a list of point patterns, object of class \code{"ppsample"}.
+#' @param i subset index.
+# @param j,drop ignored.
+#' @author Ute Hahn,  \email{ute@@imf.au.dk}
+
+
+"[.ppsample" <- function(x, i) {
+  y <- NextMethod()
+  attr(y, "parentwindow") <- attr(x, "parentwindow")
+  class(y) <- class(x)
+  y    
+}
