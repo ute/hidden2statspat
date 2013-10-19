@@ -35,39 +35,28 @@ is.sostyppp <- function(x) inherits(x, "sostyppp")
     # attach typemarks to marks
     if (need.to.rescue.tmarks)
     {
-      marx <- marks(x) 
-      tmarx <- as.matrix(x$sostinfo$tmarks) 
-      if (is.null(marx)) {
-        marx <- tmarx
-        male <- 0
-      } else { 
-        marx <- as.matrix(marx)
-        male <- dim(marx)[2]
-        marx <- cbind(marx, tmarx)  
-      }  
-      x$marks <- as.data.frame(marx)
+      marx <- as.data.frame(marks(x))
+      male <- dim(marx)[2]
+      if (male>0) marx <- cbind(marx, x$sostinfo$tmarks)  else marx <- x$sostinfo$tmarks
+      x$marks <- marx
       y <- NextMethod()
-      y <- as.sostyppp(y, "none")
+      y <- as.sostyppp.ppp(y)
       y$sostinfo <- x$sostinfo
-      # now split up the marks again
-      marx <- as.matrix(y$marks)
+      marx <- y$marks
       if (male > 0) {
-        # new side effects in spatstat make this a dangerous thing: y looses its type!
-        # marks(y) <- marx[, (1:male)] # has to come first, function marks will destroy typemarks!
-        y$marks <- marx[, (1:male)]
-        y$sostinfo$tmarks <- as.data.frame(marx[, -(1 : male)], row.names = NULL)
+        marks(y) <- marx[, (1:male)] # has to come first, function marks will destroy typemarks!
+        y$sostinfo$tmarks <- as.data.frame(marx[, -(1 : male)])
       }
       else {
-        y$marks <- NULL
-        y$markformat <- "none"
-        y$sostinfo$tmarks <- as.data.frame(marx, row.names = NULL)
+        marks(y) <- NULL
+        y$sostinfo$tmarks <- as.data.frame(marx)
       }
       names(y$sostinfo$tmarks) <- names(x$sostinfo$tmarks)
     }
     else
     {
       y <- NextMethod()
-      y <- as.sostyppp(y, "none")
+      y <- as.sostyppp.ppp(y)
       y$sostinfo <- x$sostinfo
     }
     y$sostype <- x$sostype
@@ -92,61 +81,45 @@ is.sostyppp <- function(x) inherits(x, "sostyppp")
 
     #check if both have same sos-type
     stopifnot(has.type(x, currenttype(value)))
-    
-    sostyp <- x$sostype
-    xtras <- x$extra
-    sosinfo <- x$sostinfo
-    tmarknames <- names(x$sostinfo$tmarks)
-    
-    marx <- marks(x) 
-    marknames <- names(marx)
-   
+
+
     need.to.rescue.tmarks <- (!is.null(x$sostinfo$tmarks))
     if (need.to.rescue.tmarks)
     {
       #attach typemarks to marks in order to use spatstats replace mechanism
-      tmarx <- as.matrix(x$sostinfo$tmarks) 
-       if (is.null(marx)) {
-          marx <- tmarx
-          male <- 0
-      } else { 
-        marx <- as.matrix(marx)
-        male <- dim(marx)[2]
-        marx <- cbind(marx, tmarx)  
-      } 
-    
-      names(marx) <- NULL
-      mary <- as.matrix(marks(value))
+      marx <- as.data.frame(marks(x))
+      male <- dim(marx)[2]
+      if (male>0) marx <- cbind(marx, x$sostinfo$tmarks)  else marx <- x$sostinfo$tmarks
+      mary <- as.data.frame(marks(value))
       maly <- dim(mary)[2]
-      tvmarx <- as.matrix(value$sostinfo$tmarks)
-      if (maly>0) mary <- cbind(mary, tvmarx)  else mary <- tvmarx
-      names(mary) <- NULL
-      
+      if (maly>0) mary <- cbind(mary, value$sostinfo$tmarks)  else mary <- value$sostinfo$tmarks
+
       # marks function is not inheritable - securing valuables before using it...
-     
-      marks(x) <- as.data.frame(marx, row.names = NULL)
-      marks(value) <- as.data.frame(mary, row.names = NULL)
+      tmarknames <- names(x$sostinfo$tmarks)
+      sostyp <- x$sostype
+      xtras <- x$extra
+
+      marks(x) <- marx
+      marks(value) <- mary
       y <- NextMethod()
-      y <- as.sostyppp(y, "none")
-      y$sostinfo <- sosinfo
+      y <- as.sostyppp.ppp(y)
       
-      marx <- as.matrix(y$marks)
+      marx <- y$marks
       if (male > 0) {
-        y$marks <- as.data.frame(marx[, (1:male)], row.names = NULL) # has to come first, function marks will destroy typemarks!
-        y$sostinfo$tmarks <- as.data.frame(marx[, -(1 : male)], row.names = NULL)
+        marks(y) <- marx[, (1:male)] # has to come first, function marks will destroy typemarks!
+        y$sostinfo$tmarks <- as.data.frame(marx[, -(1 : male)])
       }
       else {
-        y$marks <- NULL
-        y$sostinfo$tmarks <- as.data.frame(marx, row.names = NULL)
+        marks(y) <- NULL
+        y$sostinfo$tmarks <- as.data.frame(marx)
       }
     }
     else
     {
       y <- NextMethod()
-      y <- as.sostyppp(y)
+      y <- as.sostyppp.ppp(y)
       y$sostinfo <- x$sostinfo
     }
-    if(!is.null(y$marks)) names(y$marks) <- marknames
     y$sostype <- sostyp
     y$extra <- xtras
     names(y$sostinfo$tmarks) <- tmarknames

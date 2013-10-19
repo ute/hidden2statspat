@@ -5,23 +5,25 @@
 #'described in Hahn & Jensen (2013). Returns an object of class \code{Kpermutest}
 #'that also can be plotted, see the details.
 #'@param x the point pattern to be tested, an object of class \code{sostyppp}
-#'@param qsamples optional subsamples to be compared, given as \code{list} 
-#'    of (two) lists of  test quadrats,  see Details
-#'@param ... optional parameters for the function \code{\link{get.qsamples}},
-#'and for the function given as \code{Kfun}, see Details
-#'@param Kfun optional \code{function}, the \eqn{K}-function to be used,
-#'  either \code{\link{estK}} (default) or \code{\link{estDeltaKdir}},
+#'@param qsets optional subsamples to be compared, given as \code{list} 
+#'    of (two) lists of  test quadrats or tessellations (objects of type 
+#'    \code{\link{tess}}),  see Details
 #'@param r0 numeric, the upper integration limit, see Details,
 #'@param rlen optional, number of steps for numerical integration, defaults to 256,
 #see Details,
+#'@param Kfun optional \code{function}, the \eqn{K}-function to be used,
+#'  either \code{\link{estK}} (default) or \code{\link{estDeltaKdir}},
+#'@param ... optional parameters #for the function \code{\link{get.qsamples}}, and 
+#'for the function \code{Kfun},# see Details
 #'@param use.tbar logical, if true, a modified test statistic is used, see Details,
-#'@param nperm number of random permutations, see Details, 
-#'@param noTest optional logical, if \code{TRUE}, no test is run, only the point 
-#'pattern subsamples and \eqn{K}-function estimates are returned.
+#'@param nperm number of random permutations, see Details.
+#@param noTest optional logical, if \code{TRUE}, no test is run, only the point 
+#pattern subsamples and \eqn{K}-function estimates are returned.
+#'
 #'@details The function tests if the point pattern \code{x} is (hidden) second-
 #'order stationary. The pattern \code{x} is an object of type \code{sostyppp}, and
 #'its type tag determines  which type of second-order stationarity will be tested.
-#'\subsection{What the test does}{
+#'\subsection{What the test does, and details on the parameters}{
 #'The test is based on estimates of the K-function on two subsamples of the
 #'pattern \code{x}. The two samples of estimated K-functions are compared by a 
 #'permutation test. The test statistic is the integral over a squared Welch-t-statistic,
@@ -38,7 +40,7 @@
 #'the integrand with  \eqn{mean (s_1^2(r)/m_1 + s_2^2(r)/m_2)}. To use this variant
 #'instead of the original statistc \eqn{T}, let \code{use.tbar = TRUE}
 #'
-#'The \emph{p}-value is obtained by permutation across the groups. The number of
+#'The \emph{p}-value is obtained by permutation across the groups; the number of
 #'permutations is specified by \code{nperm}. If \code{nperm = NULL}, 
 #'the exact test with all permutations is used (combinations, for symmetry reasons). 
 #'This may cause memory or computing time issues. 
@@ -46,35 +48,39 @@
 #'unless \code{nperm} is larger than the number of disjoint combinations. 
 #'In that case, the exact version is applied, see \code{\link{tL2.permtest}}.
 #'
-#'To test differences in local anisotropy, the \eqn{\Delta K_{dir}}-function 
-#'is used instead of the isotropic \eqn{K}-function, see H&J (2013). 
+#'To test against differences in local anisotropy, in particular to test the
+#'hypotheses of locally rescaled and retransformed second-order stationarity 
+#'against each other, H\&J (2013) propose to use the \eqn{\Delta K_{dir}}-function 
+#'instead of the isotropic \eqn{K}-function. 
 #'For this variant of the test, let \code{Kfun = estDeltaKdir}.
 #'
+#'A list of quadrats as required for argument \code{qsets} can be obtained by
+#'function \code{\link{quadsets.hilo}}.
 #'}
-#'\subsection{Specifiying test quadrats}{
-#'Samples of quadrats to be compared can be given explicitely, via the argument 
-#'\code{qsamples}. For best power, one should chose the two samples such that 
-#'one sample contains quadrats with high intensity, the other sample contains 
-#'quadrats with low intensity. Consequently, the list \code{qsamples} contains 
-#'two elements \code{hi} and \code{lo}. 
-#'These are
-#'either objects of ({spatstat}) class \code{\link{tess}}, or \code{list}s of
-#'objects of ({spatstat}-) class \code{\link{owin}}.
-#'
-#'If \code{qsamples} is not given, \code{sos.test} passes the optional \ldots 
-#'arguments to function \code{\link{get.qsamples}}. This function optionally 
-#'constructs quadrats, and divides them into sets with high and low intensity,
-#'conditioned on a minimum number \code{minpoints} of points. The arguments used
-#'are 
-#'\itemize{
-#'\item \code{quadrats} : pre-specified quadrats, a {spatstat}-\code{\link{tess}} object, 
-#'or a \code{list}s of objects of {spatstat}- \code{\link{owin}}s.
-#'\item\code{nx, ny, xbreaks, ybreaks, grad} : arguments for setting up quadrats,
-#'\item\code{minpoints} : the minimum number of points required (default: 20),
-#'}
-#'for details see \code{\link{get.qsamples}.
-#'}
-#'}  
+#\subsection{Specifiying test quadrats}{
+#Samples of quadrats to be compared can be given explicitely, via the argument 
+#\code{qsamples}. For best power, one should chose the two samples such that 
+#one sample contains quadrats with high intensity, the other sample contains 
+#quadrats with low intensity. Consequently, the list \code{qsamples} contains 
+#two elements \code{hi} and \code{lo}. 
+#These are
+#either objects of ({spatstat}) class \code{\link{tess}}, or \code{list}s of
+#objects of ({spatstat}-) class \code{\link{owin}}.
+#
+#If \code{qsamples} is not given, \code{sos.test} passes the optional \ldots 
+#arguments to function \code{\link{get.qsamples}}. This function optionally 
+#constructs quadrats, and divides them into sets with high and low intensity,
+#conditioned on a minimum number \code{minpoints} of points. The arguments used
+#are 
+#\itemize{
+#\item \code{quadrats} : pre-specified quadrats, a {spatstat}-\code{\link{tess}} object, 
+#or a \code{list}s of objects of {spatstat}- \code{\link{owin}}s.
+#\item\code{nx, ny, xbreaks, ybreaks, grad} : arguments for setting up quadrats,
+#\item\code{minpoints} : the minimum number of points required (default: 20),
+#}
+#for details see \code{\link{get.qsamples}.
+#}
+#}  
 #'\subsection{Details on the return value}{
 #'The test returns an object belonging to classes \code{sostest} and \code{htest},
 #'a list containing the following components:
