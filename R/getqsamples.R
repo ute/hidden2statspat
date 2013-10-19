@@ -12,20 +12,33 @@
 #'@param xbreaks,ybreaks numeric vector of \eqn{x} resp. \eqn{y} coordinates of the
 #'quadrat boundaries
 #'@param minpoints minimum number of points required, see Details.
+#'@param by.intensity logical, if \code{TRUE}, use estimated intensity for division,
+#'otherwise, go by gradient coordinate.
+#'
 #'@details
 #'If \code{quadrats} is not given, the quadrats are generated using spatstat's function 
 #'\code{\link{quadrats}}, which splits the window into rectangles.
 #'Then, the \eqn{x}-coordinates of quadrat boundaries are determined either by 
-#'specifying \code{xbreaks}, or by \code{nx} and \code{gradx}, with priority on \code{xbreaks}. 
+#'specifying \code{xbreaks}, or by \code{nx} and \code{gradx}, with priority on 
+#'\code{xbreaks}. 
 #'If \code{gradx} is \code{TRUE}, equidistant quantiles of the 
 #'\eqn{x}-coordinates of the point pattern \code{pp} are used; otherwise, 
 #'the boundaries are equally spaced. The \eqn{y}-coordinate is treated analogously.
 #'
+#'
 #'Quadrats with a number of points less than \code{minpoints} are returned as
-#'a list "\code{unused}". The remaining quadrats are divided into a set with high
-#'and a set with low estimated intensity. The median of the intensity estimates
-#'on the "used" quadrats serves as threshold.
+#'a list "\code{unused}". 
+#'
+#'If \code{by.intensity} is \code{TRUE}, the remaining quadrats are divided into 
+#'a set (list of quadrats) with high and a set with low estimated intensity. 
+#'#'If \code{by.intensity} is \code{FALSE}, the remaining quadrats are divided 
+#'into two sets according to their \eqn{x}-coordinate, if \code{gradx} is 
+#'\code{TRUE}. Otherwise, the \eqn{y}-coordinate is used as criterion.
 #'  
+#In case of an uneven number of quadrats with enough points, the set with "low" 
+#intensity or gradient coordinate 
+#
+#'    
 #'@return A list with three elements \code{hi}, \code{lo} and \code{unused}. The 
 #'elements themselves are lists of spatstat-\code{owin} objects.
 #'@seealso The spatstat function \code{quadrats}
@@ -35,8 +48,69 @@
 
 
 quadsets.hilo <- function (pp, quads = NULL, 
-                           nx = NULL, ny = NULL,  gradx = FALSE, grady = FALSE,
+                           nx = NULL, ny = NULL, gradx = FALSE, grady = FALSE,
                            xbreaks = NULL, ybreaks = NULL,
-                           minpoints = 20){
-  NULL
+                           minpoints = 20,
+                           by.intensity = !xor(gradx, grady)) {
+  stopifnot(is.ppp(pp))
+  if (is.null(quads)) { 
+    # prepare arguments for quadrats function
+    if (is.null(xbreaks)){
+      if (is.null(nx)) stop("one of nx or xbreaks has to be given")
+      if (gradx) { 
+        if (npoints(pp) < nx - 1) {
+          warning ("not enough points for gradient subdivision of window")
+        } 
+        else {
+            inset <- if (nx > 1) quantile(pp$x, prob = (1 : (nx-1)) / nx) else NULL
+            xbreaks <- c(pp$window$xrange[1], inset, pp$window$xrange[2])
+            nx <- NULL
+        }
+      }  
+    }
+    if (is.null(ybreaks)){
+      if (is.null(ny)) stop("one of ny or ybreaks has to be given")
+      if (grady) { 
+        if (npoints(pp) < ny - 1) {
+          warning ("not enough points for gradient subdivision of window")
+        } 
+        else {
+          inset <- if (ny > 1) quantile(pp$y, prob = (1 : (ny-1)) / ny) else NULL
+          ybreaks <- c(pp$window$yrange[1], inset, pp$window$yrange[2])
+          ny <- NULL
+        }
+      }  
+    }
+    quads <- tiles(quadrats(pp$window, nx, ny, xbreaks, ybreaks))
+  } 
+  else {
+    if (is.tess(quads)) quads <- tiles(quads)
+    stopifnot(is.list(quads))
+  }
+  ppsmpl <- ppsubsample(pp, quads)
+  npts <- npoints(ppsmpl)
+  enoughpts <- (npts >= minpoints)
+  nused <- sum(enoughpts)
+  if (nused < 2) 
+    warning ("quadrats with minimum number of points are not enough to make two subsets")
+  usedquads <- quads[enoughpts]
+  if (by.intensity) {
+    ints <- intensity(ppsmpl[enoughpts])
+    ord <- order(ints)
+#     
+#     [enoughpoints])  
+#     medint <- median(ints[enoughpts])
+#     hi <- (ints > medint) & enoughpts
+#     lo <- (ints <= medint) & enoughpts
+  }
+  else {
+    if (gradx) centre <- sapply(usedquads, function(owi)mean(owi$xrange))
+    else centre <- sapply(usedquads, function(owi)mean(owi$yrange))
+    ord <- order(centre)
+  }
+  # if the number of used quadrats is uneven, assign one more to the "lo" set
+  mord <- (nused + 1) %/% 2 
+  list(hi = usedquads[ord[mord + seq_len(nused - mord)]],
+       lo = usedquads[ord[seq_len(mord)]],
+       unused = quads[!enoughpts])
 }
