@@ -13,7 +13,7 @@
 #see Details,
 #'@param Kfun optional \code{function}, the \eqn{K}-function to be used,
 #'  either \code{\link{estK}} (default) or \code{\link{estDeltaKdir}},
-#'@param ... optional parameters #for the function \code{\link{get.qsamples}}, and 
+#'@param ... optional parameters #for the function \code{\link{quadshilo}}, and 
 #'for the function \code{Kfun},# see Details
 #'@param use.tbar logical, if true, a modified test statistic is used, see Details,
 #'@param nperm number of random permutations, see Details.
@@ -55,7 +55,7 @@
 #'For this variant of the test, let \code{Kfun = estDeltaKdir}.
 #'
 #'A list of quadrats as required for argument \code{qsets} can be obtained by
-#'function \code{\link{quadsets.hilo}}.
+#'function \code{\link{quadshilo}}.
 #'}
 #\subsection{Specifiying test quadrats}{
 #Samples of quadrats to be compared can be given explicitely, via the argument 
@@ -68,7 +68,7 @@
 #objects of ({spatstat}-) class \code{\link{owin}}.
 #
 #If \code{qsamples} is not given, \code{sos.test} passes the optional \ldots 
-#arguments to function \code{\link{get.qsamples}}. This function optionally 
+#arguments to function \code{\link{quadshilo}}. This function optionally 
 #constructs quadrats, and divides them into sets with high and low intensity,
 #conditioned on a minimum number \code{minpoints} of points. The arguments used
 #are 
@@ -78,7 +78,7 @@
 #\item\code{nx, ny, xbreaks, ybreaks, grad} : arguments for setting up quadrats,
 #\item\code{minpoints} : the minimum number of points required (default: 20),
 #}
-#for details see \code{\link{get.qsamples}.
+#for details see \code{\link{quadshilo}.
 #}
 #}  
 #'\subsection{Details on the return value}{
@@ -106,7 +106,7 @@
 #'    \url{http://data.imf.au.dk/publications/csgb/2013/math-csgb-2013-07.pdf}
 #'
 #'@seealso function \code{\link{tL2.permtest}} from package {fdnonpar} is used 
-#'as test engine, \code{\link{get.qsamples}} is used for setting up quadrat samples.
+#'as test engine, \code{\link{quadshilo}} is used for setting up quadrat samples.
 #'The quadrat subsamples or the $K$-function estimates can be plotted, see 
 #'\code{\link{plot.sostest}}
 

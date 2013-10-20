@@ -47,11 +47,11 @@
 #'@author Ute Hahn,  \email{ute@@imf.au.dk}
 
 
-quadsets.hilo <- function (pp, quads = NULL, 
-                           nx = NULL, ny = NULL, gradx = FALSE, grady = FALSE,
-                           xbreaks = NULL, ybreaks = NULL,
-                           minpoints = 20,
-                           by.intensity = !xor(gradx, grady)) {
+quadshilo <- function(pp, quads = NULL, 
+                      nx = NULL, ny = NULL, gradx = FALSE, grady = FALSE,
+                      xbreaks = NULL, ybreaks = NULL,
+                      minpoints = 20,
+                      by.intensity = !xor(gradx, grady)) {
   stopifnot(is.ppp(pp))
   if (is.null(quads)) { 
     # prepare arguments for quadrats function
