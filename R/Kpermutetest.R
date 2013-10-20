@@ -61,12 +61,12 @@ correctionkey <- function (correction)
 #' @param rmax upper bound for the radius,
 #' @param rlen optional, number of steps in argument vector, defaults to 256,
 #' @param ... further arguments passed to \code{"fun"} or for type-tagging of the point pattern \code{X}
-#' @return An object of class \code{foolist}, which is a list with items
+#' @return An object of class \code{eoqlist}, which is a list with items
 #' \itemize{
 #'    \item \code{npts} number of points on the quadrats
-#'    \item \code{r} arguments of the \eqn{K}-function
+#    \item \code{r} arguments of the \eqn{K}-function
 #    \item \code{foomean} unweighted mean of the estimated \eqn{K}-functions
-#'    \item \code{fooarray} array of estimates, of dimension \code{rlen} x number of quadrats
+#'    \item \code{fooli} list, one entry each for every correction of array of estimates, of dimension \code{rlen} x number of quadrats
 #'    \item \code{footheo} theoretical values under CSR (Poisson process)
 #'    \item \code{type} the type character
 #'    \item \code{correction} character, the correction used
@@ -136,7 +136,7 @@ estOnQuadrats <- function(X, type = NULL, quads,
    # r = rr,
   #  foomean = Kmean,
     # fooarray = Kar,
-    fooli = Kars,
+    foolist = Kars,
     footheo = Ktheo,
     type = type
  #   ylab = ylab,

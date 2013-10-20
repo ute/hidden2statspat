@@ -8,8 +8,8 @@
   22 m x 22 m plot in Australian bush.
   
   Data were recorded and analysed by Armstrong (1991). A locally scaled point 
-  process was fitted to the data by Prokesova et al. 
-  (2006). 
+  process was fitted to the data in Prokesova et al. (2006). The data set was
+  also analysed in Hahn and JEnsen (2013).
 } 
 \format{
   An object of class \code{"ppp"}
