@@ -1,20 +1,22 @@
-# test on second-order stationarity
+# test of second-order stationarity
 
 #'@title Test of second-order stationarity
 #'@description Perform a permutation test of (hidden) second-order stationarity as 
 #'described in Hahn & Jensen (2013). Returns an object of class \code{Kpermutest}
 #'that also can be plotted, see the details.
 #'@param x the point pattern to be tested, an object of class \code{sostyppp}
-#'@param qsets optional subsamples to be compared, given as \code{list} 
+#'@param qsets quadrat sets on which the point pattern is to be compared, given as
+#'     \code{list} 
 #'    of (two) lists of  test quadrats or tessellations (objects of type 
-#'    \code{\link{tess}}),  see Details
+#'    \code{\link{tess}}). The list contains entries with names \code{hi}
+#'    and \code{lo}, optionally also \code{unused}, as produced by  \code{\link{quadshilo}}.
 #'@param r0 numeric, the upper integration limit, see Details,
 #'@param rlen optional, number of steps for numerical integration, defaults to 256,
 #see Details,
 #'@param Kfun optional \code{function}, the \eqn{K}-function to be used,
 #'  either \code{\link{estK}} (default) or \code{\link{estDeltaKdir}},
-#'@param ... optional parameters #for the function \code{\link{quadshilo}}, and 
-#'for the function \code{Kfun},# see Details
+#'@param ... optional parameters for function \code{Kfun}. To speed up 
+#'calculations, it is recommended to give an explicite \code{correction} argument.
 #'@param use.tbar logical, if true, a modified test statistic is used, see Details,
 #'@param nperm number of random permutations, see Details.
 #@param noTest optional logical, if \code{TRUE}, no test is run, only the point 
@@ -36,7 +38,8 @@
 #'of the integrand over all \code{rlen} values of \eqn{r}, multiplied by the length
 #'of the integral, i.e., by \code{r0}.
 #'
-#'A variant of the test statistic, \eqn{\bar T}{Tbar}, replaces the denominator in
+#'A variant of the test statistic, \eqn{\bar T}{Tbar}, uses the variance stabilized
+#'function \eqn{K(r)/r} instead of \eqn{K(r)} and replaces the denominator in
 #'the integrand with  \eqn{mean (s_1^2(r)/m_1 + s_2^2(r)/m_2)}. To use this variant
 #'instead of the original statistc \eqn{T}, let \code{use.tbar = TRUE}
 #'
@@ -57,30 +60,6 @@
 #'A list of quadrats as required for argument \code{qsets} can be obtained by
 #'function \code{\link{quadshilo}}.
 #'}
-#\subsection{Specifiying test quadrats}{
-#Samples of quadrats to be compared can be given explicitely, via the argument 
-#\code{qsamples}. For best power, one should chose the two samples such that 
-#one sample contains quadrats with high intensity, the other sample contains 
-#quadrats with low intensity. Consequently, the list \code{qsamples} contains 
-#two elements \code{hi} and \code{lo}. 
-#These are
-#either objects of ({spatstat}) class \code{\link{tess}}, or \code{list}s of
-#objects of ({spatstat}-) class \code{\link{owin}}.
-#
-#If \code{qsamples} is not given, \code{sos.test} passes the optional \ldots 
-#arguments to function \code{\link{quadshilo}}. This function optionally 
-#constructs quadrats, and divides them into sets with high and low intensity,
-#conditioned on a minimum number \code{minpoints} of points. The arguments used
-#are 
-#\itemize{
-#\item \code{quadrats} : pre-specified quadrats, a {spatstat}-\code{\link{tess}} object, 
-#or a \code{list}s of objects of {spatstat}- \code{\link{owin}}s.
-#\item\code{nx, ny, xbreaks, ybreaks, grad} : arguments for setting up quadrats,
-#\item\code{minpoints} : the minimum number of points required (default: 20),
-#}
-#for details see \code{\link{quadshilo}.
-#}
-#}  
 #'\subsection{Details on the return value}{
 #'The test returns an object belonging to classes \code{sostest} and \code{htest},
 #'a list containing the following components:
@@ -91,7 +70,7 @@
 #' \cr\code{method}\tab{a character string indicating what type of test was performed,}
 #' \cr\code{data.name}\tab{a character string giving the name(s) of the data.}
 #' \cr\code{ppsamples}\tab{a list of \code{{ppsample}}-objects, with elements 
-#' \code{hi}, \code{lo} and \code{unused}}
+#' \code{hi}, \code{lo} (and \code{unused}, if present)}
 #' \cr\code{Ksamples}\tab{a list of \code{\link{fdsample}}-objects, with elements 
 #' \code{hi}, \code{lo} and \code{theo}}
 #' }
@@ -111,17 +90,47 @@
 #'\code{\link{plot.sostest}}
 
 sos.test <- function (x,
-                      qsamples = NULL,
-                      ...,
-                      #quadrats = NULL,
-                      #nx = NULL, ny = NULL, xbreaks = NULL, ybreaks = NULL,
-                       #grad = "", minpoints = 20,
+                      qsets = NULL,
                       Kfun = estK,
-                      r0 = NULL, rlen = 256, 
+                      r0, rlen = 256, 
+                      ...,
                       use.tbar = FALSE,
-                      nperm = 25000,
-                      noTest = FALSE) {
-  NULL
+                      nperm = 1000) {
+  if(!is.ppp(x)) stop("not a point pattern")
+  AnisTest <- identical(Kfun, estDeltaKdir)
+  dataname <- paste( "point pattern",deparse(substitute(sost)))
+  type <- currenttype(x)
+  if (length(type) == 0) stop ("unknown type of hidden 2nd-order stationarity")
+  typename <- .TYPENAMESX[which(.TYPES == type)]
+  
+  stopifnot (is.list(qsets) && length(qsets) > 1)
+  stopifnot (all(c("hi", "lo") %in% names(qsets)))
+  pp.hi <- ppsubsample(x, qsets$hi)           
+  pp.lo <- ppsubsample(x, qsets$lo)           
+  pp.unused <- if (!is.null(qsets$unused)) ppsubsample(x, qsets$unused) else NULL          
+  
+  testerg <- twosample.K.test(pp.hi, pp.lo, Kfun = Kfun, r0 = r0, ...,  
+                              use.tbar = use.tbar, nperm = nperm)
+  Ksnames <- names(testerg$Ksamples) 
+  Ksnames[1] <- "hi"
+  Ksnames[2] <- "lo"
+  names(testerg$Ksamples) <- Ksnames
+         
+             
+  testerg$ppsamples <- list(hi = pp.hi, lo = pp.lo, unused = pp.unused)           
+  
+  testerg$data.name <- dataname
+  
+  testerg$method <- c(paste("Studentized permutation test of",
+          typename ," hidden second-order stationarity,"),
+          ifelse(AnisTest, "directional version, using Delta K_dir",
+                "isotropic version, using K_0"),
+          paste("test statistic: ", if(use.tbar) "Tbar,"
+               else "T,", "upper integration bound: ",r0),
+           testerg$method[2] )
+  testerg$alternative <- c(paste("not the same", typename, "K-function"),
+                      if(AnisTest) ",\nbut different kinds of anisotropy")
+  testerg           
 }
 
 
@@ -172,5 +181,5 @@ sos.test <- function (x,
 plot.sostest <- function(sost, hilostyles, plotquads = FALSE,
                          theostyle = style(lwd = "dashed"), 
                          ...) {
-  NA
+  
 }

@@ -237,7 +237,7 @@ estOnQuadrats <- function(X, type = NULL, quads,
 #' @keywords nonparametric
 #' @keywords ts
 
-Kpermute.test <- function(X, Y = NULL,
+oldKpermute.test <- function(X, Y = NULL,
                       type = NULL,
                       quads1, quads2,
                     #  tquads1, tquads2,
