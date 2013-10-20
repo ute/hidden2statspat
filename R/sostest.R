@@ -93,7 +93,7 @@
 #' \cr\code{ppsamples}\tab{a list of \code{{ppsample}}-objects, with elements 
 #' \code{hi}, \code{lo} and \code{unused}}
 #' \cr\code{Ksamples}\tab{a list of \code{\link{fdsample}}-objects, with elements 
-#' \code{hi} and \code{lo}}
+#' \code{hi}, \code{lo} and \code{theo}}
 #' }
 #'}
 #'
@@ -122,4 +122,55 @@ sos.test <- function (x,
                       nperm = 25000,
                       noTest = FALSE) {
   NULL
+}
+
+
+#'@title Plot K-functions or quadrats used in test on second-order stationarity
+#'@description Plot the K-function estimates or the point pattern subsamples used
+#'in a test on second-order stationarity, \code{\link{sos.test}}.
+#'@param sost result of a \code{\link{sos.test}},
+#'@param hilostyles list of \code{\link{style}} lists with elements \code{hi} 
+#'and \code{lo}, defines how the quadrats or K-function estimates are plotted see Details,
+#'@param theostyle plot style for the reference \eqn{K}-function of a Poisson point process,
+#'@param ... further arguments passed to plot methods.
+#'@details 
+#'If \code{plotquads} is \code{FALSE}, the estimates of the \eqn{K}-function on
+#'the quadrats are plotted together with the group means. The \eqn{K}-function
+#'of a Poisson point process is also present in the plot, unless \code{theostyle = NULL}.
+#'
+#'If \code{plotquads} is \code{TRUE}, a plot of the point pattern, divided into
+#'the quadrats that were used in the test, is generated, with background colours 
+#'according to \code{hilostyles}.
+#'
+#'Colours and line attributes for plotting quadrats or K-function estimates
+#'are controlled by argument \code{hilostyles}, which contains two elements \code{hi}
+#'and \code{lo}. These are \code{\link{style}} lists with elements
+#'\tabular{ll}{
+#'\code{col} \tab colour
+#'\cr\code{col.mea}\tab optional, colour for the mean \eqn{K}-function, defaults to \code{col}
+#\cr\code{col.env}\tab optional, colour for the envelope, defaults to \code{col}
+#'\cr\code{col.win}\tab optional, colour for the quadrats, defaults to \code{col}
+#'\cr\code{col.pts}\tab optional, colour for the points in quadratsplot, defaults to 
+#'\code{par("col")}
+#'\cr\code{alpha} \tab optional, alpha-value for the individual \eqn{K}-functions, defaults to \code{0.5}
+#'\cr\code{alpha.win} \tab optional, alpha-value for the quadrats, defaults to \code{0.5 * alpha}
+#'\cr\code{lwd}\tab optional, line width for plot of \eqn{K}-functions, defaults to \code{par("lwd")}
+#'\cr\code{lwd.mea}\tab optional line width for the mean \eqn{K}-function, defaults to \code{2 * lwd}
+#'}
+#'@export
+#'@author Ute Hahn,  \email{ute@@imf.au.dk}
+#'@examples
+#'# testing beilschmiedia pattern on reweighted second-order stationarity
+#'bei.ml <- reweighted(bei, intensity = bei.intens.maxlik)
+#'bei.quads <- hiloquads(bei, nx = 8, ny = 4, minpoints = 30)
+#'beitest <- sos.test(bei.ml, quads = bei.quads)
+#'beistyle <- list(hi = style(col = "red"), lo = style(col = "blue"))
+#'
+#'plot(beitest, beistyle, main = "bei.ml: K estimated on quadrats")
+#'plot(beitest, beistyle, plotquads = TRUE, main = "bei.ml: quadrats for testing")
+
+plot.sostest <- function(sost, hilostyles, plotquads = FALSE,
+                         theostyle = style(lwd = "dashed"), 
+                         ...) {
+  NA
 }
