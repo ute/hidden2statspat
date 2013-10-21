@@ -1,8 +1,16 @@
+  CHANGES IN sostatpp VERSION 0.11.1
+
+    o new plot function for class Ktest
+    
+    o function quadratsplot completely rewritten, with changed call
+    
+    o some fixes
+
   CHANGES IN sostatpp VERSION 0.11.0
 
     o new functions twosample.K.test and sos.test, to replace Kpermute.test
 
-    o new class sostest
+    o new class Ktest
 
   CHANGES IN sostatpp VERSION 0.10.1
   

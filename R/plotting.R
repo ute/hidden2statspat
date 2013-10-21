@@ -61,7 +61,7 @@
 #'      )
 
 
-quadratsplot <- function (x, quads1, quads2,
+oldquadratsplot <- function (x, quads1, quads2,
                           style1 = NULL, style2 = NULL, 
                           bgcol1 = NULL, bgcol2 = NULL, 
                           quads0 = NULL, style0 = list(col = "white"), bgcol0 = NULL,

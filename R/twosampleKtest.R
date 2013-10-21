@@ -114,7 +114,9 @@ twosample.K.test <- function (x, y,
   testerg$method <- method
   testerg$alternative <- alternative
   testerg$data.name <- dataname
-  testerg$Ksamples <- list(x = Kx, y = Ky, theo = Ktheo)
+  testerg$Ksamples <- list(theo = Ktheo, x = Kx, y = Ky) 
+  # don't change this - theo is asumed to be the first to be plotted, otherwise
+  # it will lie above the interesting things
   class(testerg) <- c("Ktest", "htest")
   return(testerg)
 }

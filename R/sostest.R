@@ -69,8 +69,9 @@
 #' \cr\code{alternative}\tab{a character string describing the alternative hypothesis,}
 #' \cr\code{method}\tab{a character string indicating what type of test was performed,}
 #' \cr\code{data.name}\tab{a character string giving the name(s) of the data.}
-#' \cr\code{ppsamples}\tab{a list of \code{{ppsample}}-objects, with elements 
-#' \code{hi}, \code{lo} (and \code{unused}, if present)}
+# \cr\code{ppsamples}\tab{a list of \code{{ppsample}}-objects, with elements 
+# \code{hi}, \code{lo} (and \code{unused}, if present)}
+# takes muc too much space for some examples with intensity as im
 #' \cr\code{Ksamples}\tab{a list of \code{\link{fdsample}}-objects, with elements 
 #' \code{hi}, \code{lo} and \code{theo}}
 #' }
@@ -111,10 +112,10 @@ sos.test <- function (x,
   
   testerg <- twosample.K.test(pp.hi, pp.lo, Kfun = Kfun, r0 = r0, ...,  
                               use.tbar = use.tbar, nperm = nperm)
-  Ksnames <- names(testerg$Ksamples) 
-  Ksnames[1] <- "hi"
-  Ksnames[2] <- "lo"
-  names(testerg$Ksamples) <- Ksnames
+  # Ksnames <- names(testerg$Ksamples) 
+  # Ksnames[] <- "hi"
+  # Ksnames[2] <- "lo"
+  names(testerg$Ksamples) <- c("theo", "hi", "lo")
          
              
   testerg$ppsamples <- list(hi = pp.hi, lo = pp.lo, unused = pp.unused)           
@@ -134,52 +135,111 @@ sos.test <- function (x,
 }
 
 
-#'@title Plot K-functions or quadrats used in test on second-order stationarity
-#'@description Plot the K-function estimates or the point pattern subsamples used
+#'@title Plot K-functions used in test on second-order stationarity
+#'@description Plot the K-function estimates used
 #'in a test on second-order stationarity, \code{\link{sos.test}}.
-#'@param sost result of a \code{\link{sos.test}},
-#'@param hilostyles list of \code{\link{style}} lists with elements \code{hi} 
-#'and \code{lo}, defines how the quadrats or K-function estimates are plotted see Details,
-#'@param theostyle plot style for the reference \eqn{K}-function of a Poisson point process,
-#'@param ... further arguments passed to plot methods.
+#'@param testresult result of a \code{\link{sos.test}} or a \code{\link{twosample.K.test}},
+#'an object of class \code{"Ktest"}
+#'@param styles named list of \code{\link{style}} lists, defines how  the K-function 
+#'estimates are plotted, see Details,
+#'@param theostyle plot style for the reference \eqn{K}-function of a Poisson point process.
+#'To supress plotting of the reference curve, let \code{theostyle = NULL}.
+#'@param ... further arguments passed to plot methods,
+#'@param mean.thicker optional numeric, multiplier for the line width of the group mean functions,
+#'@param mean.alpha optional numeric, alpha value for the colour of the group mean functions.
 #'@details 
-#'If \code{plotquads} is \code{FALSE}, the estimates of the \eqn{K}-function on
-#'the quadrats are plotted together with the group means. The \eqn{K}-function
+#If \code{plotquads} is \code{FALSE}, t
+#'The estimates of the \eqn{K}-function on the quadrats are plotted together 
+#'with the group means. The \eqn{K}-function
 #'of a Poisson point process is also present in the plot, unless \code{theostyle = NULL}.
 #'
-#'If \code{plotquads} is \code{TRUE}, a plot of the point pattern, divided into
-#'the quadrats that were used in the test, is generated, with background colours 
-#'according to \code{hilostyles}.
-#'
-#'Colours and line attributes for plotting quadrats or K-function estimates
-#'are controlled by argument \code{hilostyles}, which contains two elements \code{hi}
-#'and \code{lo}. These are \code{\link{style}} lists with elements
+#If \code{plotquads} is \code{TRUE}, a plot of the point pattern, divided into
+#the quadrats that were used in the test, is generated, with background colours 
+#according to \code{hilostyles}.
+#
+#'Colours and line attributes for plotting K-function estimates
+#'are controlled by argument \code{styles}, which contains two elements.
+#'For plotting the result of a \code{sos.test}, the have to be named \code{hi}
+#'and \code{lo}, for the result of a \code{twosample.K.test}, the names
+#'are \code{x} and \code{y}. The elements themselve are \code{\link{style}} lists 
+#'with elements
 #'\tabular{ll}{
-#'\code{col} \tab colour
-#'\cr\code{col.mea}\tab optional, colour for the mean \eqn{K}-function, defaults to \code{col}
+#'\code{col} \tab colour for the individual \eqn{K}-functions
+#\cr\code{col.mea}\tab optional, colour for the mean \eqn{K}-function, defaults to \code{col}
 #\cr\code{col.env}\tab optional, colour for the envelope, defaults to \code{col}
-#'\cr\code{col.win}\tab optional, colour for the quadrats, defaults to \code{col}
-#'\cr\code{col.pts}\tab optional, colour for the points in quadratsplot, defaults to 
-#'\code{par("col")}
-#'\cr\code{alpha} \tab optional, alpha-value for the individual \eqn{K}-functions, defaults to \code{0.5}
-#'\cr\code{alpha.win} \tab optional, alpha-value for the quadrats, defaults to \code{0.5 * alpha}
-#'\cr\code{lwd}\tab optional, line width for plot of \eqn{K}-functions, defaults to \code{par("lwd")}
-#'\cr\code{lwd.mea}\tab optional line width for the mean \eqn{K}-function, defaults to \code{2 * lwd}
+#\cr\code{col.win}\tab optional, colour for the quadrats, defaults to \code{col}
+#\cr\code{col.pts}\tab optional, colour for the points in quadratsplot, defaults to 
+#\code{par("col")}
+#'\cr\code{alpha} \tab optional, alpha-value for the individual \eqn{K}-functions, 
+#'defaults to \code{0.5}
+#\cr\code{alpha.win} \tab optional, alpha-value for the quadrats, defaults to \code{0.5 * alpha}
+#'\cr\code{lwd}\tab optional, line width for plot of \eqn{K}-functions
+#\cr\code{lwd.sum}\tab optional line width for the mean \eqn{K}-function, defaults to \code{2 * lwd}
+#'\cr\code{lty}\tab optional, line type for plot of \eqn{K}-functions
+#\cr\code{lty.sum}\tab optional line type for the mean \eqn{K}-function, defaults to \code{lty}
 #'}
+#'
 #'@export
 #'@author Ute Hahn,  \email{ute@@imf.au.dk}
 #'@examples
 #'# testing beilschmiedia pattern on reweighted second-order stationarity
 #'bei.ml <- reweighted(bei, intensity = bei.intens.maxlik)
-#'bei.quads <- hiloquads(bei, nx = 8, ny = 4, minpoints = 30)
-#'beitest <- sos.test(bei.ml, quads = bei.quads)
+#'bei.quads <- quadshilo(bei, nx = 8, ny = 4, minpoints = 30)
+#'beitest <- sos.test(bei.ml, qsets = bei.quads, r0 =25 )
 #'beistyle <- list(hi = style(col = "red"), lo = style(col = "blue"))
 #'
 #'plot(beitest, beistyle, main = "bei.ml: K estimated on quadrats")
-#'plot(beitest, beistyle, plotquads = TRUE, main = "bei.ml: quadrats for testing")
+#plot(beitest, beistyle, plotquads = TRUE, main = "bei.ml: quadrats for testing")
 
-plot.sostest <- function(sost, hilostyles, plotquads = FALSE,
-                         theostyle = style(lwd = "dashed"), 
-                         ...) {
+plot.Ktest <- function(testresult, styles,
+                      theostyle = style(lty = "dotted", col = "black", alpha = 1),
+                       ...)
+  #,
+  #                     mean.thicker = 2, mean.alpha = 1)
+#                       labline = 2.4) 
+{
+  Ksamp <- testresult$Ksamples
+  if (is.null(theostyle)) Ksamp$theo <- NULL
+  if (missing(styles)) styles <- list()
+ # styles$theo <- theostyle
+ # textline <- par("mgp")
+#  textline[1] <- labline
+  
+  allrange <- sapply(Ksamp, rangexy, finite = TRUE)
+  
+  dotargs <- style(...)
+  if (is.null(dotargs$xlim)) 
+    dotargs$xlim <- range(range(allrange["x",]))
+  if (is.null(dotargs$ylim)) 
+    dotargs$ylim <- range(range(allrange["y",]))
+  
+  if (!is.null(Ksamp$theo)) {
+    if (is.null(theostyle$lwd)) {
+      if(!is.null(dotargs$lwd)) theostyle$lwd <- 2*dotargs$lwd
+      else theostyle$lwd <- 2*par("lwd")
+    }
+    splot(Ksamp$theo, dotargs, theostyle, add = FALSE)
+    add = TRUE
+  } else {
+    add = FALSE
+  }
+    
+  Ksamp$theo <- NULL
+  lplot(Ksamp, styles, dotargs, add = add, allinone = TRUE, .plotmethod = "summaryplot")
+  
+#   Ksamp$theo <- NULL
+#   Kmeans <- lapply(Ksamp, mean)
+#   mstyles <- styles
+#   lplot(Ksamp, styles, dotargs, add = FALSE, allinone = TRUE)
+#   
+#   dotargs$style
+#   if (!is.null(theostyle)) { 
+#       plotargstheo <- uniquelist(c(theostyle, plotargs) )
+#       do.call(plot, c(list(x$footheo), list(plotargstheo), list(ylim = ylim, mgp = textline)));
+#       add <- TRUE }
+#   }
+#   
   
 }
+
+  
