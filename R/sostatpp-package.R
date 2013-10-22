@@ -105,7 +105,7 @@
 #'
 #'
 #'@keywords  package
-#'@seealso  The \code{\link[spatstat:spatstat-package]{spatstat}} package
+#'@seealso  The \code{\link[spatstat]{spatstat}} package
 #'@examples
 #'#### analysis of the scholtzia data set ################################
 #'

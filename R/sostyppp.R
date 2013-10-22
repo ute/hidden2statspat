@@ -23,7 +23,7 @@ is.sostyppp <- function(x) inherits(x, "sostyppp")
 #' @method [ sostyppp
 # @export
 #' @param x a sos-typed point pattern, object of class \code{"sostyppp"}.
-#' @param i subset index, see spatstat \code{\link{[<-.ppp}}.
+#' @param i subset index, see spatstat \code{\link[spatstat]{[<-.ppp}}.
 # @param j,drop ignored.
 #' @seealso \code{\link{sostyppp.object}} for details on the class.
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
@@ -35,16 +35,16 @@ is.sostyppp <- function(x) inherits(x, "sostyppp")
     # attach typemarks to marks
     if (need.to.rescue.tmarks)
     {
-      marx <- marks(x) 
-      tmarx <- as.matrix(x$sostinfo$tmarks) 
+      marx <- marks(x)
+      tmarx <- as.matrix(x$sostinfo$tmarks)
       if (is.null(marx)) {
         marx <- tmarx
         male <- 0
-      } else { 
+      } else {
         marx <- as.matrix(marx)
         male <- dim(marx)[2]
-        marx <- cbind(marx, tmarx)  
-      }  
+        marx <- cbind(marx, tmarx)
+      }
       x$marks <- as.data.frame(marx)
       y <- NextMethod()
       y <- as.sostyppp(y, "none")
@@ -92,44 +92,44 @@ is.sostyppp <- function(x) inherits(x, "sostyppp")
 
     #check if both have same sos-type
     stopifnot(has.type(x, currenttype(value)))
-    
+
     sostyp <- x$sostype
     xtras <- x$extra
     sosinfo <- x$sostinfo
     tmarknames <- names(x$sostinfo$tmarks)
-    
-    marx <- marks(x) 
+
+    marx <- marks(x)
     marknames <- names(marx)
-   
+
     need.to.rescue.tmarks <- (!is.null(x$sostinfo$tmarks))
     if (need.to.rescue.tmarks)
     {
       #attach typemarks to marks in order to use spatstats replace mechanism
-      tmarx <- as.matrix(x$sostinfo$tmarks) 
+      tmarx <- as.matrix(x$sostinfo$tmarks)
        if (is.null(marx)) {
           marx <- tmarx
           male <- 0
-      } else { 
+      } else {
         marx <- as.matrix(marx)
         male <- dim(marx)[2]
-        marx <- cbind(marx, tmarx)  
-      } 
-    
+        marx <- cbind(marx, tmarx)
+      }
+
       names(marx) <- NULL
       mary <- as.matrix(marks(value))
       maly <- dim(mary)[2]
       tvmarx <- as.matrix(value$sostinfo$tmarks)
       if (maly>0) mary <- cbind(mary, tvmarx)  else mary <- tvmarx
       names(mary) <- NULL
-      
+
       # marks function is not inheritable - securing valuables before using it...
-     
+
       marks(x) <- as.data.frame(marx, row.names = NULL)
       marks(value) <- as.data.frame(mary, row.names = NULL)
       y <- NextMethod()
       y <- as.sostyppp(y, "none")
       y$sostinfo <- sosinfo
-      
+
       marx <- as.matrix(y$marks)
       if (male > 0) {
         y$marks <- as.data.frame(marx[, (1:male)], row.names = NULL) # has to come first, function marks will destroy typemarks!
@@ -155,7 +155,7 @@ is.sostyppp <- function(x) inherits(x, "sostyppp")
 
 #' Print brief details of a second-order stationarity typed point pattern
 #'
-#' Extends spatstat method \code{\link{print.ppp}} by type of second-order stationarity.
+#' Extends spatstat method \code{\link[spatstat]{print.ppp}} by type of second-order stationarity.
 #'
 #' @param x sos-typed point pattern.
 #' @param ... ignored
@@ -299,7 +299,7 @@ furthertypeno <- function (x)
 #'  extra information relevant for analysis as a realization of a
 #'  second-order stationary point process.
 #'
-#'  From its ancestor, spatstat-class \code{"\link{ppp}"}, an object of type
+#'  From its ancestor, spatstat-class \code{"\link[spatstat]{ppp}"}, an object of type
 #'  \code{sostyppp} inherits the elements
 #'  \tabular{ll}{
 #'    \code{x} \tab vector of \eqn{x} coordinates of data points

@@ -106,7 +106,7 @@ as.sostyppp.sostyppp <- function(x, type = "h", ...)
 #'   \item a pixel image of class \code{"\link{im}"}
 #'   }
 #' @param \ldots optional extra parameters. If \code{intensity} is given as a function, \ldots may contain extra parameters,
-#'   if \code{intensity} is empty, these are parameters passed to the \bold{spatstat}-function \code{\link{density.ppp}}.
+#'   if \code{intensity} is empty, these are parameters passed to \code{spatstat::\link[spatstat]{density.ppp}}.
 #' @return A reweighted s.o.s. typed point pattern (object of class \code{{"sostyppp"}}),
 #' having typemarks  with  an element \code{intensity} (estimated intensity)
 #' @export
@@ -116,7 +116,7 @@ as.sostyppp.sostyppp <- function(x, type = "h", ...)
 #'   the intensity is calculated as the square inverse scale factor.
 #'
 #'   If  \code{intensity} is empty, and \code{X} has no inverse scale factor marks, the intensity
-#'   is estimated using the \bold{spatstat}-function \code{\link{density.ppp}}, and extra arguments \ldots
+#'   is estimated using \code{spatstat::\link[spatstat]{density.ppp}}, and extra arguments \ldots
 #'   are passed to \code{density.ppp}. By contrast to \bold{spatstat},
 #'   the {"leaveoneout"}-method is not chosen by default.
 #'
@@ -163,7 +163,7 @@ reweighted <- function (X, intensity = NULL, ...)#, normpower = 0)
 #' @param intensity optional extra parameters, see details.
 #' The possible format of this corresponds to that of parameter \code{invscale}.
 #' @param \ldots arguments passed to \code{invscale} or \code{intensity}, if these are functions, or to
-#'   the \bold{spatstat}-function \code{\link{density.ppp}} if both \code{invscale} and \code{intensity} are missing.
+#'   \code{spatstat::\link[spatstat]{density.ppp}} if both \code{invscale} and \code{intensity} are missing.
 # @param normpower an integer between 0 and 2. If \code{normpower} > 0 and \code{invscale} is missing,
 #   the intensity \code{intensity} is normalized,
 #   see the Details.
@@ -174,7 +174,7 @@ reweighted <- function (X, intensity = NULL, ...)#, normpower = 0)
 #'   If neither \code{invscale} nor \code{intensity} are given, the function checks if the pattern \code{X}
 #'   has previously been marked with the intensity (by function \code{\link{reweighted}}).
 #'   If both \code{invscale} and \code{intensity} are empty and there are no intensity marks, the intensity
-#'   is estimated using the \bold{spatstat}-function \code{\link{density.ppp}}, and extra arguments \ldots
+#'   is estimated using \code{spatstat::\link[spatstat]{density.ppp}}, and extra arguments \ldots
 #'   are passed to \code{density.ppp}.
 #'
 #'   If \code{invscale} (or \code{intensity}) is given as a function, extra parameters may be passed as \ldots.
@@ -269,7 +269,7 @@ rescaled <- function (X,  invscale = NULL, intensity = NULL, ...)
 #'   homogeneity by function with \code{"\link{backtransformed}"}.
 #'   In the case of gradient transformations, these functions are obtained by linear transformation
 #'   with (\code{\link{approxfun}}). The reverse of \code{backtransform} is needed when the window is
-#'   a binary mask, see \code{spatstat}'s \code{\link{owin}}, and has to be given as argument {\code{trafo}}.
+#'   a binary mask, see \code{spatstat::\link[spatstat]{owin}}, and has to be given as argument {\code{trafo}}.
 #' @export
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 #'@references

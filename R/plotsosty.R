@@ -1,9 +1,9 @@
 #' Plot a second-order stationarity typed point pattern
 #'
-#' Extends spatstat method \code{\link{plot.ppp}} by background color.
+#' Extends the spatstat method \code{\link[spatstat]{plot.ppp}} by background color.
 #'
 #' @param x sos-typed point pattern which is plotted.
-#' @param main title text 
+#' @param main title text
 #' @param ... arguments passed to \code{\link{plot.ppp}}
 #' @param col.win color of the plot window
 #' @param alpha.win numeric between 0 and 1, alpha-value of window color, see

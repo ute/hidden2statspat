@@ -3,13 +3,13 @@
 #' Estimate  a  summary function on subsamples of a point pattern.
 #'
 #' @param pp point pattern, object of  class \code{\link{sostyppp}} or
-#' {spatstat}-class \code{\link{ppp}}
+#' {spatstat}-class \code{\link[spatstat]{ppp}}
 #' @param quads quadrats for subsampling \code{pp}. A \code{list} of objects
-#' of spatstat-class \code{\link{owin}} or an object of spatstat-class \code{\link{tess}}.
+#' of spatstat-class \code{\link[spatstat]{owin}} or an object of spatstat-class \code{\link[spatstat]{tess}}.
 #' @param fun the summary function to be applied
 #' @param ... further arguments passed to \code{"fun"}
 #' @return An object of class \code{fvlist}, which is a list of
-#'   spatstat-\code{\link{fv}} objects.
+#'   spatstat-\code{\link[spatstat]{fv}} objects.
 # @seealso \code{\link{K.est}}, \code{\link{DeltaKdir.est}}
 #    for estimation of the template \eqn{K}-function or of Delta K_dir.
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
@@ -30,7 +30,7 @@ fv.on.quadrats <- function(pp, quads, fun = K.est, ...) {
 }
 
 #'@title Coerce a list of \code{fv} objects into a \code{fdsample}
-#'@description Transform a list of spatstat function tables (\code{\link{fv}} objects)
+#'@description Transform a list of spatstat function tables (\code{\link[spatstat]{fv}} objects)
 #'into an \code{\link{fdsample}} object, extracting one of the columns in each
 #'function table.
 #'@param fvl list of spatstat function tables (\code{fv} objects),

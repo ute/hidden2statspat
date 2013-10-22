@@ -42,7 +42,7 @@ correctionkey <- function (correction)
 #'
 #' Estimate  a  summary function on subsamples of a point pattern.
 #'
-#' @param X point pattern, object of  \bold{spatstat}-class \code{\link{ppp}}
+#' @param X point pattern, object of class \code{spatstat::\link[spatstat]{ppp}}
 #' @param type optional character, the type of second-order stationarity assumed:
 #'   \itemize{
 #'        \item \code{"w"} reweighted
@@ -53,7 +53,7 @@ correctionkey <- function (correction)
 #'   }
 #'   Only the first match is used.
 #' @param quads quadrats for subsampling \code{X}. A \code{list} of objects
-#' of \bold{spatstat}-class \code{\link{owin}} or an object of \bold{spatstat}-class \code{\link{tess}}.
+#' of class \code{spatstat::\link[spatstat]{owin}} or an object of class \code{spatstat::\link[spatstat]{tess}}.
 # In the current version not used for retransformed used if \code{type != "t"}.
 # @param tquads used instead of \code{quads} for the backtransformed pattern if \code{type != "t"}.
 #' @param fun the summary function to be applied
@@ -159,8 +159,8 @@ estOnQuadrats <- function(X, type = NULL, quads,
 #'
 #' Perform a studentized permutation test of equal \eqn{K}-function for one or two
 #' subsampled point patterns.
-#' @param X point pattern, object of  \bold{spatstat}-class \code{\link{ppp}}
-#' @param Y optional; point pattern, object of  \bold{spatstat}-class \code{\link{ppp}}
+#' @param X point pattern, object of  class \code{spatstat::\link[spatstat]{ppp}}
+#' @param Y optional; point pattern, object of  class \code{spatstat::\link[spatstat]{ppp}}
 #' @param type optional character, the type of second-order stationarity assumed:
 #'   \itemize{
 #'        \item \code{"w"} reweighted
@@ -171,7 +171,7 @@ estOnQuadrats <- function(X, type = NULL, quads,
 #'   }
 #'   Only the first match is used.
 #' @param quads1,quads2 quadrats for subsampling \code{X} (and \code{Y}). A \code{list} of objects
-#' of \bold{spatstat}-class \code{\link{owin}} or an object of \bold{spatstat}-class \code{\link{tess}}.
+#' of class \code{spatstat::\link[spatstat]{owin}} or an object of class \code{spatstat::\link[spatstat]{tess}}.
 # In the current version not used for retransformed used if \code{type != "t"}.
 # @param tquads1,tquads2 used instead of \code{quads1} and \code{quads2} for
 #      the backtransformed pattern if \code{type != "t"}.

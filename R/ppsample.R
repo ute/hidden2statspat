@@ -5,16 +5,16 @@
 #@aliases ppsubsample
 #'@description Subsample a point pattern on quadrats, generating a list of
 #'point patterns (\code{\link{sostyppp}} objects)
-#'@param pp object of class \code{\link{sostyppp}} or spatstat-class \code{\link{ppp}},
+#'@param pp object of class \code{\link{sostyppp}} or spatstat-class \code{\link[spatstat]{ppp}},
 #'the point pattern to be subsampled
-#'@param quads optional a list of objects of spatstat-class \code{\link{owin}} or a
-#'spatstat - \code{\link{tess}} object
-#'@param ... arguments passed to spatstat-function \code{\link{quadrats}}
-#'or an object of spatstat-class \code{\link{tess}}, the quadrats for subsampling \code{pp}.
+#'@param quads optional a list of objects of spatstat-class \code{\link[spatstat]{owin}} or a
+#'spatstat - \code{\link[spatstat]{tess}} object
+#'@param ... arguments passed to \code{spatstat::\link[spatstat]{quadrats}}
+#'or an object of spatstat-class \code{\link[spatstat]{tess}}, the quadrats for subsampling \code{pp}.
 #or a named list containing lists of \code{owin}s or \code{tess} objects, see the Details.
 #'@return a \code{ppsample} object: a list of objects of same class as the input \code{pp}.
-#'@details If \code{quads} is not given, the quadrats are determined by spatstat-function
-#'\code{\link{quadrats}}.
+#'@details If \code{quads} is not given, the quadrats are determined by
+#'\code{spatstat::\link[spatstat]{quadrats}}.
 #'
 #'The \code{ppsample} can be plotted, and number of points or estimated intensity
 #'can be retrieved by methods \code{npoints} and \code{intensity}.
@@ -74,7 +74,7 @@ is.ppsample <- function(x) inherits(x, "ppsample")
 # @author Ute Hahn,  \email{ute@@imf.au.dk}
 #'@seealso \code{\link{ppsubsample}} for creating \code{ppsample} objects,
 #'\code{\link{npoints.ppsample}} for obtaining the number of points,
-#'\code{\link{intensity}} for spatstats generic function.
+#'\code{\link[spatstat]{intensity}} for spatstats generic function.
 #@examples
 
 intensity.ppsample <- function(X, ...) sapply(X, npoints)/ sapply(X, area.owin)
@@ -92,7 +92,7 @@ intensity.ppsample <- function(X, ...) sapply(X, npoints)/ sapply(X, area.owin)
 # @author Ute Hahn,  \email{ute@@imf.au.dk}
 #'@seealso \code{\link{ppsubsample}} for creating \code{ppsample} objects,
 #'\code{intensity.ppsample} for estimating the empirical intensity,
-#'\code{\link{npoints}} for spatstats generic function.
+#'\code{\link[spatstat]{npoints}} for spatstat's generic function.
 #@exampl
 
 npoints.ppsample <- function(x) sapply(x, npoints)
