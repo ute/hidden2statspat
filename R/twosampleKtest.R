@@ -8,24 +8,24 @@
 #'@param rlen optional, number of steps for numerical integration, defaults to 256,
 #see Details,
 #'@param Kfun optional \code{function}, the \eqn{K}-function to be used,
-#'  either \code{\link{estK}} (default) or \code{\link{estDeltaKdir}},
-#'@param ... optional parameters for the function \code{Kfun}. To speed up 
+#'  either \code{\link{K.est}} (default) or \code{\link{DeltaKdir.est}},
+#'@param ... optional parameters for the function \code{Kfun}. To speed up
 #'calculations, it is recommended to give an explicite \code{correction} argument.
 #'@param use.tbar logical, if true, a modified test statistic is used, see Details,
 #'@param nperm number of random permutations, see Details. Defaults to 1000.
-#@param noTest optional logical, if \code{TRUE}, no test is run, only the point 
+#@param noTest optional logical, if \code{TRUE}, no test is run, only the point
 #pattern subsamples and \eqn{K}-function estimates are returned.
 #'
 #'@details The function tests if the \eqn{K}-functions estimated on the
-#'point pattern samples have the same mean. 
+#'point pattern samples have the same mean.
 #'\subsection{What the test does, and details on the parameters}{
 #'The \eqn{K}-function, or \eqn{\Delta K_{dir}}, is estimated on all patterns in
-#'the two samples, and the resulting two samples of estimated K-functions are 
-#'compared by a permutation test. 
+#'the two samples, and the resulting two samples of estimated K-functions are
+#'compared by a permutation test.
 #'The test statistic is the integral over a squared Welch-t-statistic,
-#'\deqn{T=\int_0^{r_max}\frac{(K_1(r)-K_2(r))^2}{s_1^2(r)/m_1 + 
-#'   s_2^2(r)/m_2} d r}{T = integral [ (K_1(r)-K_2(r))^2 / (s_1^2(r)/m_1 + 
-#'   s_2^2(r)/m_2)],} 
+#'\deqn{T=\int_0^{r_max}\frac{(K_1(r)-K_2(r))^2}{s_1^2(r)/m_1 +
+#'   s_2^2(r)/m_2} d r}{T = integral [ (K_1(r)-K_2(r))^2 / (s_1^2(r)/m_1 +
+#'   s_2^2(r)/m_2)],}
 #'where \eqn{K_1(r)} and \eqn{K_2(r)} are the group means, and
 #'\eqn{s_1^2(r), s_2^2(r)} are within group variances at a fixed argument \eqn{r}.
 #'The integral spans an interval \eqn{[0, r_{max}]}. It is approximated by the mean
@@ -38,17 +38,17 @@
 #'instead of the original statistc \eqn{T}, let \code{use.tbar = TRUE}
 #'
 #'The \emph{p}-value is obtained by permutation across the groups; the number of
-#'permutations is specified by \code{nperm}. If \code{nperm = NULL}, 
-#'the exact test with all permutations is used (combinations, for symmetry reasons). 
-#'This may cause memory or computing time issues. 
-#'If \code{nperm} is given as an integer, the permutations are sampled randomly, 
-#'unless \code{nperm} is larger than the number of disjoint combinations. 
+#'permutations is specified by \code{nperm}. If \code{nperm = NULL},
+#'the exact test with all permutations is used (combinations, for symmetry reasons).
+#'This may cause memory or computing time issues.
+#'If \code{nperm} is given as an integer, the permutations are sampled randomly,
+#'unless \code{nperm} is larger than the number of disjoint combinations.
 #'In that case, the exact version is applied, see \code{\link{tL2.permtest}}.
 #'
-#'To test against differences in local anisotropy,  H\&J (2013) propose to use 
-#'the \eqn{\Delta K_{dir}}-function 
-#'instead of the isotropic \eqn{K}-function. 
-#'For this variant of the test, let \code{Kfun = estDeltaKdir}.
+#'To test against differences in local anisotropy,  H\&J (2013) propose to use
+#'the \eqn{\Delta K_{dir}}-function
+#'instead of the isotropic \eqn{K}-function.
+#'For this variant of the test, let \code{Kfun = DeltaKdir.est}.
 #'
 #'A list of quadrats as required for argument \code{qsets} can be obtained by
 #'function \code{\link{quadshilo}}.
@@ -62,7 +62,7 @@
 #' \cr\code{alternative}\tab{a character string describing the alternative hypothesis,}
 #' \cr\code{method}\tab{a character string indicating what type of test was performed,}
 #' \cr\code{data.name}\tab{a character string giving the name(s) of the data.}
-#' \cr\code{Ksamples}\tab{a list of \code{\link{fdsample}}-objects, with elements 
+#' \cr\code{Ksamples}\tab{a list of \code{\link{fdsample}}-objects, with elements
 #' \code{x}, \code{y} and \code{theo}}
 #' }
 #'}
@@ -76,20 +76,20 @@
 #' Inhomogeneous spatial point processes with hidden second-order stationarity.
 #' \emph{CSGB preprint} 2013-7.
 #' \url{http://data.imf.au.dk/publications/csgb/2013/math-csgb-2013-07.pdf}
-#'@seealso function \code{\link{tL2.permtest}} from package {fdnonpar} is used 
+#'@seealso function \code{\link{tL2.permtest}} from package {fdnonpar} is used
 #'as test engine, \code{\link{quadshilo}} is used for setting up quadrat samples.
 
 twosample.K.test <- function (x, y,
-                      Kfun = estK,
-                      r0, rlen = 256, 
+                      Kfun = K.est,
+                      r0, rlen = 256,
                       ...,
                       use.tbar = FALSE,
-                      nperm = 1000) 
+                      nperm = 1000)
 {
-  if(!is.ppsample(x) || !is.ppsample(y)) 
+  if(!is.ppsample(x) || !is.ppsample(y))
     stop("expect point pattern samples as arguments")
-  AnisTest <- identical(Kfun, estDeltaKdir)
-  dataname <- paste("point pattern samples", deparse(substitute(x)), 
+  AnisTest <- identical(Kfun, DeltaKdir.est)
+  dataname <- paste("point pattern samples", deparse(substitute(x)),
                     "and", deparse(substitute(y)))
   rr <- seq(0, r0, length.out=rlen)
   Kfunx <- lapply(x, Kfun, r = rr, ...)
@@ -114,7 +114,7 @@ twosample.K.test <- function (x, y,
   testerg$method <- method
   testerg$alternative <- alternative
   testerg$data.name <- dataname
-  testerg$Ksamples <- list(theo = Ktheo, x = Kx, y = Ky) 
+  testerg$Ksamples <- list(theo = Ktheo, x = Kx, y = Ky)
   # don't change this - theo is asumed to be the first to be plotted, otherwise
   # it will lie above the interesting things
   class(testerg) <- c("Ktest", "htest")

@@ -72,7 +72,7 @@ correctionkey <- function (correction)
 #'    \item \code{correction} character, the correction used
 #'    \item \code{xlab, ylab} labels for plotting
 #' }
-#' @seealso \code{\link{estK}}, \code{\link{estDeltaKdir}}
+#' @seealso \code{\link{K.est}}, \code{\link{DeltaKdir.est}}
 #'    for estimation of the template \eqn{K}-function or of Delta K_dir.
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 #' @export
@@ -82,7 +82,7 @@ correctionkey <- function (correction)
 #' @keywords ts
 
 estOnQuadrats <- function(X, type = NULL, quads,
-                          fun = estK,
+                          fun = K.est,
                           rmin = 0, rmax = 1.25, rlen = 100,
                         ...)
 {
@@ -179,7 +179,7 @@ estOnQuadrats <- function(X, type = NULL, quads,
 #' @param rmax upper integration bound, see `Details',
 #' @param rlen optional, number of steps for numerical integration, defaults to 256; see `Details',
 #' @param Kfun optional \code{function}, the \eqn{K}-function to be used,
-#'  either \code{\link{estK}} (default) or \code{\link{estDeltaKdir}}
+#'  either \code{\link{K.est}} (default) or \code{\link{DeltaKdir.est}}
 #' @param correction a character vector giving the edge correction type, may be
 #'   any subset of \code{"border"},  \code{"isotropic"}, \code{"translate"}, \code{"none"}.
 #' @param ... further arguments for \code{Kfun}
@@ -244,13 +244,13 @@ oldKpermute.test <- function(X, Y = NULL,
                       rmin = 0,
                       rmax,
                       rlen = 100,
-                      Kfun = estK,
+                      Kfun = K.est,
                       correction = "iso",
                       ...,
                       use.tbar = FALSE,
                       nperm = 25000)
 {
-  AnisTest <- identical(Kfun, estDeltaKdir)
+  AnisTest <- identical(Kfun, DeltaKdir.est)
 
   dataname <- if(is.null(Y)) paste( "point pattern",deparse(substitute(X)))
               else paste( "point patterns",deparse(substitute(X)), "and" ,deparse(substitute(Y)))
