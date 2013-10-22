@@ -3,7 +3,7 @@
 #'Several sets of quadrats can be plotted in the same plot, distinguished by
 #'different background colour.
 #'@param x point pattern
-#'@param quads the quadrat sets, a \emph{named} list of  lists of windows (\code{"\link{owin}"})
+#'@param qsets the quadrat sets, a \emph{named} list of  lists of windows (\code{"\link{owin}"})
 #' or tessellations (\pkg{spatstat}-object \code{"\link[spatstat]{tess}"})
 #'@param styles optional a \emph{named} list of \code{\link{style}} lists, see Details,
 #'@param ... further plot parameters

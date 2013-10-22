@@ -88,7 +88,7 @@
 #'@seealso function \code{\link{tL2.permtest}} from package {fdnonpar} is used
 #'as test engine, \code{\link{quadshilo}} is used for setting up quadrat samples.
 #'The quadrat subsamples or the $K$-function estimates can be plotted, see
-#'\code{\link{plot.sostest}}
+#'\code{\link{plot.Ktest}}
 
 sos.test <- function (x,
                       qsets = NULL,
@@ -138,15 +138,15 @@ sos.test <- function (x,
 #'@title Plot K-functions used in test on second-order stationarity
 #'@description Plot the K-function estimates used
 #'in a test on second-order stationarity, \code{\link{sos.test}}.
-#'@param testresult result of a \code{\link{sos.test}} or a \code{\link{twosample.K.test}},
+#'@param x result of a \code{\link{sos.test}} or a \code{\link{twosample.K.test}},
 #'an object of class \code{"Ktest"}
 #'@param styles named list of \code{\link{style}} lists, defines how  the K-function
 #'estimates are plotted, see Details,
 #'@param theostyle plot style for the reference \eqn{K}-function of a Poisson point process.
 #'To supress plotting of the reference curve, let \code{theostyle = NULL}.
 #'@param ... further arguments passed to plot methods,
-#'@param mean.thicker optional numeric, multiplier for the line width of the group mean functions,
-#'@param mean.alpha optional numeric, alpha value for the colour of the group mean functions.
+#@param mean.thicker optional numeric, multiplier for the line width of the group mean functions,
+#@param mean.alpha optional numeric, alpha value for the colour of the group mean functions.
 #'@details
 #If \code{plotquads} is \code{FALSE}, t
 #'The estimates of the \eqn{K}-function on the quadrats are plotted together
@@ -191,14 +191,14 @@ sos.test <- function (x,
 #'plot(beitest, beistyle, main = "bei.ml: K estimated on quadrats")
 #plot(beitest, beistyle, plotquads = TRUE, main = "bei.ml: quadrats for testing")
 
-plot.Ktest <- function(testresult, styles,
+plot.Ktest <- function(x, styles,
                       theostyle = style(lty = "dotted", col = "black", alpha = 1),
                        ...)
   #,
   #                     mean.thicker = 2, mean.alpha = 1)
 #                       labline = 2.4)
 {
-  Ksamp <- testresult$Ksamples
+  Ksamp <- x$Ksamples
   if (is.null(theostyle)) Ksamp$theo <- NULL
   if (missing(styles)) styles <- list()
  # styles$theo <- theostyle

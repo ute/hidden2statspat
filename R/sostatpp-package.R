@@ -74,8 +74,10 @@
 #' }
 #' \subsection{Tests}{
 #' \tabular{ll}{
-#' \code{\link{Kpermute.test}} \tab test type of s.o.s or local anisotropy,
+#' \code{\link{sos.test}} \tab test type of s.o.s or local anisotropy,
 #'    using \eqn{K}-function on subsamples
+#' \cr\code{\link{twosample.K.test}} \tab comparison of the \eqn{K}-function
+#'   on two samples of point patterns.
 # \cr\code{\link{Kaniso.test}} \tab test of local anisotropy, using \eqn{\Delta K_{dir}}-function
 #'}
 #'}
