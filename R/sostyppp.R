@@ -245,10 +245,11 @@ furthertypeno <- function (x)
 #' @keywords internal
 # \code{"ppp"}
 
-.TYPENAMES  <- c("reweighted", "retransformed", "rescaled", "homogeneous", "scaled-homogeneous")
-.TYPES  <- c("w", "t", "s", "h", "hs")
-.TYBITS <- c(1, 2, 4, 8, 16)
-.TYLAST <- 32
+.TYPENAMES  <- c("reweighted", "retransformed", "rescaled", "homogeneous", 
+  "scaled-homogeneous", "not specified")
+.TYPES  <- c("w", "t", "s", "h", "hs", "none")
+.TYBITS <- c(1, 2, 4, 8, 16, 32)
+.TYLAST <- 64
 
 .gettype <- function (typecode)
 {

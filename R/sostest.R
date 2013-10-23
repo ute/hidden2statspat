@@ -9,8 +9,8 @@
 #'     \code{list}
 #'    of (two) lists of  test quadrats or tessellations (objects of type
 #'    \code{\link{tess}}). The list contains entries with names \code{hi}
-#'    and \code{lo}, optionally also \code{unused}, as produced by  \code{\link{quadshilo}}.
-#'@param r0 numeric, the upper integration limit, see Details,
+#'    and \code{lo}, optionally also \code{unused}, as produced by  \code{\link{twoquadsets}}.
+#'@param rmax numeric, the upper integration limit, see Details,
 #'@param rlen optional, number of steps for numerical integration, defaults to 256,
 #see Details,
 #'@param Kfun optional \code{function}, the \eqn{K}-function to be used,
@@ -29,14 +29,14 @@
 #'The test is based on estimates of the K-function on two subsamples of the
 #'pattern \code{x}. The two samples of estimated K-functions are compared by a
 #'permutation test. The test statistic is the integral over a squared Welch-t-statistic,
-#'\deqn{T=\int_0^{r_0}\frac{(K_1(r)-K_2(r))^2}{s_1^2(r)/m_1 +
+#'\deqn{T=\int_0^{r_{max}}\frac{(K_1(r)-K_2(r))^2}{s_1^2(r)/m_1 +
 #'   s_2^2(r)/m_2} d r}{T = integral [ (K_1(r)-K_2(r))^2 / (s_1^2(r)/m_1 +
 #'   s_2^2(r)/m_2)],}
 #'where \eqn{K_1(r)} and \eqn{K_2(r)} are the group means, and
 #'\eqn{s_1^2(r), s_2^2(r)} are within group variances at a fixed argument \eqn{r}.
-#'The integral spans an interval \eqn{[0, r_0]}. It is approximated by the mean
+#'The integral spans an interval \eqn{[0, r_{max}]}. It is approximated by the mean
 #'of the integrand over all \code{rlen} values of \eqn{r}, multiplied by the length
-#'of the integral, i.e., by \code{r0}.
+#'of the integral, i.e., by \code{rmax}.
 #'
 #'A variant of the test statistic, \eqn{\bar T}{Tbar}, uses the variance stabilized
 #'function \eqn{K(r)/r} instead of \eqn{K(r)} and replaces the denominator in
@@ -58,7 +58,7 @@
 #'For this variant of the test, let \code{Kfun = DeltaKdir.est}.
 #'
 #'A list of quadrats as required for argument \code{qsets} can be obtained by
-#'function \code{\link{quadshilo}}.
+#'function \code{\link{twoquadsets}}.
 #'}
 #'\subsection{Details on the return value}{
 #'The test returns an object belonging to classes \code{sostest} and \code{htest},
@@ -86,14 +86,14 @@
 #'    \url{http://data.imf.au.dk/publications/csgb/2013/math-csgb-2013-07.pdf}
 #'
 #'@seealso function \code{\link{tL2.permtest}} from package {fdnonpar} is used
-#'as test engine, \code{\link{quadshilo}} is used for setting up quadrat samples.
+#'as test engine, \code{\link{twoquadsets}} is used for setting up quadrat samples.
 #'The quadrat subsamples or the $K$-function estimates can be plotted, see
 #'\code{\link{plot.Ktest}}
 
 sos.test <- function (x,
                       qsets = NULL,
                       Kfun = K.est,
-                      r0, rlen = 256,
+                      rmax, rlen = 256,
                       ...,
                       use.tbar = FALSE,
                       nperm = 1000) {
@@ -110,7 +110,7 @@ sos.test <- function (x,
   pp.lo <- ppsubsample(x, qsets$lo)
   pp.unused <- if (!is.null(qsets$unused)) ppsubsample(x, qsets$unused) else NULL
 
-  testerg <- twosample.K.test(pp.hi, pp.lo, Kfun = Kfun, r0 = r0, ...,
+  testerg <- twosample.K.test(pp.hi, pp.lo, Kfun = Kfun, rmax = rmax, ...,
                               use.tbar = use.tbar, nperm = nperm)
   # Ksnames <- names(testerg$Ksamples)
   # Ksnames[] <- "hi"
@@ -127,7 +127,7 @@ sos.test <- function (x,
           ifelse(AnisTest, "directional version, using Delta K_dir",
                 "isotropic version, using K_0"),
           paste("test statistic: ", if(use.tbar) "Tbar,"
-               else "T,", "upper integration bound: ",r0),
+               else "T,", "upper integration bound: ", rmax),
            testerg$method[2] )
   testerg$alternative <- c(paste("not the same", typename, "K-function"),
                       if(AnisTest) ",\nbut different kinds of anisotropy")
@@ -145,6 +145,8 @@ sos.test <- function (x,
 #'@param theostyle plot style for the reference \eqn{K}-function of a Poisson point process.
 #'To supress plotting of the reference curve, let \code{theostyle = NULL}.
 #'@param ... further arguments passed to plot methods,
+#'@param labline numeric, controls the position of the axis labels: first 
+#'entry in graphic parameter \code{mgp}. 
 #@param mean.thicker optional numeric, multiplier for the line width of the group mean functions,
 #@param mean.alpha optional numeric, alpha value for the colour of the group mean functions.
 #'@details
@@ -184,8 +186,8 @@ sos.test <- function (x,
 #'@examples
 #'# testing beilschmiedia pattern on reweighted second-order stationarity
 #'bei.ml <- reweighted(bei, intensity = bei.intens.maxlik)
-#'bei.quads <- quadshilo(bei, nx = 8, ny = 4, minpoints = 30)
-#'beitest <- sos.test(bei.ml, qsets = bei.quads, r0 =25 )
+#'bei.quads <- twoquadsets(bei, nx = 8, ny = 4, minpoints = 30)
+#'beitest <- sos.test(bei.ml, qsets = bei.quads, rmax =25 )
 #'beistyle <- list(hi = style(col = "red"), lo = style(col = "blue"))
 #'
 #'plot(beitest, beistyle, main = "bei.ml: K estimated on quadrats")
@@ -193,17 +195,17 @@ sos.test <- function (x,
 
 plot.Ktest <- function(x, styles,
                       theostyle = style(lty = "dotted", col = "black", alpha = 1),
-                       ...)
+                       ..., labline = 2.4)
   #,
   #                     mean.thicker = 2, mean.alpha = 1)
-#                       labline = 2.4)
 {
   Ksamp <- x$Ksamples
   if (is.null(theostyle)) Ksamp$theo <- NULL
   if (missing(styles)) styles <- list()
  # styles$theo <- theostyle
- # textline <- par("mgp")
-#  textline[1] <- labline
+  textlines <- par("mgp")
+  textlines[1] <- labline
+  par(mgp = textlines)
 
   allrange <- sapply(Ksamp, rangexy, finite = TRUE)
 

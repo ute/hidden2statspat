@@ -47,7 +47,7 @@
 #'@author Ute Hahn,  \email{ute@@imf.au.dk}
 
 
-quadshilo <- function(pp, quads = NULL,
+twoquadsets <- function(pp, quads = NULL,
                       nx = NULL, ny = NULL, gradx = FALSE, grady = FALSE,
                       xbreaks = NULL, ybreaks = NULL,
                       minpoints = 20,

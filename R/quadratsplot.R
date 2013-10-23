@@ -18,7 +18,7 @@
 #'@author Ute Hahn,  \email{ute@@imf.au.dk}
 #'@examples
 #'# quadrat plot for the beilschmiedia pattern
-#'beiquads <- quadshilo(bei, nx = 8, ny = 4, minpoints = 30)
+#'beiquads <- twoquadsets(bei, nx = 8, ny = 4, minpoints = 30)
 #'beistyle <- list(hi = style(col.win = "red"), lo = style(col.win = "blue"))
 #'
 #'quadratsplot(bei, beiquads, beistyle, alpha.win = 0.2, main = "Beilschmiedia: quadrats")

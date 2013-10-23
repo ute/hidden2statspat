@@ -4,7 +4,7 @@
 #' Returns an object of class \code{Ktest}
 #'that also can be plotted, see the details.
 #'@param x,y the point pattern samples to be compared, objects of class \code{ppsample}
-#'@param r0 numeric, the upper integration limit, see Details,
+#'@param rmax numeric, the upper integration limit, see Details,
 #'@param rlen optional, number of steps for numerical integration, defaults to 256,
 #see Details,
 #'@param Kfun optional \code{function}, the \eqn{K}-function to be used,
@@ -30,7 +30,7 @@
 #'\eqn{s_1^2(r), s_2^2(r)} are within group variances at a fixed argument \eqn{r}.
 #'The integral spans an interval \eqn{[0, r_{max}]}. It is approximated by the mean
 #'of the integrand over all \code{rlen} values of \eqn{r}, multiplied by the length
-#'of the integral, i.e., by \code{r0}.
+#'of the integral, i.e., by \code{rmax}.
 #'
 #'A variant of the test statistic, \eqn{\bar T}{Tbar}, uses the variance stabilized
 #'function \eqn{K(r)/r} instead of \eqn{K(r)} and replaces the denominator in
@@ -51,7 +51,7 @@
 #'For this variant of the test, let \code{Kfun = DeltaKdir.est}.
 #'
 #'A list of quadrats as required for argument \code{qsets} can be obtained by
-#'function \code{\link{quadshilo}}.
+#'function \code{\link{twoquadsets}}.
 #'}
 #'\subsection{Details on the return value}{
 #'The test returns an object belonging to classes \code{sostest} and \code{htest},
@@ -77,11 +77,11 @@
 #' \emph{CSGB preprint} 2013-7.
 #' \url{http://data.imf.au.dk/publications/csgb/2013/math-csgb-2013-07.pdf}
 #'@seealso function \code{\link{tL2.permtest}} from package {fdnonpar} is used
-#'as test engine, \code{\link{quadshilo}} is used for setting up quadrat samples.
+#'as test engine, \code{\link{twoquadsets}} is used for setting up quadrat samples.
 
 twosample.K.test <- function (x, y,
                       Kfun = K.est,
-                      r0, rlen = 256,
+                      rmax, rlen = 256,
                       ...,
                       use.tbar = FALSE,
                       nperm = 1000)
@@ -91,7 +91,7 @@ twosample.K.test <- function (x, y,
   AnisTest <- identical(Kfun, DeltaKdir.est)
   dataname <- paste("point pattern samples", deparse(substitute(x)),
                     "and", deparse(substitute(y)))
-  rr <- seq(0, r0, length.out=rlen)
+  rr <- seq(0, rmax, length.out=rlen)
   Kfunx <- lapply(x, Kfun, r = rr, ...)
   Ktheo <- extract.fdsample(Kfunx[1], "theo")
   Kx <- extract.fdsample(Kfunx)
@@ -107,7 +107,7 @@ twosample.K.test <- function (x, y,
               ifelse(AnisTest, "directional version, using Delta K_dir",
                        "isotropic version, using K_0"),
               paste("test statistic: ", if(use.tbar) "Tbar,"
-                      else "T,", "upper integration bound:",r0),
+                      else "T,", "upper integration bound:",rmax),
                 testerg$method[2])
   alternative <- c(paste("not the same K-function"),
                      if(AnisTest) ",\nbut different kinds of anisotropy")

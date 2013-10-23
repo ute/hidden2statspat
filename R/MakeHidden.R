@@ -48,9 +48,9 @@ as.sostyppp <- function(x, type = "h", ...)
 as.sostyppp.ppp <- function(x, type = "h", ...)
 {
   X <- x
-  if (!("sostyppp" %in% class(X))) class(X) <-  c("sostyppp", class(X))
+  firstclass(X) <-  "sostyppp"
   X$sostinfo <- list()
-  if (type == "none") { X$sostinfo$tmarks <- NULL;  X$sostype <- NULL }
+  if (type == "none") { X$sostinfo$tmarks <- NULL;  X$sostype <- .settype("none", NULL) }
   else { if (type == "w") X <- reweighted(X, ...)
     else { if (type == "t") X <- retransformed(X, ...)
       else { if (type == "s") X <- rescaled(X, ...)
@@ -83,13 +83,17 @@ as.sostyppp.ppp <- function(x, type = "h", ...)
 
 as.sostyppp.sostyppp <- function(x, type = "h", ...)
 {
-  if (type == "w") X <- reweighted(x, ...)
-    else { if (type == "t") X <- retransformed(x, ...)
-      else { if (type == "s") X <- rescaled(x, ...)
-        else { if (type == "h") X <- ashomogeneous(x, "h")
-          else { if (type == "hs") X <- ashomogeneous(x, "hs")
+  if (type == "none") { 
+    x$sostinfo$tmarks <- NULL  
+    x$sostype <- .settype("none", NULL) 
+  }
+  else if (type == "w") x <- reweighted(x, ...)
+    else { if (type == "t") x <- retransformed(x, ...)
+      else { if (type == "s") x <- rescaled(x, ...)
+        else { if (type == "h") x <- ashomogeneous(x, "h")
+          else { if (type == "hs") x <- ashomogeneous(x, "hs")
             else { warning("unknown 2ndorder stationarity type") }}}}}
-  return(X)
+  return(x)
 }
 
 

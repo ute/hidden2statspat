@@ -52,11 +52,11 @@ fv.on.quadrats <- function(pp, quads, fun = K.est, ...) {
 #' @keywords nonparametric
 #' @keywords ts
 #'@examples
-#'Ks <- replicate(4, list(estK(rpoispp(100), r = seq(0, 0.2, 0.005))))
+#'Ks <- replicate(4, list(K.est(rpoispp(100), r = seq(0, 0.2, 0.005))))
 #'Ksample <- extract.fdsample(Ks, "iso")
 #'plot(Ksample, col = "red")
 #'# add the "theo" values to the plot
-#'plot(extract.fdsample(Ks, "theo"), lty = "dashed", add = T)
+#'plot(extract.fdsample(Ks, "theo"), lty = "dashed", add = TRUE)
 extract.fdsample  <- function(fvl, valname = NULL) {
   OK <- inherits(fvl, "fvlist") || (is.list(fvl) && all(sapply(fvl, is.fv)))
   if (!OK)
