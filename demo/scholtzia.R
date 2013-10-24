@@ -9,81 +9,57 @@
 data(scholtzia)
 data(intensities)
 
+# "home made" quadrats:
+#
 # the data show higher intensity at the bottom than at the top of the plot,
 # therefore we divide it into two halves according to y-coordinate
 
-mediany <- median(scholtzia$y)
-rangey <- scholtzia$window$yrange
-rangex <- scholtzia$window$yrange
+testset <- twoquadsets(scholtzia, nx = 1, ny = 2, grady = TRUE)
 
-testset <- tiles(quadrats(bronzefilter, xbreaks = rangex, 
-                 ybreaks = c(rangey[1], mediany, rangey[2])))
+# now the subsets are subdivided into 2x2 and 4x1 quadrats, respectively
+# new lo: low intensity, the upper part (was hi), 2x2  hi: lower part, 4x1
 
-quads1 <- tiles(quadrats(testset[[2]], nx = 4, ny = 1))
-quads2 <- tiles(quadrats(testset[[1]], nx = 2, ny = 2))
+quadsets <- list(lo = quadrats(testset$hi[[1]], nx = 2, ny = 2),
+                 hi = quadrats(testset$lo[[1]], nx = 4, ny = 1))
 
 # colors for plotting, and a plot of the quadrats (Figure 19)
 
-style1 <- list(col = "red", light = .6)
-style2 <- list(col = "blue", light = .6)
+styles <-  list(hi = style(col="red",  alpha=.4, col.win="red", alpha.win=.4),
+               lo = style(col="blue", alpha=.4, col.win="blue"))
 
-quadratsplot(scholtzia, quads1, quads2, style1, style2, pch=16, cex=.5)
+quadratsplot(scholtzia, quadsets, styles, pch=16, cex=.5)
 
 ##### ----------  analysis as locally rescaled second-order stationary  --------
 
-scholtzia.s <- rescaled(scholtzia, lambda = scholtzia.intens)
+scholtzia_s <- rescaled(scholtzia, intensity = scholtzia.intens)
 
-Kpermute.test(scholtzia.s, quads1 = quads1, quads2 = quads2, rmax = 1.25, 
-              use.tbar = TRUE)
-
+test_s <- sos.test(scholtzia_s, quadsets, rmax = 1.25, use.tbar = TRUE)
+print(test_s)
 # visualisation: Figure 20, upper left
-
-plot(estOnQuadrats(scholtzia.s, fun = estK, quads = quads1, rmax = 1.25), 
-     style = style1, ylim = c(0, 6))
-plot(estOnQuadrats(scholtzia.s, fun = estK, quads = quads2, rmax = 1.25), 
-     style = style2, add = TRUE)
+plot(test_s, styles)
 
 ##### ----------- adjusting intensity on quadrats by "normpower" ----------
-Kpermute.test(scholtzia.s, quads1 = quads1, quads2 = quads2, rmax = 1.25, 
-              use.tbar = TRUE, normpower = 2)
 
+test_s2 <- sos.test(scholtzia_s, quadsets, rmax = 1.25, use.tbar = TRUE, normpowe = 2)
+print(test_s2)
 # visualisation: Figure 20, upper right
-
-plot(estOnQuadrats(scholtzia.s, fun = estK, quads = quads1, rmax = 1.25,
-                  normpower = 2), 
-     style = style1, ylim = c(0, 6))
-plot(estOnQuadrats(scholtzia.s, fun = estK, quads = quads2, rmax = 1.25,
-                  normpower = 2), 
-     style = style2, add = TRUE)
+plot(test_s2, styles)
 
 
-##### ----------  analysis as reweighted second-order stationary  --------
+##### ----------  analysis as locally rescaled second-order stationary  --------
 
-scholtzia.w <- reweighted(scholtzia, lambda = scholtzia.intens)
+scholtzia_w <- reweighted(scholtzia, intensity = scholtzia.intens)
 
-Kpermute.test(scholtzia.w, quads1 = quads1, quads2 = quads2, rmax = 2.0, 
-              use.tbar = TRUE)
-
+test_w <- sos.test(scholtzia_w, quadsets, rmax = 2, use.tbar = TRUE)
+print(test_w)
 # visualisation: Figure 20, lower left
-
-plot(estOnQuadrats(scholtzia.w, fun = estK, quads = quads1, rmax = 2.0), 
-     style = style1, ylim = c(0, 15))
-plot(estOnQuadrats(scholtzia.w, fun = estK, quads = quads2, rmax = 2.0), 
-     style = style2, add = TRUE)
-
+plot(test_w, styles)
 
 ##### ----------- adjusting intensity on quadrats by "normpower" ----------
 
-
-Kpermute.test(scholtzia.w, quads1 = quads1, quads2 = quads2, rmax = 2.0, 
-              use.tbar = TRUE, normpower = 2)
-
+test_w2 <- sos.test(scholtzia_w, quadsets, rmax = 2, use.tbar = TRUE, normpower = 2)
+print(test_w2)
 # visualisation: Figure 20, lower right
-
-plot(estOnQuadrats(scholtzia.w, fun = estK, quads = quads1, rmax = 2.0, normpower = 2), 
-     style = style1, ylim = c(0, 15))
-plot(estOnQuadrats(scholtzia.w, fun = estK, quads = quads2, rmax = 2.0, normpower = 2), 
-     style = style2, add = TRUE)
-
+plot(test_w2, styles)
 
 

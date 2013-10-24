@@ -15,27 +15,24 @@ lambda <- predict(lambdarho)
 #####----------  analysis as rescaled or reweighted ---------- 
 
 # determine two sets of 3x3 quadrats, with approximately the same number
-# of points, using quantiles of the x-values 
+# of points, using quantiles of the x-values. Assign to the sets according to
+# x -ccordinate
 
-xmedian <- median(bronzefilter$x)
-xbreaks <- quantile(c(bronzefilter$x, bronzefilter$window$xrange), (0:6)/6)
-quads <- tiles(quadrats(bronzefilter, xbreaks = xbreaks, ny = 3))
-
-group1 <- sapply(quads, function(w) min(w$x <= xmedian))
-quads1 <- quads[group1 == 1]
-quads2 <- quads[group1 == 0]
+bronzequads <- twoquadsets(bronzefilter, nx = 6, ny = 3, gradx = TRUE, 
+                           by.intensity = FALSE)
 
 # Figure 10: plot of the test sets
 
 # colors for plotting
-style1 <- list(col = "red", light = .6)
-style2 <- list(col = "blue", light = .6)
+styles <- list( lo = style(col="red", col.win="red", alpha.win=.4, alpha=.4), 
+                hi = style(col="blue", col.win="blue", alpha.win=.4, alpha=.4))
+
 
 # could also be set to black and white printing, e.g.
 # style1 <- list(col = "black", lty = "solid", light = .6)
 # style2 <- list(col = "black", lty = "dashed", light = .8)
 
-quadratsplot(bronzefilter, quads1, quads2, style1, style2, pch=16, cex=.5)
+quadratsplot(bronzefilter, bronzequads, styles, use.marks=FALSE, pch=16, cex=.5)
 
 
 ##### ----------  analysis as rescaled second-order stationary  --------
@@ -51,40 +48,32 @@ bronzs <- rescaled(bronzefilter, intensity = lambda)
 
 nperm <- 1000
 
-Kpermute.test(bronzs, quads1 = quads1, quads2 = quads2, rmax = 1.25, 
-              nperm = nperm)
+test_s <- sos.test(bronzs, bronzequads, rmax = 1.25, nperm = nperm)
+test_s
+
+plot(test_s, styles)
 
 # using the test statistic $\bar T$ instead
 
-Kpermute.test(bronzs, quads1 = quads1, quads2 = quads2, rmax = 1.25, 
-              use.tbar = TRUE, nperm = nperm)
+sos.test(bronzs, bronzequads, rmax = 1.25, nperm = nperm, use.tbar = TRUE)
 
 # visualisation: Figure 11, left
 
-plot(estOnQuadrats(bronzs, fun = estK, quads = quads1, rmax = 1.25), 
-     style = style1, ylim = c(0, 5))
-plot(estOnQuadrats(bronzs, fun = estK, quads = quads2, rmax = 1.25), 
-     style = style2, add = TRUE)
+plot(test_s, styles)
 
 ##### ----------  analysis as reweighted second-order stationary  --------
 
 bronzw <- reweighted(bronzefilter, intensity = lambda)
 
-Kpermute.test(bronzw, quads1 = quads1, quads2 = quads2, rmax = 0.4,
-              nperm = nperm)
+test_w<- sos.test(bronzw, bronzequads, rmax = 0.4, nperm = nperm)
+test_w
 
 # using the test statistic $\bar T$ instead
-
-Kpermute.test(bronzw, quads1 = quads1, quads2 = quads2, rmax = 0.4, 
-              use.tbar = TRUE, nperm = nperm)
+sos.test(bronzw, bronzequads, rmax = 0.4, nperm = nperm, use.tbar = TRUE)
 
 # visualisation: Figure 11, right
 
-plot(estOnQuadrats(bronzw, fun = estK, quads = quads1, rmax = 0.4), 
-     style = style1, ylim = c(0, 0.5))
-plot(estOnQuadrats(bronzw, fun = estK, quads = quads2, rmax = 0.4), 
-     style = style2, add = TRUE)
-
+plot(test_w, styles)
 
 ##### ----------  analysis as retransformed second-order stationary  --------
 
@@ -93,66 +82,27 @@ plot(estOnQuadrats(bronzw, fun = estK, quads = quads2, rmax = 0.4),
 
 bronzt <- retransformed(bronzefilter, backtrafo="gradx", intensity = lambda)
 
-# as in the paper, we specify the subwindows on the backtransformed pattern
-# note that this only necessary for obtaining a plot as Figure 12, but the
-# test could also be carried out using the original quadrats as in the analysis
-# of rescaled s.o.s.
+test_t<- sos.test(bronzt, bronzequads, rmax = 0.5, nperm = nperm)
+test_t
 
-# two testsets of same size
-testset <- tiles(quadrats(bronzefilter, nx = 2, ny = 1))
-
-quadt1 <- quadrats(testset[[1]], 3, 3)
-quadt2 <- quadrats(testset[[2]], 3, 3)
-
-# Figure 12, left part
-
-quadratsplot(backtransformed(bronzt), quadt1, quadt2, style1, style2, 
-             pch=16, cex=.5)
+# Figure 12, left part: backtransformed quadratsplot 
+quadratsplot(bronzt, bronzequads, styles, use.marks = FALSE, pch=16, cex=.5,
+  backtransformed = TRUE)
 
 # Figure 12, right part
 
-plot(estOnQuadrats(bronzt, fun = estK, quads = quads1, rmax = 0.5), 
-     style = style1, ylim = c(0, 0.8))
-plot(estOnQuadrats(bronzt, fun = estK, quads = quads2, rmax = 0.5), 
-     style = style2, add = TRUE)
-
-# testing
-
-Kpermute.test(bronzt, quads1 = quads1, quads2 = quads2, rmax=.5, 
-              nperm = nperm)
-Kpermute.test(bronzt, quads1 = quads1, quads2 = quads2, rmax=.5, 
-              nperm = nperm, use.tbar = TRUE)
-
+plot(test_t, styles)
 
 #### directional analysis of the backtransformed pattern ---------------------
 
+test_tdir<- sos.test(bronzt, bronzequads, Kfun = DeltaKdir.est, rmax = 0.5, nperm = nperm)
+print(test_tdir)
+
+test_sdir<- sos.test(bronzs, bronzequads, Kfun = DeltaKdir.est, rmax = 1.25, nperm = nperm)
+print(test_sdir)
+
 # Figure 14, left part, and test
 
-plot(estOnQuadrats(bronzt, fun = estDeltaKdir, quads = quads1, rmax = 0.6), 
-     style = style1, ylim = c(-.5, .5))
-plot(estOnQuadrats(bronzt, fun = estDeltaKdir, quads = quads2, rmax = 0.6), 
-     style = style2, add = TRUE)
+plot(test_tdir, styles)
 
-Kpermute.test(bronzt, Kfun = estDeltaKdir, quads1 = quads1, quads2 = quads2, 
-              rmax=.5, use.tbar = FALSE, nperm = nperm)
-
-Kpermute.test(bronzt, Kfun = estDeltaKdir, quads1 = quads1, quads2 = quads2, 
-              rmax=.5, use.tbar = TRUE, nperm = nperm)
-
-
-#### directional analysis of the locally rescaled pattern ---------------------
-
-# Figure 14, right part, and test
-
-plot(estOnQuadrats(bronzs, fun = estDeltaKdir, quads = quads1, rmax = 1.25), 
-     style = style1, ylim = c(-3, 3))
-plot(estOnQuadrats(bronzs, fun = estDeltaKdir, quads = quads2, rmax = 1.25), 
-     style = style2, add = TRUE)
-
-Kpermute.test(bronzs, Kfun = estDeltaKdir, quads1 = quads1, quads2 = quads2, 
-              rmax=1.25, use.tbar = FALSE, nperm = nperm)
-
-Kpermute.test(bronzs, Kfun = estDeltaKdir, quads1 = quads1, quads2 = quads2, 
-              rmax=1.25, use.tbar = TRUE, nperm = nperm)
-
-
+plot(test_sdir, styles)

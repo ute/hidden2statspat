@@ -5,6 +5,8 @@
     
     o removed obsolete functions like Kpermute.test
 
+    o updated demo files (data analysis from H&J 2013)
+
     o adjustments in the documentation
 
   CHANGES IN sostatpp VERSION 0.11.1

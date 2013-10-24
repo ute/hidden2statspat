@@ -72,10 +72,14 @@ extract.fdsample  <- function(fvl, valname = NULL) {
     OK <- all(sapply(fvl, function(x) valname %in% attr(x, "dotnames")))
   }
   if (!OK)
-    stop("correction", corr, "not found in all members of fv-list")
+    stop("correction", valname, "not found in all members of fv-list")
   argu <- attr(fvl[[1]], "argu")
   args <- as.list(fvl[[1]])[[argu]]
-  if (!all(sapply(fvl, function(x) as.list(x)[[argu]]==args)))
+  
+  almostidentical <- function(x,y) {
+    identical(length(x), length(y)) && max(abs(x-y) < 1e-10)
+  }
+  if (!all(sapply(fvl, function(x) almostidentical(as.list(x)[[argu]], args))))
     stop("not all members of fv-list have the same argument values")
   fvals <- sapply(fvl, function(x) as.list(x)[[valname]])
   ylab <- attr(fvl[[1]], "ylab")

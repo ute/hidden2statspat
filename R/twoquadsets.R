@@ -110,7 +110,8 @@ twoquadsets <- function(pp, quads = NULL,
   }
   # if the number of used quadrats is uneven, assign one more to the "lo" set
   mord <- (nused + 1) %/% 2
-  list(hi = usedquads[ord[mord + seq_len(nused - mord)]],
-       lo = usedquads[ord[seq_len(mord)]],
-       unused = quads[!enoughpts])
+  qlist <- list(hi = usedquads[ord[mord + seq_len(nused - mord)]],
+               lo = usedquads[ord[seq_len(mord)]])
+  if (sum(!enoughpts) > 0) qlist <- c(qlist, unused = list(quads[!enoughpts]))
+  qlist
 }

@@ -7,7 +7,10 @@
 #' or tessellations (\pkg{spatstat}-object \code{"\link[spatstat]{tess}"})
 #'@param styles optional a \emph{named} list of \code{\link{style}} lists, see Details,
 #'@param ... further plot parameters
-#'@details
+#'@param main title to be put above the plot. Default: tries to guess title from call.
+#'@param backtransformed logical, if \code{TRUE} backtransform  pattern and quadrats.
+#'Requires pattern of sos-type \code{"t"}.
+#'#'@details
 #'Background colour and coulour intensity of the quadrats are determined by the
 #'parameters \code{col.win} and \code{alpha.win}, see \code{\link{plot.sostyppp}}.
 #'These plot parameters can be given as \code{\link{style}} lists or explicitely.
@@ -28,10 +31,28 @@
 #'quadratsplot(bei, beiquads, col.win = list(hi = "red", lo = "blue"),
 #'  alpha.win = 0.2, main = "Beilschmiedia: quadrats", pch = 16, cex = .3)
 
-quadratsplot <- function(x, qsets, styles = NULL, ...){
-  x <- as.sostyppp(x, type = "none") # to be on the safe side
-  ppsamples <- mapply(ppsubsample, quads = qsets, MoreArgs = list(pp = x))
-  dotargs <- style(...)
-  splot(x, matching(dotargs, plot.ppp, .graphparams))
-  lplot(ppsamples, styles, ..., allinone = TRUE, add = TRUE)
+quadratsplot <- function(x, qsets, styles = NULL, ..., main = NULL, 
+                        backtransformed = FALSE) {
+  # qsets should be a list 
+  stopifnot(is.list(qsets), is.ppp(x))
+  
+  if (is.null(main)) {
+    main <- deparse(substitute(x))
+    if (backtransformed) main <- paste(main, ", backtransformed", sep = "")
+  }
+  if(!is.sostyppp(x)) x <- as.sostyppp(x, type = "none") 
+  ppsamples <- lapply(qsets, function(sa) ppsubsample(x, sa))
+  
+  if (backtransformed && identical(currenttype(x), "t")){
+    x <- backtransformed(x)
+    ppsamples <- lapply(ppsamples, backtransformed.ppsample)
+  }
+    
+  
+  # plot original pattern, just to have unused points also in the plot
+  do.call("plot.ppp", c(list(x), 
+        matching(style(..., main = main), plot.ppp, .graphparams)))
+  # don't throw warnings because of extra arguments in the styles
+  okstyles <- lapply(styles, matching, plot.ppp, plot.sostyppp, .graphparams)
+  lplot(ppsamples, okstyles, ..., allinone = TRUE, add = TRUE)
 }

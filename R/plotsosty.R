@@ -8,23 +8,31 @@
 #' @param col.win color of the plot window
 #' @param alpha.win numeric between 0 and 1, alpha-value of window color, see
 #'   \code{\link{alphacol}}
-#' @S3method plot sostyppp
+# @S3method plot sostyppp
 #' @method plot sostyppp
-# @export
+#' @export plot.sostyppp
 #' @seealso \code{\link{plot.ppp}} for the print method of class ancestor \code{ppp}.
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 
 plot.sostyppp <- function(x, main, ..., col.win = NULL, alpha.win = 0.4) {
   dotargs <- style(...)
+  unknownargs <- matching(dotargs, plot.owin, plot.ppp, plot.sostyppp, 
+                          .graphparams, .plotparams, .notmatching = TRUE)
+  if (length(unknownargs) > 0) 
+    warning(paste("unused parameters: ", paste(names(unknownargs), collapse = ", ")))
   if (missing(main)) main <- deparse(substitute(x))
-  if (!is.null(col.win)){
+  allargs <- style(dotargs, main = main, col.win = col.win, alpha.win = alpha.win, 
+                   NULL.rm = TRUE)
+  if (!is.null(allargs$col.win)){
     # plot a coloured window first if plot is not added
-      splot(x$window, main, col = alphacol(col.win, alpha.win), dotargs)
-      # remove plot.owin specific parameter
-      dotargs <- matching(dotargs, plot.owin, .notmatching = TRUE)
-      class(dotargs) <- c("style", "list")
-      dotargs$add <- TRUE
-      main = NULL
+      useargs <- matching(allargs, plot.owin, .graphparams, .plotparams) 
+      useargs$col <- alphacol(allargs$col.win, allargs$alpha.win)
+      do.call ("plot.owin", c(list(x$window), useargs))
+      allargs$add <- TRUE
+      allargs$main = NULL
   }
-  splot(as.ppp(x), main, dotargs)
+  # strip arguments that are only used for the window
+  useargs <- matching(allargs, plot.ppp, .graphparams)
+  useargs$col <- NULL
+  do.call("plot.ppp", c(list(x), useargs))
 }

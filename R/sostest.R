@@ -102,7 +102,7 @@ sos.test <- function (x,
   dataname <- paste( "point pattern",deparse(substitute(sost)))
   type <- currenttype(x)
   if (length(type) == 0) stop ("unknown type of hidden 2nd-order stationarity")
-  typename <- .TYPENAMESX[which(.TYPES == type)]
+  typename <- .TYPENAMES[which(.TYPES == type)]
 
   stopifnot (is.list(qsets) && length(qsets) > 1)
   stopifnot (all(c("hi", "lo") %in% names(qsets)))
@@ -112,13 +112,10 @@ sos.test <- function (x,
 
   testerg <- twosample.K.test(pp.hi, pp.lo, Kfun = Kfun, rmax = rmax, ...,
                               use.tbar = use.tbar, nperm = nperm)
-  # Ksnames <- names(testerg$Ksamples)
-  # Ksnames[] <- "hi"
-  # Ksnames[2] <- "lo"
   names(testerg$Ksamples) <- c("theo", "hi", "lo")
-
-
-  testerg$ppsamples <- list(hi = pp.hi, lo = pp.lo, unused = pp.unused)
+ 
+# 
+#   testerg$ppsamples <- list(hi = pp.hi, lo = pp.lo, unused = pp.unused)
 
   testerg$data.name <- dataname
 
@@ -188,10 +185,9 @@ sos.test <- function (x,
 #'bei.ml <- reweighted(bei, intensity = bei.intens.maxlik)
 #'bei.quads <- twoquadsets(bei, nx = 8, ny = 4, minpoints = 30)
 #'beitest <- sos.test(bei.ml, qsets = bei.quads, rmax =25 )
-#'beistyle <- list(hi = style(col = "red"), lo = style(col = "blue"))
+#'beistyle <- list(hi = style(col = "red", alpha = .5), lo = style(col = "blue", alpha = .5))
 #'
-#'plot(beitest, beistyle, main = "bei.ml: K estimated on quadrats")
-#plot(beitest, beistyle, plotquads = TRUE, main = "bei.ml: quadrats for testing")
+#'plot(beitest, beistyle, main = "bei.ml: K estimated on quadrats", ylim = c(0,3000))
 
 plot.Ktest <- function(x, styles,
                       theostyle = style(lty = "dotted", col = "black", alpha = 1),
@@ -202,7 +198,9 @@ plot.Ktest <- function(x, styles,
   Ksamp <- x$Ksamples
   if (is.null(theostyle)) Ksamp$theo <- NULL
   if (missing(styles)) styles <- list()
- # styles$theo <- theostyle
+  styles$theo <- theostyle
+  # don't throw warnings because of extra arguments in the styles
+  okstyles <- lapply(styles, matching, plot.fdsample, .graphparams)
   textlines <- par("mgp")
   textlines[1] <- labline
   par(mgp = textlines)
@@ -228,18 +226,5 @@ plot.Ktest <- function(x, styles,
 
   Ksamp$theo <- NULL
   lplot(Ksamp, styles, dotargs, add = add, allinone = TRUE, .plotmethod = "summaryplot")
-
-#   Ksamp$theo <- NULL
-#   Kmeans <- lapply(Ksamp, mean)
-#   mstyles <- styles
-#   lplot(Ksamp, styles, dotargs, add = FALSE, allinone = TRUE)
-#
-#   dotargs$style
-#   if (!is.null(theostyle)) {
-#       plotargstheo <- uniquelist(c(theostyle, plotargs) )
-#       do.call(plot, c(list(x$footheo), list(plotargstheo), list(ylim = ylim, mgp = textline)));
-#       add <- TRUE }
-#   }
-#
 
 }

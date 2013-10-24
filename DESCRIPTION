@@ -1,6 +1,6 @@
 Package: sostatpp
-Version: 0.11.2
-Date: 2013-10-22
+Version: 0.11.3
+Date: 2013-10-24
 Title: Analysis of hidden second-order stationary point processes
 Authors@R: c(person("Ute", "Hahn", role = c("aut", "cre"),
     email = "ute@imf.au.dk"))
@@ -8,10 +8,10 @@ Author: Ute Hahn <ute@imf.au.dk>
 Maintainer: Ute Hahn <ute@imf.au.dk>
 Depends:
     R (>= 2.15),
-    spatstat (>= 1.25)
-Imports:
-    fdnonpar,
+    spatstat (>= 1.25),
     plottools,
+    fdnonpar
+Imports:
     plyr
 Description: A package on top of spatstat, contributing functions for
     the analysis of homogeneous and inhomogeneous spatial point patterns 
