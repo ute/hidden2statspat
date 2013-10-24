@@ -178,7 +178,8 @@ sos.test <- function (x,
 #\cr\code{lty.sum}\tab optional line type for the mean \eqn{K}-function, defaults to \code{lty}
 #'}
 #'
-#'@export
+#'@export plot.Ktest
+#'@method plot Ktest
 #'@author Ute Hahn,  \email{ute@@imf.au.dk}
 #'@examples
 #'# testing beilschmiedia pattern on reweighted second-order stationarity
