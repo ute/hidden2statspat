@@ -1,11 +1,17 @@
+  CHANGES IN sostatpp VERSION 0.11.3
+
+    o quadratsplot for backtransformed patterns
+
+    o updated demo files (data analysis from H&J 2013)
+
+    o extract.fdsample now tolerates small differences in argument (numerical effects)
+
   CHANGES IN sostatpp VERSION 0.11.2
 
     o renamed estK, estL, estDeltaKdir to K.est, L.est, DeltaKdir.est to stress
       similarity to spatstat, since these functions return fv-objects
     
     o removed obsolete functions like Kpermute.test
-
-    o updated demo files (data analysis from H&J 2013)
 
     o adjustments in the documentation
 
