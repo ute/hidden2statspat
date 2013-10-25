@@ -24,12 +24,15 @@ bronzequads <- twoquadsets(bronzefilter, nx = 6, ny = 3, gradx = TRUE,
 # Figure 10: plot of the test sets
 
 # colors for plotting
-styles <- list( lo = style(col="red", col.win="red", alpha.win=.4, alpha=.4), 
-                hi = style(col="blue", col.win="blue", alpha.win=.4, alpha=.4))
+styles <- list(lo = simplist(col="red", col.win="red", alpha.win=.4, alpha=.4),
+               hi = simplist(col="blue", col.win="blue", alpha.win=.4, alpha=.4))
 
 
 # could also be set to black and white printing, e.g.
-# style1 <- list(col = "black", lty = "solid", light = .6)
+# styles <- list(lo = simplist(col="black", col.win = gray(.6), lty = "solid", alpha=.4),
+#               hi = simplist(col="black", col.win = gray(.9), lty="dashed",  alpha=.4))
+
+# styles <- list(simplist(col = "black", lty = "solid", light = .6)
 # style2 <- list(col = "black", lty = "dashed", light = .8)
 
 quadratsplot(bronzefilter, bronzequads, styles, use.marks=FALSE, pch=16, cex=.5)

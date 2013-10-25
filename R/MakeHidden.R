@@ -54,8 +54,8 @@ as.sostyppp.ppp <- function(x, type = "h", ...)
   else { if (type == "w") X <- reweighted(X, ...)
     else { if (type == "t") X <- retransformed(X, ...)
       else { if (type == "s") X <- rescaled(X, ...)
-        else { if (type == "h") X <- ashomogeneous(X, "h")
-          else { if (type == "hs") X <- ashomogeneous(X, "hs")
+        else { if (type == "h") X <- homogeneous(X, "h")
+          else { if (type == "hs") X <- homogeneous(X, "hs")
             else { warning("unknown 2ndorder stationarity type") }}}}}}
   return(X)
 }
@@ -63,7 +63,7 @@ as.sostyppp.ppp <- function(x, type = "h", ...)
 #' Convert object of class sostyppp to class sostyppp
 #'
 #' Wrapper function for \code{\link{reweighted}}, \code{\link{retransformed}},
-#' \code{\link{rescaled}} and \code{\link{ashomogeneous}}, assigns type of
+#' \code{\link{rescaled}} and \code{\link{homogeneous}}, assigns type of
 #' second-order stationarity.
 #'
 #' @S3method as.sostyppp sostyppp
@@ -83,15 +83,15 @@ as.sostyppp.ppp <- function(x, type = "h", ...)
 
 as.sostyppp.sostyppp <- function(x, type = "h", ...)
 {
-  if (type == "none") { 
-    x$sostinfo$tmarks <- NULL  
-    x$sostype <- .settype("none", NULL) 
+  if (type == "none") {
+    x$sostinfo$tmarks <- NULL
+    x$sostype <- .settype("none", NULL)
   }
   else if (type == "w") x <- reweighted(x, ...)
     else { if (type == "t") x <- retransformed(x, ...)
       else { if (type == "s") x <- rescaled(x, ...)
-        else { if (type == "h") x <- ashomogeneous(x, "h")
-          else { if (type == "hs") x <- ashomogeneous(x, "hs")
+        else { if (type == "h") x <- homogeneous(x, "h")
+          else { if (type == "hs") x <- homogeneous(x, "hs")
             else { warning("unknown 2ndorder stationarity type") }}}}}
   return(x)
 }
@@ -130,7 +130,7 @@ as.sostyppp.sostyppp <- function(x, type = "h", ...)
 #'   constant intensity, which effectively means that it will be analysed as a homogeneous
 #'   point process with known intensity.
 #'
-#' @seealso related functions: \code{\link{rescaled}}, \code{\link{retransformed}}, \code{\link{ashomogeneous}}
+#' @seealso related functions: \code{\link{rescaled}}, \code{\link{retransformed}}, \code{\link{homogeneous}}
 #' @seealso \code{\link{sostyppp}} for details on the class.
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 
@@ -186,7 +186,7 @@ reweighted <- function (X, intensity = NULL, ...)#, normpower = 0)
 #'   If \code{invscale} is given as a single number, the point pattern gets marked with
 #'   constant scale factor, which effectively means that it will be analysed as a homogeneous
 #'   point process.
-#' @seealso related functions: \code{\link{reweighted}}, \code{\link{retransformed}}, \code{\link{ashomogeneous}}
+#' @seealso related functions: \code{\link{reweighted}}, \code{\link{retransformed}}, \code{\link{homogeneous}}
 #' @seealso \code{\link{sostyppp.object}} for details on the class.
 #' @export
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
@@ -258,7 +258,7 @@ rescaled <- function (X,  invscale = NULL, intensity = NULL, ...)
 #' @param ... optional extra parameters for \code{backtrafo}, if this is given as a \code{function}.
 #' @return A retransformed s.o.s. typed point pattern (object of class \code{"\link{sostyppp}"})
 #' with information about the backtransform.
-#' @seealso related functions: \code{\link{reweighted}}, \code{\link{rescaled}}, \code{\link{ashomogeneous}}
+#' @seealso related functions: \code{\link{reweighted}}, \code{\link{rescaled}}, \code{\link{homogeneous}}
 #' @seealso \code{\link{sostyppp.object}} for details on the class.
 #' @details
 #'   If \code{backtrafo = "gradx"} or \code{backtrafo = "grady"}, the backtransformation is obtained
@@ -398,7 +398,7 @@ retransformed <- function (X, backtrafo = identxy, intensity = NULL, trafo = NUL
 #' @export
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 
-ashomogeneous <- function (X,  type="h", intensity = NULL)
+homogeneous <- function (X,  type="h", intensity = NULL)
 {
   if(!is.sostyppp(X)) X <- as.sostyppp.ppp(X, "none")
   npts <- npoints(X)
@@ -458,7 +458,7 @@ backtransformed <- function(X)
   else Y <- coordTransform(as.ppp(X),
                            trafoxy = X$sostinfo$backtransform,
                            subdivideBorder = !preserveRectangle)
-  return(ashomogeneous(Y))
+  return(homogeneous(Y))
 }
 
 

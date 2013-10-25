@@ -24,8 +24,8 @@ quadsets <- list(lo = quadrats(testset$hi[[1]], nx = 2, ny = 2),
 
 # colors for plotting, and a plot of the quadrats (Figure 19)
 
-styles <-  list(hi = style(col="red",  alpha=.4, col.win="red", alpha.win=.4),
-               lo = style(col="blue", alpha=.4, col.win="blue"))
+styles <-  list(hi = simplist(col="red",  alpha=.4, col.win="red", alpha.win=.4),
+               lo = simplist(col="blue", alpha=.4, col.win="blue"))
 
 quadratsplot(scholtzia, quadsets, styles, pch=16, cex=.5)
 
@@ -61,5 +61,4 @@ test_w2 <- sos.test(scholtzia_w, quadsets, rmax = 2, use.tbar = TRUE, normpower 
 print(test_w2)
 # visualisation: Figure 20, lower right
 plot(test_w2, styles)
-
 

@@ -2,12 +2,14 @@
 .Rhistory
 # Example code in package build process
 *-Ex.R
-# Rstudio stuff
+# Rstudio stuff Winedt and other stuff
 .Rproj.user
 .Rhistory
 *.RData
 .Rbuildignore
 *.Rproj
+.gitattributes
+*.prj
 #
 # backups
 #
@@ -30,6 +32,9 @@ allfigures/*.*
 allfigures/*
 testR/*.*
 paper/*.*
+Changelog
+Rplots.pdf
+inst.tmp
 #
 # documentation aux files
 #

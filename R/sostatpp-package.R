@@ -57,7 +57,7 @@
 #'  \code{\link{reweighted}} \tab for reweighted s.o.stationarity
 #'  \cr\code{\link{retransformed}} \tab for retransformed s.o. stationarity
 #'  \cr\code{\link{rescaled}} \tab for locally rescaled s.o.stationarity
-#'  \cr\code{\link{ashomogeneous}} \tab for plain, homogeneous s.o. stationarity.
+#'  \cr\code{\link{homogeneous}} \tab for plain, homogeneous s.o. stationarity.
 #'  }
 #'  A \code{sostyppp}-object can contain information on several types of s.o.
 #'  stationarity. To retrieve the type(s) of an \code{sostyppp}, apply

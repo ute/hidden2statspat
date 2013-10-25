@@ -5,7 +5,7 @@
 #'@param x point pattern
 #'@param qsets the quadrat sets, a \emph{named} list of  lists of windows (\code{"\link{owin}"})
 #' or tessellations (\pkg{spatstat}-object \code{"\link[spatstat]{tess}"})
-#'@param styles optional a \emph{named} list of \code{\link{style}} lists, see Details,
+#'@param styles optional a \emph{named} list of \code{\link{simplist}}s, see Details,
 #'@param ... further plot parameters
 #'@param main title to be put above the plot. Default: tries to guess title from call.
 #'@param backtransformed logical, if \code{TRUE} backtransform  pattern and quadrats.
@@ -13,7 +13,7 @@
 #'#'@details
 #'Background colour and coulour intensity of the quadrats are determined by the
 #'parameters \code{col.win} and \code{alpha.win}, see \code{\link{plot.sostyppp}}.
-#'These plot parameters can be given as \code{\link{style}} lists or explicitely.
+#'These plot parameters can be given as \code{\link{simplist}}s or explicitely.
 #'Both styles and explicite parameters can be given as named lists, the names are
 #'then matched with the names of the quadrat sets.
 #'Quadrats that have not been assigned
@@ -22,7 +22,7 @@
 #'@examples
 #'# quadrat plot for the beilschmiedia pattern
 #'beiquads <- twoquadsets(bei, nx = 8, ny = 4, minpoints = 30)
-#'beistyle <- list(hi = style(col.win = "red"), lo = style(col.win = "blue"))
+#'beistyle <- list(hi = simplist(col.win = "red"), lo = simplist(col.win = "blue"))
 #'
 #'quadratsplot(bei, beiquads, beistyle, alpha.win = 0.2, main = "Beilschmiedia: quadrats")
 #'
@@ -31,27 +31,27 @@
 #'quadratsplot(bei, beiquads, col.win = list(hi = "red", lo = "blue"),
 #'  alpha.win = 0.2, main = "Beilschmiedia: quadrats", pch = 16, cex = .3)
 
-quadratsplot <- function(x, qsets, styles = NULL, ..., main = NULL, 
+quadratsplot <- function(x, qsets, styles = NULL, ..., main = NULL,
                         backtransformed = FALSE) {
-  # qsets should be a list 
+  # qsets should be a list
   stopifnot(is.list(qsets), is.ppp(x))
-  
+
   if (is.null(main)) {
     main <- deparse(substitute(x))
     if (backtransformed) main <- paste(main, ", backtransformed", sep = "")
   }
-  if(!is.sostyppp(x)) x <- as.sostyppp(x, type = "none") 
+  if(!is.sostyppp(x)) x <- as.sostyppp(x, type = "none")
   ppsamples <- lapply(qsets, function(sa) ppsubsample(x, sa))
-  
+
   if (backtransformed && identical(currenttype(x), "t")){
     x <- backtransformed(x)
     ppsamples <- lapply(ppsamples, backtransformed.ppsample)
   }
-    
-  
+
+
   # plot original pattern, just to have unused points also in the plot
-  do.call("plot.ppp", c(list(x), 
-        matching(style(..., main = main), plot.ppp, .graphparams)))
+  do.call("plot.ppp", c(list(x),
+        matching(simplist(..., main = main), plot.ppp, .graphparams)))
   # don't throw warnings because of extra arguments in the styles
   okstyles <- lapply(styles, matching, plot.ppp, plot.sostyppp, .graphparams)
   lplot(ppsamples, okstyles, ..., allinone = TRUE, add = TRUE)

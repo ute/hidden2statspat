@@ -15,18 +15,18 @@
 #' for the plot methods of elements in the sample.
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 
-plot.ppsample <- function(x, ..., add = FALSE, 
+plot.ppsample <- function(x, ..., add = FALSE,
                           allinone = TRUE) {
-  dotargs <- style(...)
+  dotargs <- simplist(...)
   if (!add){
     # spatstatpatch
     # don't let plot.ppp or plot.owin print a rubbish name as title because of do.call
-    if (is.null(dotargs$main)) { 
+    if (is.null(dotargs$main)) {
       dotargs$main = ""
- #     dotargs$main <- deparse(substitute(x))[1] also gives rubbish, 
+ #     dotargs$main <- deparse(substitute(x))[1] also gives rubbish,
   #    if plot.ppsample was invoked by do call
-  #    
- #### TODO: style$ wenn mal ganz viel Zeit ist... #################
+  #
+ #### TODO: simplist$ wenn mal ganz viel Zeit ist... #################
       # class(dotargs) <- c("class", "list")
     }
     if (allinone) {

@@ -177,7 +177,7 @@ K.est <- function (X,
     if(is.sostyppp(X)) sostype <- currenttype(X) else sostype <- NULL
     if (length(sostype) == 0)
       {
-         X <- ashomogeneous(X)
+         X <- homogeneous(X)
          sostype <- "h"
       }
   }

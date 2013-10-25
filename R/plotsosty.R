@@ -15,17 +15,17 @@
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 
 plot.sostyppp <- function(x, main, ..., col.win = NULL, alpha.win = 0.4) {
-  dotargs <- style(...)
-  unknownargs <- matching(dotargs, plot.owin, plot.ppp, plot.sostyppp, 
+  dotargs <- simplist(...)
+  unknownargs <- matching(dotargs, plot.owin, plot.ppp, plot.sostyppp,
                           .graphparams, .plotparams, .notmatching = TRUE)
-  if (length(unknownargs) > 0) 
+  if (length(unknownargs) > 0)
     warning(paste("unused parameters: ", paste(names(unknownargs), collapse = ", ")))
   if (missing(main)) main <- deparse(substitute(x))
-  allargs <- style(dotargs, main = main, col.win = col.win, alpha.win = alpha.win, 
+  allargs <- simplist(dotargs, main = main, col.win = col.win, alpha.win = alpha.win,
                    NULL.rm = TRUE)
   if (!is.null(allargs$col.win)){
     # plot a coloured window first if plot is not added
-      useargs <- matching(allargs, plot.owin, .graphparams, .plotparams) 
+      useargs <- matching(allargs, plot.owin, .graphparams, .plotparams)
       useargs$col <- alphacol(allargs$col.win, allargs$alpha.win)
       do.call ("plot.owin", c(list(x$window), useargs))
       allargs$add <- TRUE

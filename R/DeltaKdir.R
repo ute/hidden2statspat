@@ -69,7 +69,7 @@ DeltaKdir.est <- function (X,
     sostype <- currenttype(X)
     if (length(sostype) == 0)
       {
-         X <- ashomogeneous(X)
+         X <- homogeneous(X)
          sostype <- "h"
       }
   }

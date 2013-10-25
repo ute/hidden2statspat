@@ -18,8 +18,8 @@ beiquads <- twoquadsets(bei, nx = 8, ny = 4, minpoints = 30)
 # generate a plot of the quadrats
 # plot style for the two used subsets
 
-beistyle <- list(hi = style(col="red",  alpha=.4, col.win="red", alpha.win=.4),
-                 lo = style(col="blue", alpha=.4, col.win="blue"))
+beistyle <- list(hi = simplist(col="red",  alpha=.4, col.win="red", alpha.win=.4),
+                 lo = simplist(col="blue", alpha=.4, col.win="blue"))
 
 quadratsplot(bei, beiquads, beistyle, pch = 16, cex = .4, 
   main = "Beilschmiedia quadrats for testing")
@@ -78,4 +78,3 @@ sos.test(bei.wbay, beiquads, rmax = 25, normpower = 2,
 sos.test(reweighted(bei, intensity = bei.intens.nonpar),
               beiquads, rmax = 25, normpower = 2,
               use.tbar=TRUE, nperm = nperm)
-

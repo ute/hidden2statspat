@@ -88,7 +88,7 @@
 #'@seealso function \code{\link{tL2.permtest}} from package {fdnonpar} is used
 #'as test engine, \code{\link{twoquadsets}} is used for setting up quadrat samples.
 #'The quadrat subsamples or the $K$-function estimates can be plotted, see
-#'\code{\link{plot.Ktest}}
+#'\code{\link{plot.sostest}}
 
 sos.test <- function (x,
                       qsets = NULL,
@@ -115,7 +115,7 @@ sos.test <- function (x,
   testerg <- twosample.K.test(pp.hi, pp.lo, Kfun = Kfun, rmax = rmax, ...,
                               use.tbar = use.tbar, nperm = nperm)
   names(testerg$Ksamples) <- c("theo", "hi", "lo")
- 
+
   testerg$method[1] <- paste("Studentized permutation test of", typename ,
                    " second-order stationarity,")
   testerg$alternative <- c(paste("not", typename, "second-order stationary"),
@@ -128,14 +128,14 @@ sos.test <- function (x,
 #'@description Plot the K-function estimates used
 #'in a test on second-order stationarity, \code{\link{sos.test}}.
 #'@param x result of a \code{\link{sos.test}} or a \code{\link{twosample.K.test}},
-#'an object of class \code{"Ktest"}
-#'@param styles named list of \code{\link{style}} lists, defines how  the K-function
+#'an object of class \code{"sostest"}
+#'@param styles named list of \code{\link{simplist}}s, defines how  the K-function
 #'estimates are plotted, see Details,
-#'@param theostyle plot style for the reference \eqn{K}-function of a Poisson point process.
+#'@param theostyle \code{simplist}, the plot style for the reference \eqn{K}-function of a Poisson point process.
 #'To supress plotting of the reference curve, let \code{theostyle = NULL}.
 #'@param ... further arguments passed to plot methods,
-#'@param labline numeric, controls the position of the axis labels: first 
-#'entry in graphic parameter \code{mgp}. 
+#'@param labline numeric, controls the position of the axis labels: first
+#'entry in graphic parameter \code{mgp}.
 #@param mean.thicker optional numeric, multiplier for the line width of the group mean functions,
 #@param mean.alpha optional numeric, alpha value for the colour of the group mean functions.
 #'@details
@@ -152,7 +152,7 @@ sos.test <- function (x,
 #'are controlled by argument \code{styles}, which contains two elements.
 #'For plotting the result of a \code{sos.test}, the have to be named \code{hi}
 #'and \code{lo}, for the result of a \code{twosample.K.test}, the names
-#'are \code{x} and \code{y}. The elements themselve are \code{\link{style}} lists
+#'are \code{x} and \code{y}. The elements themselve are \code{\link{simplist}}s
 #'with elements
 #'\tabular{ll}{
 #'\code{col} \tab colour for the individual \eqn{K}-functions
@@ -170,27 +170,27 @@ sos.test <- function (x,
 #\cr\code{lty.sum}\tab optional line type for the mean \eqn{K}-function, defaults to \code{lty}
 #'}
 #'
-#'@export plot.Ktest
-#'@method plot Ktest
+#'@export plot.sostest
+#'@method plot sostest
 #'@author Ute Hahn,  \email{ute@@imf.au.dk}
 #'@examples
 #'# testing beilschmiedia pattern on reweighted second-order stationarity
 #'bei.ml <- reweighted(bei, intensity = bei.intens.maxlik)
 #'bei.quads <- twoquadsets(bei, nx = 8, ny = 4, minpoints = 30)
 #'beitest <- sos.test(bei.ml, qsets = bei.quads, rmax =25 )
-#'beistyle <- list(hi = style(col = "red", alpha = .5), lo = style(col = "blue", alpha = .5))
+#'beistyle <- list(hi = simplist(col = "red", alpha = .5), lo = simplist(col = "blue", alpha = .5))
 #'
 #'plot(beitest, beistyle, main = "bei.ml: K estimated on quadrats", ylim = c(0,3000))
 
-plot.Ktest <- function(x, styles,
-                      theostyle = style(lty = "dotted", col = "black", alpha = 1),
+plot.sostest <- function(x, styles,
+                      theostyle = simplist(lty = "dotted", col = "black", alpha = 1),
                        ..., labline = 2.4)
   #,
   #                     mean.thicker = 2, mean.alpha = 1)
 {
   Ksamp <- x$Ksamples
   if (is.null(theostyle)) Ksamp$theo <- NULL
-  if (missing(styles)) styles <- list()
+  if (missing(styles)) styles <- simplist()
   styles$theo <- theostyle
   # don't throw warnings because of extra arguments in the styles
   okstyles <- lapply(styles, matching, plot.fdsample, .graphparams)
@@ -200,7 +200,7 @@ plot.Ktest <- function(x, styles,
 
   allrange <- sapply(Ksamp, rangexy, finite = TRUE)
 
-  dotargs <- style(...)
+  dotargs <- simplist(...)
   if (is.null(dotargs$xlim))
     dotargs$xlim <- range(range(allrange["x",]))
   if (is.null(dotargs$ylim))

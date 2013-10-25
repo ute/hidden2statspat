@@ -1,7 +1,7 @@
 #'@title Two sample K-permutation-test
 #'@description Perform a permutation test to compare K-functions estimated on
 #'two point pattern samples
-#' Returns an object of class \code{Ktest}
+#' Returns an object of class \code{sostest}
 #'that also can be plotted, see the details.
 #'@param x,y the point pattern samples to be compared, objects of class \code{ppsample}
 #'@param rmax numeric, the upper integration limit, see Details,
@@ -117,6 +117,6 @@ twosample.K.test <- function (x, y,
   testerg$Ksamples <- list(theo = Ktheo, x = Kx, y = Ky)
   # don't change this - theo is asumed to be the first to be plotted, otherwise
   # it will lie above the interesting things
-  class(testerg) <- c("Ktest", "htest")
+  firstclass(testerg) <- "sostest"
   return(testerg)
 }
