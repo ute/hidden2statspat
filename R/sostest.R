@@ -103,6 +103,8 @@ sos.test <- function (x,
   type <- currenttype(x)
   if (length(type) == 0) stop ("unknown type of hidden 2nd-order stationarity")
   typename <- .TYPENAMES[which(.TYPES == type)]
+  if (type %in% c("h", "hs", "none"))
+    typename <- ""
 
   stopifnot (is.list(qsets) && length(qsets) > 1)
   stopifnot (all(c("hi", "lo") %in% names(qsets)))
@@ -114,19 +116,9 @@ sos.test <- function (x,
                               use.tbar = use.tbar, nperm = nperm)
   names(testerg$Ksamples) <- c("theo", "hi", "lo")
  
-# 
-#   testerg$ppsamples <- list(hi = pp.hi, lo = pp.lo, unused = pp.unused)
-
-  testerg$data.name <- dataname
-
-  testerg$method <- c(paste("Studentized permutation test of",
-          typename ," hidden second-order stationarity,"),
-          ifelse(AnisTest, "directional version, using Delta K_dir",
-                "isotropic version, using K_0"),
-          paste("test statistic: ", if(use.tbar) "Tbar,"
-               else "T,", "upper integration bound: ", rmax),
-           testerg$method[2] )
-  testerg$alternative <- c(paste("not the same", typename, "K-function"),
+  testerg$method[1] <- paste("Studentized permutation test of", typename ,
+                   " second-order stationarity,")
+  testerg$alternative <- c(paste("not", typename, "second-order stationary"),
                       if(AnisTest) ",\nbut different kinds of anisotropy")
   testerg
 }
