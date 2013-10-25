@@ -169,11 +169,13 @@ is.sostyppp <- function(x) inherits(x, "sostyppp")
 print.sostyppp <- function(x, ...)
 {
   print.ppp(x)
-  if(length (currentTypeno(x)) > 0)
-    cat("pattern is",.TYPENAMES[currentTypeno(x)],"second-order stationary","\n")
+  sost <- attr(x, "sostype")
+  if(length (sost) > 0)
+    cat("pattern is", longTypeName(sost[1]),"second-order stationary","\n")
   else cat("pattern is second-order stationary of unassigned type","\n")
-  further <- furthertypeno(x)
-  if (length(further>0)) cat("additional types:",.TYPENAMES[further],"\n")
+  further <- sost[-1]
+  if (length(further > 0)) 
+    cat("additional types:",sapply(further, longTypeName),"\n")
 }
 
 #' Manipulate s.o.s. type information
@@ -194,7 +196,8 @@ hasType <- function (x, type = .TYPES)
 {
   knowntype <-  any(!is.na(match(type, .TYPES)))
   if (!knowntype) stop ("unknown type of hidden 2nd-order stationarity")
-  return(type %in% .gettype(attr(x, "sostype"))$all)
+  #return(type %in% .gettype(attr(x, "sostype"))$all)
+  return(type %in% (attr(x, "sostype")))
 }
 
 
@@ -209,60 +212,49 @@ hasType <- function (x, type = .TYPES)
 
 currentType <- function (x)
 {
-  return(.gettype(attr(x, "sostype"))$last)
+  #return(.gettype(attr(x, "sostype"))$last)
+  return(attr(x, "sostype")[1])
 }
 
-# @return integer, index number of second-order stationarity type
-# @rdname sostyppp-types
-#' @rdname sostatpp-internal
-#' @keywords internal
-# @export
+#@param value type character
+#@usage currentType(x) <- value
+#'@export
+#'@rdname sostatpp-internal
+#'@usage currentType(x) <- value
+#'@keywords internal
 
-currentTypeno <- function (x)
+"currentType<-" <- function(x, value)
 {
-  return(.gettype(attr(x, "sostype"))$lastno)
-}
+  knowntype <-  any(!is.na(match(value, .TYPES)))
+  if (!knowntype) stop ("unknown type of hidden 2nd-order stationarity")
+  types <- attr(x, "sostype")
+  if("none" %in% types) types <- types[-match("none", types)]
+  if(value %in% types) types <- types[-match(value, types)]
+  attr(x, "sostype") <- c(value, types)
+  x
+}  
 
-
-# @param x point pattern, of class sostyppp
-# @return vector of type numbers, all but the current type
-# if several types are present, the last one is picked
-# @rdname sostyppp-types
-#' @rdname sostatpp-internal
-#' @keywords internal
-# @export
-
-furthertypeno <- function (x)
-{
-  return(.gettype(attr(x, "sostype"))$furtherno)
-}
-
-
-# hand made bit operations, certainly much too awkward...
 # @param typecode integer. encrypted information on last type, and all types
 # @return a list (\code{last}, \code{all}) of character vectors giving the type
 # if several types are present, the last one is picked
-#' @rdname sostatpp-internal
-#' @keywords internal
-# \code{"ppp"}
+# @rdname sostatpp-internal
+# @keywords internal
 
 .TYPENAMES  <- c("reweighted", "retransformed", "rescaled", "homogeneous", 
   "scaled-homogeneous", "not specified")
 .TYPES  <- c("w", "t", "s", "h", "hs", "none")
-.TYBITS <- c(1, 2, 4, 8, 16, 32)
-.TYLAST <- 64
 
-.gettype <- function (typecode)
-{
-  last <- typecode %/% .TYLAST
-  lindex <- (last %/% .TYBITS) %% 2 == 1
-  all <- typecode %% .TYLAST
-  contained <- (all %/% .TYBITS) %% 2 == 1
-  return(list(last = .TYPES[lindex], all = .TYPES[contained],
-              lastno = which(lindex), furtherno = which(!lindex & contained) ))
+# return long name
+#
+#' @rdname sostatpp-internal
+#' @keywords internal
+
+longTypeName <- function(type){
+  typeno <- match(type, .TYPES)
+  if (!is.na(typeno)) .TYPENAMES[typeno] else ""
 }
 
-# @param typecode integer, encrypted information on last type, and all types so far
+# @param typecode character
 # @param type character, giving the type to be entered in encrypted info
 # @return integer, updated encrypted type information
 # if several types are present, the last one is picked
@@ -272,18 +264,27 @@ furthertypeno <- function (x)
 
 .settype <- function(type, typecode)
 {
-  tindex <- which(.TYPES == type)
-  stopifnot(length(tindex) == 1)
-  if (length(typecode) < 1) { # new typecode
-    return(.TYBITS[tindex] * (.TYLAST+1))
-  }
-  else {
-    all <- typecode %% .TYLAST
-    contained <- (all %/% .TYBITS) %% 2 == 1
-    if (!contained[tindex]) all <- all + .TYBITS[tindex]
-    return (.TYBITS[tindex] * .TYLAST + all)
-  }
-}
+  knowntype <-  any(!is.na(match(type, .TYPES)))
+  if (!knowntype) stop ("unknown type of hidden 2nd-order stationarity")
+  if("none" %in% typecode) typecode <- typecode[-match("none", typecode)]
+  if(type %in% typecode) typecode <- typecode[-match(type, typecode)]
+  c(type, typecode)
+}  
+
+# .settype_oldsystem <- function(type, typecode)
+# {
+#   tindex <- which(.TYPES == type)
+#   stopifnot(length(tindex) == 1)
+#   if (length(typecode) < 1) { # new typecode
+#     return(.TYBITS[tindex] * (.TYLAST+1))
+#   }
+#   else {
+#     all <- typecode %% .TYLAST
+#     contained <- (all %/% .TYBITS) %% 2 == 1
+#     if (!contained[tindex]) all <- all + .TYBITS[tindex]
+#     return (.TYBITS[tindex] * .TYLAST + all)
+#   }
+# }
 
 
 

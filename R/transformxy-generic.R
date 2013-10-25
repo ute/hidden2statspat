@@ -20,14 +20,12 @@ identxy <- function (x, y = NULL)
   else return (data.frame(x = x, y = y))
 }
 
-#' internal functions of sostatpp package
-#'
-#' @name sostatpp-internal
-#' @description
-#' functions for use by the package's functions, partly slightly
-#' documented in the source code
+
+
+
 #' @rdname sostatpp-internal
 #' @keywords internal
+#' 
 mapstructxy <- function(X, mapxy = identxy, ...)
 {
   mapargs <- formals(mapxy)

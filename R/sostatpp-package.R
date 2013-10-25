@@ -106,6 +106,13 @@
 # \cr\code{\link{Kaniso.test}} \tab test of local anisotropy, using \eqn{\Delta K_{dir}}-function
 #'}
 #'}
+#'@section Demos
+#' The data analysis section in H&J(2013) is covered by the following demos:
+#'\tabular{l}{
+#'  \code{demo(bronzefilter)}
+#'  \cr\code{demo(beilschmiedia)}
+#'  \cr\code{demo(scholtzia)}
+#'}
 #'@author Ute Hahn, \email{ute@@imf.au.dk}
 #'
 #'@references
@@ -120,9 +127,4 @@
 #'
 #'@keywords  package
 #'@seealso  The \code{\link[spatstat]{spatstat}} package
-#'@examples
-#'## The data analysis section in H&J(2013) is covered by the following demos: ##
-#'demo(bronzefilter)
-#'demo(beilschmiedia)
-#'demo(scholtzia)
 NA

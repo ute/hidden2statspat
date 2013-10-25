@@ -106,7 +106,8 @@ npoints.ppsample <- function(x) sapply(x, npoints)
 #' @details The parent window is also retransformed. For more details, see the function
 #' \code{\link{backtransformed}} for single point patterns.
 #' @S3method backtransformed ppsample
-#' @method backtransformed ppsampl
+#' @method backtransformed ppsample
+#' @export backtransformed.ppsample
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 # @examples
 # bronzetra <- retransformed(bronzefilter, "gradx")

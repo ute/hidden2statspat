@@ -1,3 +1,10 @@
+  CHANGES IN sostatpp VERSION 0.11.4
+
+    o type information is no longer stored as list element, but as attribute
+
+    o simplified encoding of type - just a plain character variable (was 
+      encrypted to save space when storing as marks in a very early version)
+
   CHANGES IN sostatpp VERSION 0.11.3
 
     o quadratsplot for backtransformed patterns

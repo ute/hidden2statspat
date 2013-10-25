@@ -88,13 +88,23 @@ as.sostyppp.sostyppp <- function(x, type = "h", ...)
   if (type == "none") {
     attr(x, "sostinfo") <- list(tmarks = NULL)
     attr(x, "sostype") <- .settype("none", NULL)
-  }
-  else if (type == "w") x <- reweighted(x, ...)
-    else { if (type == "t") x <- retransformed(x, ...)
-      else { if (type == "s") x <- rescaled(x, ...)
-        else { if (type == "h") x <- homogeneous(x, "h")
-          else { if (type == "hs") x <- homogeneous(x, "hs")
-            else { warning("unknown 2ndorder stationarity type") }}}}}
+  } else {
+    if (hasType(x, type) && (length(list(...))==0)) {
+      # mainly nothing to do, but forward type in list of types
+      currentType(x) <- type
+    } 
+    else {if (type == "w") x <- reweighted(x, ...)
+      else { if (type == "t") x <- retransformed(x, ...)
+        else { if (type == "s") x <- rescaled(x, ...)
+          else { if (type == "h") x <- homogeneous(x, "h")
+            else { if (type == "hs") x <- homogeneous(x, "hs")
+              else { warning("unknown 2ndorder stationarity type") }
+            }
+          }
+        }
+      }
+    }
+  }  
   return(x)
 }
 
@@ -292,10 +302,11 @@ rescaled <- function (X,  invscale = NULL, intensity = NULL, ...)
 
 retransformed <- function (X, backtrafo = identxy, intensity = NULL, trafo = NULL, ...)
 {
-  if(!is.sostyppp(X)) X <- as.sostyppp.ppp(X, "none")
+  if (!is.sostyppp(X)) 
+    X <- as.sostyppp.ppp(X, "none")
   sostinfo <- attr(X, "sostinfo")
   npts <- npoints(X)
-  isGradTrafo <- (backtrafo %in% c("gradx", "grady"))
+  isGradTrafo <- is.character(backtrafo) && backtrafo %in% c("gradx", "grady")
   gradient <- ifelse(isGradTrafo, backtrafo, NULL)
   if (npts > 0){
     if (is.function(backtrafo)){
@@ -441,7 +452,7 @@ homogeneous <- function (X,  type="h", intensity = NULL)
 #'
 #'  The window of the resulting pattern is polygonal if the original was a rectangle or polygonal;
 #'  it is a binary mask if the original window was a binary mask.
-#' @details If \code{X} is a \code{ppsample}, the function \code{\link{backtransform.sostyppp}}
+#' @details If \code{X} is a \code{ppsample}, the function \code{\link{backtransformed.sostyppp}}
 #' is applied to each of its elements. 
 #' @export
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
@@ -455,7 +466,7 @@ homogeneous <- function (X,  type="h", intensity = NULL)
 #' plot(bronzesample, use.marks = FALSE)
 #' plot(backtransformed(bronzesample), use.marks = FALSE)
 
-backtransformed <- function(X,  ...) UseMethod("backtransformed", X)
+backtransformed <- function(X) UseMethod("backtransformed", X)
 
 #' Obtain backtransformed point pattern
 #'
@@ -480,6 +491,7 @@ backtransformed <- function(X,  ...) UseMethod("backtransformed", X)
 #' is stored as element \code{invtransform} in attribute \code{sostinfo}.
 #' @S3method backtransformed sostyppp
 #' @method backtransformed sostyppp
+#' @export backtransformed.sostyppp
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 #' @examples
 #' bronzetra <- retransformed(bronzefilter, "gradx")
@@ -507,12 +519,19 @@ backtransformed.sostyppp <- function(X)
                            subdivideBorder = !preserveRectangle)
   return(homogeneous(Y))
 }
-
-
+#'@title Internal functions of sostatpp package
+#' @description
+#' Functions for use by the package's functions, partly slightly
+#' documented in the source code
+#' @name sostatpp-internal
+#' @rdname sostatpp-internal
+NA
 
 # @param X point pattern, of class ppp
 # @param intensity optional intensity, number, vector, function or image
 # @param ... extra parameters for estimation of intensity
+# @name sostatpp-internal
+# @aliases getIntensity
 #' @rdname sostatpp-internal
 #' @export
 #' @keywords internal
