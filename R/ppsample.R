@@ -105,12 +105,14 @@ npoints.ppsample <- function(x) sapply(x, npoints)
 #' @return a \code{ppsample} object consisiting of homogeneous s.o.s. typed point patterns.
 #' @details The parent window is also retransformed. For more details, see the function
 #' \code{\link{backtransformed}} for single point patterns.
-#' @export
+#' @S3method backtransformed ppsample
+#' @method backtransformed ppsampl
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 # @examples
 # bronzetra <- retransformed(bronzefilter, "gradx")
-# bronzetemplate <- backtransformed(bronzetra)
-# plot(bronzetemplate, use.marks = FALSE)
+#'bronzesample <- ppsubsample(bronzetra, quadrats(bronzetra, nx=6, ny = 3))
+#'plot(bronzesample, use.marks = FALSE)
+#'plot(backtransformed(bronzesample), use.marks = FALSE)
 
 backtransformed.ppsample <- function(X)
 {

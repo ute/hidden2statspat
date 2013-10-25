@@ -418,33 +418,71 @@ homogeneous <- function (X,  type="h", intensity = NULL)
 }
 
 
-#' Obtain backtransformed point pattern
+#' Obtain backtransformed point pattern or sample of point patterns
 #'
-#' Backtransform a pattern that is tagged as  retransformed second-order stationary.
+#' Backtransform a
+#' pattern that is tagged as  retransformed second-order stationary, or a sample
+#' of such patterns.
 #'
-#' @param X a retransformed s.o.s. type tagged point pattern, object of class \code{{sostyppp}}.
-#' @return a homogeneous s.o.s. type tagged point pattern of class \code{{sostyppp}}
-#'  with points in \code{x0} and \code{y0}.
+#' @param X a retransformed s.o.s. type tagged point pattern, object of class \code{{sostyppp}},
+#' or a \code{ppsample} of such point patterns.
+#' @return A homogeneous s.o.s. type tagged point pattern of class \code{sostyppp}, or a
+#' \code{ppsample} of such point patterns.
 #'  The type of the result is set to both  homogeneous and scaled-homogeneous,
 #'  and is typemarked with constant intensity and constant inverse scale factor.
 #'
 #'  The window of the resulting pattern is polygonal if the original was a rectangle or polygonal;
 #'  it is a binary mask if the original window was a binary mask.
-#' @details As retransformed s.o.s. typed point pattern, \code{X} has an element \code{tinfo},
-#' a list containing information about the transformation. If this list contains
+#' @details If \code{X} is a \code{ppsample}, the function \code{\link{backtransform.sostyppp}}
+#' is applied to each of its elements. 
+#' @export
+#' @author Ute Hahn,  \email{ute@@imf.au.dk}
+#' @seealso \code{\link{backtransformed.sostyppp}}, \code{\link{backtransformed.ppsample}}
+#' @examples
+#' bronzetra <- retransformed(bronzefilter, "gradx")
+#' bronzetemplate <- backtransformed(bronzetra)
+#' plot(bronzetemplate, use.marks = FALSE)
+#' 
+#' bronzesample <- ppsubsample(bronzetra, quadrats(bronzetra, nx=6, ny = 3))
+#' plot(bronzesample, use.marks = FALSE)
+#' plot(backtransformed(bronzesample), use.marks = FALSE)
+
+backtransformed <- function(X,  ...) UseMethod("backtransformed", X)
+
+#' Obtain backtransformed point pattern
+#'
+#' Backtransform a pattern that is tagged as  retransformed second-order stationary.
+#'
+#' @param X a retransformed s.o.s. type tagged point pattern, object of class \code{{sostyppp}}.
+#' @return A homogeneous s.o.s. type tagged point pattern of class \code{sostyppp}.
+#'  The type of the result is set to both  homogeneous and scaled-homogeneous,
+#'  and is typemarked with constant intensity and constant inverse scale factor.
+#'
+#'  The window of the resulting pattern is polygonal if the original was a rectangle or polygonal;
+#'  it is a binary mask if the original window was a binary mask.
+#' @details  As retransformed s.o.s. typed point pattern, \code{X} has an attribute \code{sostinfo},
+#' a list containing (among others) information about the transformation. If this list contains
 #' an element \code{backtransform}, this element is taken to be a function and used
 #' to backtransform the window. If the original transformation was a gradient transformation,
-#' the coordinates of the window are interpolated. Currently, no saftey precautions if
-#' \code{backtransform} returns rubbish.
+#' the coordinates of the window are interpolated. Currently, no saftey precautions are taken if
+#' \code{backtransformed} returns rubbish. 
 #'
-# If no element \code{invtrafo} is present in \code{X$extra}, the original window is retained, which also might result in rubbish.
-#' @export
+#' For patterns with windows that are binary masks (objects of class \code{spatstat::\link{im}}),
+#' also information on the inverse of \code{backtransformed} is required. This information
+#' is stored as element \code{invtransform} in attribute \code{sostinfo}.
+#' @S3method backtransformed sostyppp
+#' @method backtransformed sostyppp
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 #' @examples
 #' bronzetra <- retransformed(bronzefilter, "gradx")
 #' bronzetemplate <- backtransformed(bronzetra)
 #' plot(bronzetemplate, use.marks = FALSE)
-backtransformed <- function(X)
+#' @seealso The details of \code{\link{retransformed}} on the necessity to give both the transformation
+#' and its inverse when the window is of class \code{spatstat::\link{im}}, and
+#' \code{\link{backtransformed.ppsample}} for backtransformation of samples of point patterns.
+#' 
+
+backtransformed.sostyppp <- function(X)
 {
   stopifnot(is.sostyppp(X))
   stopifnot(hasType(X, type= "t"))

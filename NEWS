@@ -2,7 +2,11 @@
 
     o quadratsplot for backtransformed patterns
 
+    o backtransform is a generic function now, with methods for sostyppp and ppsample
+
     o updated demo files (data analysis from H&J 2013)
+
+    o updated package documentation
 
     o extract.fdsample now tolerates small differences in argument (numerical effects)
 

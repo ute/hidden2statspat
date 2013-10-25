@@ -66,6 +66,28 @@
 #'  \code{\link{hasType}} \tab to check if the object contains information for a particular type
 #'  \cr\code{\link{currentType}} \tab to retrieve the s.o.s.-type that will be used for analysis
 #'  }
+#'@section Data manipulation and subsampling:
+#'\subsection{Transformation}{
+#' Arbitrary coordinate transformation on \pkg{spatstat} objects can be done with
+#'     \code{\link{coordTransform}}, currently supporting
+#'\tabular{ll}{
+#'  \code{\link{coordTransform.im}} \tab transformation of \code{\link{im.object}s},
+#'  \cr\code{\link{coordTransform.owin}} \tab transformation of \code{\link{owin.object}s},
+#'  \cr\code{\link{coordTransform.ppp}} \tab transformation of \code{\link{ppp.object}s}.
+#'}
+#'
+#'\code{\link{backtransformed}}  returnes the backtransform of a retransformed s.o.s. point pattern
+#'or of a subsample of such a pattern
+#'}
+#'\subsection{Subsampling}
+#'\tabular{ll}{
+#'\code{ppsubsample}\tab generates a quadrat subsample of a point pattern (object of type \code{ppsample}) 
+#'\cr\code{plot.ppsample}\tab can be used to plot a subsample
+#'\cr\code{twoquadsets}\tab to divide a set of quadrats into two sets that suitable 
+#'for testing second-order stationarity
+#'\cr\code{quadratsplot}\tab a plot to visualize two quadrat subsamples of a point pattern.
+#'}
+#'
 #'@section Statistical analysis:
 #'\subsection{Second order summary functions}{
 #'The following functions return objects of \pkg{spatstat}-class \code{fv}:
@@ -84,18 +106,6 @@
 # \cr\code{\link{Kaniso.test}} \tab test of local anisotropy, using \eqn{\Delta K_{dir}}-function
 #'}
 #'}
-#'@section Coordinate transformation:
-#'   Arbitrary coordinate transformation on \pkg{spatstat} objects can be done with
-#'     \code{\link{coordTransform}}, currently supporting
-#'\tabular{ll}{
-#'  \code{\link{coordTransform.im}} \tab transformation of \code{\link{im.object}s},
-#'  \cr\code{\link{coordTransform.owin}} \tab transformation of \code{\link{owin.object}s},
-#'  \cr\code{\link{coordTransform.ppp}} \tab transformation of \code{\link{ppp.object}s}.
-#'}
-#'\tabular{ll}{
-#'\code{\link{backtransformed}} \tab returnes the backtransform of a retransformed s.o.s. point pattern
-#'\cr
-#'    }
 #'@author Ute Hahn, \email{ute@@imf.au.dk}
 #'
 #'@references
@@ -111,44 +121,8 @@
 #'@keywords  package
 #'@seealso  The \code{\link[spatstat]{spatstat}} package
 #'@examples
-#'#### analysis of the scholtzia data set ################################
-#'
-#' data(scholtzia)
-#' data(intensities) # same intensity estimate as in the article
-#' # compare estimates of reweighted and rescaled template K-function
-#'  r.ls <- seq(0,1.25,0.002)
-#'  r.inhom <- r.ls / sqrt(intensity(scholtzia))
-#'
-#'############### Exploring and testing hypotheses #############################
-#'
-#'######################### subsample ####################################
-#'
-#'medy <- median(scholtzia$y)
-#'W1 <- owin(c(0, 22), c(0, medy), unitname=c("metre", "metres"))
-#'W2 <-  owin(c(0, 22), c(medy, 22), unitname=c("metre", "metres"))
-#'quads1 <- tiles(quadrats(W1, nx=4, ny=1))
-#'quads2 <- tiles(quadrats(W2, nx=2, ny=2))
-#'
-#'sscholtzia <- rescaled(scholtzia, intensity = scholtzia.intens)
-#'
-#'ssample <- list(hi = ppsubsample(sscholtzia, quads1),
-#'                lo = ppsubsample(sscholtzia, quads2))
-################ estimate K on subsamples ###############################
-#
-## Ks1 <- estOnQuadrats(scholtzia, fun = K.est, type="s", lambda=scholtzia.intens,
-##                      quads = quads1, rmax = 1.25)
-#
-##Ks2 <- estOnQuadrats(scholtzia, fun = K.est, type="s", lambda=scholtzia.intens,
-##                      quads = quads2, rmax = 1.25)
-#
-######## plot the estimated K_functions ##################################
-#
-#plot(Ks1, col = "red", light = .5,
-#     ylim=c(0, 6),  main=" rescaled, original intensity")
-#plot(Ks2, col = "blue", light = .5, add=TRUE)
-#
-##########  test s.-o. rescaled stationarity ###########################
-#
-#Kpermute.test(scholtzia, type="s", quads1 = quads1, quads2 = quads2,
-#                  rmax = 1.25, lambda=scholtzia.intens, use.tbar = TRUE)
+#'### The data analysis section in H&J is covered by the following demos: ####
+#'demo(bronzefilter)
+#'demo(beilschmiedia)
+#'demo(scholtzia)
 NA
