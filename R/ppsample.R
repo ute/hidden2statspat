@@ -118,7 +118,7 @@ backtransformed.ppsample <- function(X)
   if (length(X) == 0) stop ("does not contain anything")
   X1 <- X[[1]]
   stopifnot(is.sostyppp(X1))
-  stopifnot(has.type(X1, type= "t"))
+  stopifnot(hasType(X1, type= "t"))
   W <- attr(X, "parentwindow")
   if (!is.null(W))
       W <- coordTransform(W,
@@ -135,7 +135,7 @@ backtransformed.ppsample <- function(X)
 
 #' @title Extract subset of a point pattern sample
 #' @aliases [.ppsample
-#' @name Subset_ppsample
+#' @rdname Subset_ppsample
 #' @description Subsample a point pattern sample, retaining information about
 #' the original pattern's window.
 #'

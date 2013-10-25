@@ -100,7 +100,7 @@ sos.test <- function (x,
   if(!is.ppp(x)) stop("not a point pattern")
   AnisTest <- identical(Kfun, DeltaKdir.est)
   dataname <- paste( "point pattern",deparse(substitute(sost)))
-  type <- currenttype(x)
+  type <- currentType(x)
   if (length(type) == 0) stop ("unknown type of hidden 2nd-order stationarity")
   typename <- .TYPENAMES[which(.TYPES == type)]
   if (type %in% c("h", "hs", "none"))

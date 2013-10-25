@@ -447,7 +447,7 @@ homogeneous <- function (X,  type="h", intensity = NULL)
 backtransformed <- function(X)
 {
   stopifnot(is.sostyppp(X))
-  stopifnot(has.type(X, type= "t"))
+  stopifnot(hasType(X, type= "t"))
   if (is.null(X$sostinfo$backtransform)) stop ("no backtransform given")
   preserveRectangle <- is.rectangle(X$window) & !is.null(X$sostinfo$gradient)
   if (is.function(X$sostinfo$transform))
@@ -515,12 +515,12 @@ normalizedIntensity <- function(X, intensity = NULL, normpower = 2)
   if(is.null(intensity)) {
     if(!is.sostyppp(X)) stop("no intensity given")
     # first priority: current type
-    if (currenttype(X) %in% c("w","s")) {
-        if (currenttype(X) == "w") intensity <- X$sostinfo$tmarks$intens
+    if (currentType(X) %in% c("w","s")) {
+        if (currentType(X) == "w") intensity <- X$sostinfo$tmarks$intens
         else intensity <- X$sostinfo$tmarks$invscale^2
       }
-    else if (has.type(X, "w")) intensity <- X$sostinfo$tmarks$intens
-    else if (has.type(X, "s")) intensity <- X$sostinfo$tmarks$invscale^2
+    else if (hasType(X, "w")) intensity <- X$sostinfo$tmarks$intens
+    else if (hasType(X, "s")) intensity <- X$sostinfo$tmarks$invscale^2
     else stop("error: no intensity information in point pattern")
   }
   else {

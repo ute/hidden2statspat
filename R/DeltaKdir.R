@@ -66,7 +66,7 @@ DeltaKdir.est <- function (X,
 
   if (missing(type))
   {
-    sostype <- currenttype(X)
+    sostype <- currentType(X)
     if (length(sostype) == 0)
       {
          X <- homogeneous(X)
@@ -75,7 +75,7 @@ DeltaKdir.est <- function (X,
   }
   else {
     sostype <- type[1]
-    if (!has.type (X, sostype)) X <- as.sostyppp(X, type = sostype, ...)
+    if (!hasType (X, sostype)) X <- as.sostyppp(X, type = sostype, ...)
   }
 
   marx <- X$sostinfo$tmarks

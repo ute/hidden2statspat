@@ -174,7 +174,7 @@ K.est <- function (X,
 
   if (missing(type))
   {
-    if(is.sostyppp(X)) sostype <- currenttype(X) else sostype <- NULL
+    if(is.sostyppp(X)) sostype <- currentType(X) else sostype <- NULL
     if (length(sostype) == 0)
       {
          X <- homogeneous(X)

@@ -5,7 +5,7 @@
 #'
 #'
 #'@import fdnonpar
-#'@import plottools
+#'@import plutils
 #'@import plyr
 #'@import spatstat
 #'
@@ -22,24 +22,25 @@
 #'@details
 #'The package \pkg{sostatpp} deals with the statistical analysis of homogeneous
 #'and inhomogeneous second-order stationary point patterns.
-#'It implements methods from the papers \emph{A studentized permutation test
-#'for the comparison of spatial point patterns} and \emph{Inhomogeneous spatial
-#'point processes with hidden second-order stationarity} by Ute Hahn and
+#'It implements methods from the papers \emph{"A studentized permutation test
+#'for the comparison of spatial point patterns"} and \emph{"Inhomogeneous spatial
+#'point processes with hidden second-order stationarity"} by Ute Hahn and
 #'Eva B. Vedel Jensen.
 #'
 #'Hahn & Jensen (2013) introduce the term "hidden second-order stationarity"
-#'as an umbrella of several classes of inhomogeneous models, viz.
+#'as an umbrella for several classes of inhomogeneous models, viz.
 #'reweighted, retransformed or rescaled second-order stationary point processes.
-#'These model classes all come with their own sensible definition of an inhomogenous
-#'"template" version to second-order summary statistics, such as the \eqn{K}-function.
+#'These model classes all come with their own sensible definition of an appropriate
+#'inhomogenous version of second-order summary statistics, such as the \eqn{K}-function.
+#'H&J (2013) use the notion of a "template version" for these second-order statistics.
 #'
 #'The \pkg{sostatpp} package extends the package \pkg{spatstat}, and
 #'makes use of its data formats. \pkg{sostatpp} currently provides
 #'\itemize{
 #'  \item estimates of the template \eqn{K}- and \eqn{L}-functions and of
 #'   the \eqn{\Delta K_{dir}}-function, described in H&J(2013)
-#' \item model tests of the type of hidden second-order stationarity that can
-#' also be used to compare two point patterns, as in H(2012).
+#' \item a model test of the type of hidden second-order stationarity,
+#' \item a test to compare the \eqn{K}-function of two point patterns, as in H(2012).
 #' }
 #'
 #' The three different types of second-order stationarity show many similarities.
@@ -62,15 +63,17 @@
 #'  A \code{sostyppp}-object can contain information on several types of s.o.
 #'  stationarity. To retrieve the type(s) of an \code{sostyppp}, apply
 #'  \tabular{ll}{
-#'  \code{\link{has.type}} \tab check for a particular type
-#'  \cr\code{\link{currenttype}} \tab the s.o.s.-type that will be used for analysis
+#'  \code{\link{hasType}} \tab to check if the object contains information for a particular type
+#'  \cr\code{\link{currentType}} \tab to retrieve the s.o.s.-type that will be used for analysis
 #'  }
 #'@section Statistical analysis:
 #'\subsection{Second order summary functions}{
+#'The following functions return objects of \pkg{spatstat}-class \code{fv}:
 #' \tabular{ll}{
-#' \code{\link{K.est}} \tab estimates the \eqn{K}-function, according to type
-#' \cr\code{\link{L.est}} \tab estimates the \eqn{L}-function,
+#' \code{\link{K.est}} \tab estimates the template \eqn{K}-function, according to type
+#' \cr\code{\link{L.est}} \tab estimates the template \eqn{L}-function,
 #' \cr\code{\link{DeltaKdir.est}} \tab estimates the \eqn{\Delta K_{dir}}-function
+#' }
 #' }
 #' \subsection{Tests}{
 #' \tabular{ll}{
@@ -81,8 +84,7 @@
 # \cr\code{\link{Kaniso.test}} \tab test of local anisotropy, using \eqn{\Delta K_{dir}}-function
 #'}
 #'}
-#'}
-#' @section Coordinate transformation:
+#'@section Coordinate transformation:
 #'   Arbitrary coordinate transformation on \pkg{spatstat} objects can be done with
 #'     \code{\link{coordTransform}}, currently supporting
 #'\tabular{ll}{

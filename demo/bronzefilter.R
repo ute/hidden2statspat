@@ -54,15 +54,13 @@ nperm <- 1000
 test_s <- sos.test(bronzs, bronzequads, rmax = 1.25, nperm = nperm)
 test_s
 
+# visualisation: Figure 11, left
+
 plot(test_s, styles)
 
 # using the test statistic $\bar T$ instead
 
 sos.test(bronzs, bronzequads, rmax = 1.25, nperm = nperm, use.tbar = TRUE)
-
-# visualisation: Figure 11, left
-
-plot(test_s, styles)
 
 ##### ----------  analysis as reweighted second-order stationary  --------
 

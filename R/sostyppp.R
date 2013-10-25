@@ -91,7 +91,7 @@ is.sostyppp <- function(x) inherits(x, "sostyppp")
       return(value)
 
     #check if both have same sos-type
-    stopifnot(has.type(x, currenttype(value)))
+    stopifnot(hasType(x, currentType(value)))
 
     sostyp <- x$sostype
     xtras <- x$extra
@@ -168,8 +168,8 @@ is.sostyppp <- function(x) inherits(x, "sostyppp")
 print.sostyppp <- function(x, ...)
 {
   print.ppp(x)
-  if(length (currenttypeno(x)) > 0)
-    cat("pattern is",.TYPENAMES[currenttypeno(x)],"second-order stationary","\n")
+  if(length (currentTypeno(x)) > 0)
+    cat("pattern is",.TYPENAMES[currentTypeno(x)],"second-order stationary","\n")
   else cat("pattern is second-order stationary of unassigned type","\n")
   further <- furthertypeno(x)
   if (length(further>0)) cat("additional types:",.TYPENAMES[further],"\n")
@@ -189,7 +189,7 @@ print.sostyppp <- function(x, ...)
 # @keywords internal
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 
-has.type <- function (x, type = .TYPES)
+hasType <- function (x, type = .TYPES)
 {
   knowntype <-  any(!is.na(match(type, .TYPES)))
   if (!knowntype) stop ("unknown type of hidden 2nd-order stationarity")
@@ -204,9 +204,9 @@ has.type <- function (x, type = .TYPES)
 # @keywords internal
 #' @export
 # @alias sos-type functions
-#' @rdname has.type
+#' @rdname hasType
 
-currenttype <- function (x)
+currentType <- function (x)
 {
   return(.gettype(x$sostype)$last)
 }
@@ -217,7 +217,7 @@ currenttype <- function (x)
 #' @keywords internal
 # @export
 
-currenttypeno <- function (x)
+currentTypeno <- function (x)
 {
   return(.gettype(x$sostype)$lastno)
 }
@@ -320,8 +320,8 @@ furthertypeno <- function (x)
 #'  }
 #'
 #'  The type of second-order stationarity of an object \code{X} of class \code{sostyppp}
-#'  is returned as \code{character} by the function \code{\link{currenttype}}. Whether \code{X} has a given type of
-#'  second-order stationarity, can be checked with \code{\link{has.type}}.
+#'  is returned as \code{character} by the function \code{\link{currentType}}. Whether \code{X} has a given type of
+#'  second-order stationarity, can be checked with \code{\link{hasType}}.
 #'
 #'  Possible types of second-order stationarity (s.o.s.) are
 #'  \tabular{ll}{
@@ -338,7 +338,7 @@ furthertypeno <- function (x)
 #'    \cr\code{"hs"} \tab homogeneous, to be evaluated with scale invariant statistics.
 #'    }
 #'  An object of class \code{sostyppp} can carry type information for several types simultaneously.
-#'  Thus, function \code{\link{has.type}} may return \code{TRUE} for different arguments.
+#'  Thus, function \code{\link{hasType}} may return \code{TRUE} for different arguments.
 #'
 #'@author Ute Hahn  \email{ute@@imf.au.dk}
 #'

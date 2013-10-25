@@ -43,7 +43,7 @@ quadratsplot <- function(x, qsets, styles = NULL, ..., main = NULL,
   if(!is.sostyppp(x)) x <- as.sostyppp(x, type = "none")
   ppsamples <- lapply(qsets, function(sa) ppsubsample(x, sa))
 
-  if (backtransformed && identical(currenttype(x), "t")){
+  if (backtransformed && identical(currentType(x), "t")){
     x <- backtransformed(x)
     ppsamples <- lapply(ppsamples, backtransformed.ppsample)
   }
@@ -52,7 +52,8 @@ quadratsplot <- function(x, qsets, styles = NULL, ..., main = NULL,
   # plot original pattern, just to have unused points also in the plot
   do.call("plot.ppp", c(list(x),
         matching(simplist(..., main = main), plot.ppp, .graphparams)))
-  # don't throw warnings because of extra arguments in the styles
+  # don't throw warnings because of extra arguments in the styles; 
   okstyles <- lapply(styles, matching, plot.ppp, plot.sostyppp, .graphparams)
-  lplot(ppsamples, okstyles, ..., allinone = TRUE, add = TRUE)
+  # force lty = "solid"
+  lplot(ppsamples, okstyles, ..., lty = "solid", allinone = TRUE, add = TRUE)
 }
