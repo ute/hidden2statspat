@@ -147,7 +147,7 @@ reweighted <- function (X, intensity = NULL, ...)#, normpower = 0)
     # now marx is really a data frame
     X$sostinfo$tmarks <-  marx
   }
-  X$sostinfo$intensity <- intensity
+ # X$sostinfo$intensity <- intensity
   X$sostype <- .settype("w", X$sostype)
   return(X)
 }
@@ -228,8 +228,8 @@ rescaled <- function (X,  invscale = NULL, intensity = NULL, ...)
   else marx <- as.data.frame(cbind(marx, invscale = iscale))
    X$sostinfo$tmarks <-  marx
   }
-  X$sostinfo$invscale <- invscale
-  X$sostinfo$intensity <- intensity
+#  X$sostinfo$invscale <- invscale
+#  X$sostinfo$intensity <- intensity
   X$sostype <- .settype("s", X$sostype)
   return(X)
 }
@@ -378,7 +378,7 @@ retransformed <- function (X, backtrafo = identxy, intensity = NULL, trafo = NUL
   # X$sostinfo$isGradTrafo <- isGradTrafo
   X$sostinfo$gradient <- gradient
   X$sostype <- .settype("t", X$sostype)
-  X$sostinfo$intensity <- intensity
+#  X$sostinfo$intensity <- intensity
   return(X)
 }
 
@@ -412,8 +412,8 @@ ashomogeneous <- function (X,  type="h", intensity = NULL)
     # make sure last type is set to given argument:
     X$sostinfo$tmarks <-  marx
   }
-  X$sostinfo$intensity <- intensity
-    X$sostype  <- .settype(type, .settype("h", .settype("hs", NULL)))
+#  X$sostinfo$intensity <- intensity
+  X$sostype  <- .settype(type, .settype("h", .settype("hs", NULL)))
   return(X)
 }
 
