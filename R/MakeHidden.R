@@ -49,8 +49,10 @@ as.sostyppp.ppp <- function(x, type = "h", ...)
 {
   X <- x
   firstclass(X) <-  "sostyppp"
-  X$sostinfo <- list()
-  if (type == "none") { X$sostinfo$tmarks <- NULL;  X$sostype <- .settype("none", NULL) }
+  if (type == "none"){
+    attr(X, "sostinfo") <- list(tmarks = NULL)
+    attr(X, "sostype") <- .settype("none", NULL) 
+  }
   else { if (type == "w") X <- reweighted(X, ...)
     else { if (type == "t") X <- retransformed(X, ...)
       else { if (type == "s") X <- rescaled(X, ...)
@@ -84,8 +86,8 @@ as.sostyppp.ppp <- function(x, type = "h", ...)
 as.sostyppp.sostyppp <- function(x, type = "h", ...)
 {
   if (type == "none") {
-    x$sostinfo$tmarks <- NULL
-    x$sostype <- .settype("none", NULL)
+    attr(x, "sostinfo") <- list(tmarks = NULL)
+    attr(x, "sostype") <- .settype("none", NULL)
   }
   else if (type == "w") x <- reweighted(x, ...)
     else { if (type == "t") x <- retransformed(x, ...)
@@ -138,17 +140,19 @@ reweighted <- function (X, intensity = NULL, ...)#, normpower = 0)
 {
   if(!is.sostyppp(X)) X <- as.sostyppp.ppp(X, "none")
   npts <- npoints(X)
-  marx <- X$sostinfo$tmarks
+  sostinfo <- attr(X, "sostinfo")
+  marx <- sostinfo$tmarks
   if (npts > 0){
     if (is.null(intensity) && !is.null(marx$invscale)) intensity <- marx$invscale^2
     la <- getIntensity(X, intensity, ...)#,  normpower = normpower)
     if (!is.null (marx$intens)) marx$intens <- la
     else marx <- as.data.frame(cbind(marx, intens = la))
     # now marx is really a data frame
-    X$sostinfo$tmarks <-  marx
+    sostinfo$tmarks <-  marx
   }
  # X$sostinfo$intensity <- intensity
-  X$sostype <- .settype("w", X$sostype)
+  attr(X, "sostype") <- .settype("w", attr(X, "sostype"))
+  attr(X, "sostinfo") <- sostinfo
   return(X)
 }
 
@@ -202,7 +206,8 @@ rescaled <- function (X,  invscale = NULL, intensity = NULL, ...)
   if(!is.sostyppp(X)) X <- as.sostyppp.ppp(X, "none")
 
   npts <- npoints(X)
-  marx <- X$sostinfo$tmarks
+  sostinfo <- attr(X, "sostinfo")
+  marx <- sostinfo$tmarks
 
   if (npts > 0){
   if (is.null(invscale))  {
@@ -226,11 +231,12 @@ rescaled <- function (X,  invscale = NULL, intensity = NULL, ...)
       }
   if (!is.null (marx$invscale)) marx$invscale <- iscale
   else marx <- as.data.frame(cbind(marx, invscale = iscale))
-   X$sostinfo$tmarks <-  marx
+  sostinfo$tmarks <-  marx
   }
 #  X$sostinfo$invscale <- invscale
 #  X$sostinfo$intensity <- intensity
-  X$sostype <- .settype("s", X$sostype)
+  attr(X, "sostype") <- .settype("s", attr(X, "sostype"))
+  attr(X, "sostinfo") <- sostinfo
   return(X)
 }
 
@@ -287,6 +293,7 @@ rescaled <- function (X,  invscale = NULL, intensity = NULL, ...)
 retransformed <- function (X, backtrafo = identxy, intensity = NULL, trafo = NULL, ...)
 {
   if(!is.sostyppp(X)) X <- as.sostyppp.ppp(X, "none")
+  sostinfo <- attr(X, "sostinfo")
   npts <- npoints(X)
   isGradTrafo <- (backtrafo %in% c("gradx", "grady"))
   gradient <- ifelse(isGradTrafo, backtrafo, NULL)
@@ -373,12 +380,11 @@ retransformed <- function (X, backtrafo = identxy, intensity = NULL, trafo = NUL
                       dQuote("gradx"),"or", dQuote("grady")))
   }
   }
-  X$sostinfo$backtransform <- backtrafo
-  X$sostinfo$transform <- trafo
-  # X$sostinfo$isGradTrafo <- isGradTrafo
-  X$sostinfo$gradient <- gradient
-  X$sostype <- .settype("t", X$sostype)
-#  X$sostinfo$intensity <- intensity
+  sostinfo$backtransform <- backtrafo
+  sostinfo$transform <- trafo
+  sostinfo$gradient <- gradient
+  attr(X, "sostinfo") <- sostinfo
+  attr(X, "sostype") <- .settype("t", attr(X, "sostype"))
   return(X)
 }
 
@@ -401,8 +407,9 @@ retransformed <- function (X, backtrafo = identxy, intensity = NULL, trafo = NUL
 homogeneous <- function (X,  type="h", intensity = NULL)
 {
   if(!is.sostyppp(X)) X <- as.sostyppp.ppp(X, "none")
+  sostinfo <- attr(X, "sostinfo")
   npts <- npoints(X)
-  marx <- X$sostinfo$tmarks
+  marx <- sostinfo$tmarks
   if (npts > 0){
     if (is.null(intensity)) la <- npts / area.owin(X$window) else la <- intensity[1]
     if (!is.null(marx$intens)) marx$intens <- la
@@ -410,10 +417,11 @@ homogeneous <- function (X,  type="h", intensity = NULL)
     if (!is.null(marx$invscale)) marx$invscale <- sqrt(la)
     else marx <-  cbind(marx, invscale = sqrt(la))
     # make sure last type is set to given argument:
-    X$sostinfo$tmarks <-  marx
+    sostinfo$tmarks <-  marx
   }
 #  X$sostinfo$intensity <- intensity
-  X$sostype  <- .settype(type, .settype("h", .settype("hs", NULL)))
+  attr(X, "sostype") <- .settype(type, .settype("h", .settype("hs", NULL)))
+  attr(X, "sostinfo") <- sostinfo
   return(X)
 }
 
@@ -486,15 +494,16 @@ backtransformed.sostyppp <- function(X)
 {
   stopifnot(is.sostyppp(X))
   stopifnot(hasType(X, type= "t"))
-  if (is.null(X$sostinfo$backtransform)) stop ("no backtransform given")
-  preserveRectangle <- is.rectangle(X$window) & !is.null(X$sostinfo$gradient)
-  if (is.function(X$sostinfo$transform))
+  sostinfo <- attr(X, "sostinfo")
+  if (is.null(sostinfo$backtransform)) stop ("no backtransform given")
+  preserveRectangle <- is.rectangle(X$window) & !is.null(sostinfo$gradient)
+  if (is.function(sostinfo$transform))
     Y <- coordTransform(as.ppp(X),
-                        trafoxy = X$sostinfo$backtransform,
-                        invtrafoxy = X$sostinfo$transform,
+                        trafoxy = sostinfo$backtransform,
+                        invtrafoxy = sostinfo$transform,
                         subdivideBorder = !preserveRectangle)
   else Y <- coordTransform(as.ppp(X),
-                           trafoxy = X$sostinfo$backtransform,
+                           trafoxy = sostinfo$backtransform,
                            subdivideBorder = !preserveRectangle)
   return(homogeneous(Y))
 }
@@ -552,13 +561,14 @@ normalizedIntensity <- function(X, intensity = NULL, normpower = 2)
   npts <- npoints(X)
   if(is.null(intensity)) {
     if(!is.sostyppp(X)) stop("no intensity given")
+    sostinfo <- attr(X, "sostinfo")
     # first priority: current type
     if (currentType(X) %in% c("w","s")) {
-        if (currentType(X) == "w") intensity <- X$sostinfo$tmarks$intens
-        else intensity <- X$sostinfo$tmarks$invscale^2
+        if (currentType(X) == "w") intensity <- sostinfo$tmarks$intens
+        else intensity <- sostinfo$tmarks$invscale^2
       }
-    else if (hasType(X, "w")) intensity <- X$sostinfo$tmarks$intens
-    else if (hasType(X, "s")) intensity <- X$sostinfo$tmarks$invscale^2
+    else if (hasType(X, "w")) intensity <- sostinfo$tmarks$intens
+    else if (hasType(X, "s")) intensity <- sostinfo$tmarks$invscale^2
     else stop("error: no intensity information in point pattern")
   }
   else {

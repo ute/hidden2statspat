@@ -79,7 +79,7 @@
 #'\code{\link{backtransformed}}  returnes the backtransform of a retransformed s.o.s. point pattern
 #'or of a subsample of such a pattern
 #'}
-#'\subsection{Subsampling}
+#'\subsection{Subsampling}{
 #'\tabular{ll}{
 #'\code{ppsubsample}\tab generates a quadrat subsample of a point pattern (object of type \code{ppsample}) 
 #'\cr\code{plot.ppsample}\tab can be used to plot a subsample
@@ -87,7 +87,7 @@
 #'for testing second-order stationarity
 #'\cr\code{quadratsplot}\tab a plot to visualize two quadrat subsamples of a point pattern.
 #'}
-#'
+#'}
 #'@section Statistical analysis:
 #'\subsection{Second order summary functions}{
 #'The following functions return objects of \pkg{spatstat}-class \code{fv}:
@@ -121,7 +121,7 @@
 #'@keywords  package
 #'@seealso  The \code{\link[spatstat]{spatstat}} package
 #'@examples
-#'### The data analysis section in H&J is covered by the following demos: ####
+#'## The data analysis section in H&J(2013) is covered by the following demos: ##
 #'demo(bronzefilter)
 #'demo(beilschmiedia)
 #'demo(scholtzia)

@@ -122,11 +122,13 @@ backtransformed.ppsample <- function(X)
   stopifnot(is.sostyppp(X1))
   stopifnot(hasType(X1, type= "t"))
   W <- attr(X, "parentwindow")
-  if (!is.null(W))
+  if (!is.null(W)){
+      sostinfo <- attr(X1, "sostinfo")
       W <- coordTransform(W,
-                          trafoxy = X1$sostinfo$backtransform,
-                          invtrafoxy = X1$sostinfo$transform,
-                          subdivideBorder = !is.rectangle(W) | is.null(X1$sostinfo$gradient))
+                          trafoxy = sostinfo$backtransform,
+                          invtrafoxy = sostinfo$transform,
+                          subdivideBorder = !is.rectangle(W) | is.null(sostinfo$gradient))
+  }
   Y <- lapply(X, backtransformed)
   attr(Y, "parentwindow") <- W
   if(!("ppsample" %in% class(Y))) class(Y) <- c("ppsample", class(Y))

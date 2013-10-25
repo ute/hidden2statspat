@@ -31,12 +31,15 @@ is.sostyppp <- function(x) inherits(x, "sostyppp")
 
 "[.sostyppp" <- function(x, i) #, j, drop, ...)
   {
-    need.to.rescue.tmarks <- (!is.null(x$sostinfo$tmarks))
+    sostinfo <- attr(x, "sostinfo")
+    need.to.rescue.tmarks <- (!is.null(sostinfo$tmarks))
     # attach typemarks to marks
     if (need.to.rescue.tmarks)
     {
       marx <- marks(x)
-      tmarx <- as.matrix(x$sostinfo$tmarks)
+      tmarx <- as.matrix(sostinfo$tmarks)
+      tmarknames <- names(sostinfo$tmarks)
+
       if (is.null(marx)) {
         marx <- tmarx
         male <- 0
@@ -48,30 +51,29 @@ is.sostyppp <- function(x) inherits(x, "sostyppp")
       x$marks <- as.data.frame(marx)
       y <- NextMethod()
       y <- as.sostyppp(y, "none")
-      y$sostinfo <- x$sostinfo
       # now split up the marks again
       marx <- as.matrix(y$marks)
       if (male > 0) {
         # new side effects in spatstat make this a dangerous thing: y looses its type!
         # marks(y) <- marx[, (1:male)] # has to come first, function marks will destroy typemarks!
         y$marks <- marx[, (1:male)]
-        y$sostinfo$tmarks <- as.data.frame(marx[, -(1 : male)], row.names = NULL)
+        sostinfo$tmarks <- as.data.frame(marx[, -(1 : male)], row.names = NULL)
       }
       else {
         y$marks <- NULL
         y$markformat <- "none"
-        y$sostinfo$tmarks <- as.data.frame(marx, row.names = NULL)
+        sostinfo$tmarks <- as.data.frame(marx, row.names = NULL)
       }
-      names(y$sostinfo$tmarks) <- names(x$sostinfo$tmarks)
+      names(sostinfo$tmarks) <- tmarknames 
     }
     else
     {
       y <- NextMethod()
       y <- as.sostyppp(y, "none")
-      y$sostinfo <- x$sostinfo
     }
-    y$sostype <- x$sostype
-    y$extra <- x$extra
+    attr(y, "sostype") <- attr(x, "sostype")
+    attr(y, "sostinfo") <- sostinfo
+    attr(y, "extra") <- attr(x, "extra")
     return(y)
   }
 
@@ -93,19 +95,19 @@ is.sostyppp <- function(x) inherits(x, "sostyppp")
     #check if both have same sos-type
     stopifnot(hasType(x, currentType(value)))
 
-    sostyp <- x$sostype
-    xtras <- x$extra
-    sosinfo <- x$sostinfo
-    tmarknames <- names(x$sostinfo$tmarks)
+    sostyp <- attr(x, "sostype")
+    xtras <- attr(x, "extra")
+    sostinfo <- attr(x, "sostinfo")
+    tmarknames <- names(sostinfo$tmarks)
 
     marx <- marks(x)
     marknames <- names(marx)
 
-    need.to.rescue.tmarks <- (!is.null(x$sostinfo$tmarks))
+    need.to.rescue.tmarks <- (!is.null(sostinfo$tmarks))
     if (need.to.rescue.tmarks)
     {
       #attach typemarks to marks in order to use spatstats replace mechanism
-      tmarx <- as.matrix(x$sostinfo$tmarks)
+      tmarx <- as.matrix(sostinfo$tmarks)
        if (is.null(marx)) {
           marx <- tmarx
           male <- 0
@@ -118,7 +120,7 @@ is.sostyppp <- function(x) inherits(x, "sostyppp")
       names(marx) <- NULL
       mary <- as.matrix(marks(value))
       maly <- dim(mary)[2]
-      tvmarx <- as.matrix(value$sostinfo$tmarks)
+      tvmarx <- as.matrix(attr(value, "sostinfo")$tmarks)
       if (maly>0) mary <- cbind(mary, tvmarx)  else mary <- tvmarx
       names(mary) <- NULL
 
@@ -128,28 +130,27 @@ is.sostyppp <- function(x) inherits(x, "sostyppp")
       marks(value) <- as.data.frame(mary, row.names = NULL)
       y <- NextMethod()
       y <- as.sostyppp(y, "none")
-      y$sostinfo <- sosinfo
-
+      
       marx <- as.matrix(y$marks)
       if (male > 0) {
         y$marks <- as.data.frame(marx[, (1:male)], row.names = NULL) # has to come first, function marks will destroy typemarks!
-        y$sostinfo$tmarks <- as.data.frame(marx[, -(1 : male)], row.names = NULL)
+        sostinfo$tmarks <- as.data.frame(marx[, -(1 : male)], row.names = NULL)
       }
       else {
         y$marks <- NULL
-        y$sostinfo$tmarks <- as.data.frame(marx, row.names = NULL)
+        sostinfo$tmarks <- as.data.frame(marx, row.names = NULL)
       }
+      names(sostinfo$tmarks) <- tmarknames
     }
     else
     {
       y <- NextMethod()
       y <- as.sostyppp(y)
-      y$sostinfo <- x$sostinfo
     }
     if(!is.null(y$marks)) names(y$marks) <- marknames
-    y$sostype <- sostyp
-    y$extra <- xtras
-    names(y$sostinfo$tmarks) <- tmarknames
+    attr(y, "sostinfo") <- sostinfo
+    attr(y, "sostype") <- sostyp
+    attr(y, "extra") <- xtras
     invisible(y)
 }
 
@@ -193,7 +194,7 @@ hasType <- function (x, type = .TYPES)
 {
   knowntype <-  any(!is.na(match(type, .TYPES)))
   if (!knowntype) stop ("unknown type of hidden 2nd-order stationarity")
-  return(type %in% .gettype(x$sostype)$all)
+  return(type %in% .gettype(attr(x, "sostype"))$all)
 }
 
 
@@ -208,7 +209,7 @@ hasType <- function (x, type = .TYPES)
 
 currentType <- function (x)
 {
-  return(.gettype(x$sostype)$last)
+  return(.gettype(attr(x, "sostype"))$last)
 }
 
 # @return integer, index number of second-order stationarity type
@@ -219,7 +220,7 @@ currentType <- function (x)
 
 currentTypeno <- function (x)
 {
-  return(.gettype(x$sostype)$lastno)
+  return(.gettype(attr(x, "sostype"))$lastno)
 }
 
 
@@ -233,7 +234,7 @@ currentTypeno <- function (x)
 
 furthertypeno <- function (x)
 {
-  return(.gettype(x$sostype)$furtherno)
+  return(.gettype(attr(x, "sostype"))$furtherno)
 }
 
 
@@ -309,12 +310,13 @@ furthertypeno <- function (x)
 #'    \cr\code{window} \tab window of observation (an object of class \code{\link{owin}})
 #'    \cr\code{marks} \tab vector or data frame of marks
 #'  }
-#'  Additionally, it contains the elements
+#'  Additionally, it has attributes
 #' \tabular{ll}{
 #'    \code{sostype} \tab integer, encrypts the type of stationarity that is
 #'    assumed in analysis, see below
-#'    \cr\code{tinfo} \tab a list containing information relevant to
-#'    the type of stationarity,
+#'    \cr\code{sostinfo} \tab a list containing information relevant to
+#'    for calculating second-order statistics, such as the intensity function at
+#'    the points of the pattern,
 #'    \cr\code{extra} \tab a container (list) of additional information, intended for internal use.
 #'    This container is copied in subsetting operations.\cr
 #'  }

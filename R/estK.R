@@ -186,7 +186,8 @@ K.est <- function (X,
     X <- as.sostyppp(X, type = sostype, ...)
   }
 
-  marx <- X$sostinfo$tmarks
+  sostinfo <- attr(X, "sostinfo") 
+  marx <- sostinfo$tmarks
   if (normpower != 0) {
     stopifnot ((1 <= normpower) & (normpower <= 2))
     if (!is.null(marx$intens)){
@@ -213,7 +214,8 @@ K.est <- function (X,
     X <- backtransformed (X)
     # make uniform intensities
     # marx$intens <- rep(npts / area, npts)
-    marx <- X$sostinfo$tmarks
+    sostinfo <- attr(X, "sostinfo")
+    marx <- sostinfo$tmarks
   }
 
   W <- X$window

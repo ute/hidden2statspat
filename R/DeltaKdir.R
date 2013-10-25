@@ -78,7 +78,8 @@ DeltaKdir.est <- function (X,
     if (!hasType (X, sostype)) X <- as.sostyppp(X, type = sostype, ...)
   }
 
-  marx <- X$sostinfo$tmarks
+  sostinfo <- attr(X, "sostinfo") 
+  marx <- sostinfo$tmarks
   if (normpower != 0) {
     stopifnot ((1 <= normpower) & (normpower <= 2))
     if (!is.null(marx$intens)){
@@ -103,8 +104,9 @@ DeltaKdir.est <- function (X,
   if (sostype == "t")
   {
     X <- backtransformed (X)
+    sostinfo <- attr(X, "sostinfo")
     # make uniform intensities
-    marx <- X$sostinfo$tmarks
+    marx <- sostinfo$tmarks
     # approximate window, if not a rectangle
     W <- X$window
     if (!is.rectangle(W))
