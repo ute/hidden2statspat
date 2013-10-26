@@ -109,8 +109,8 @@ npoints.ppsample <- function(x) sapply(x, npoints)
 #' @method backtransformed ppsample
 #' @export backtransformed.ppsample
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
-# @examples
-# bronzetra <- retransformed(bronzefilter, "gradx")
+#' @examples
+#' bronzetra <- retransformed(bronzefilter, "gradx")
 #'bronzesample <- ppsubsample(bronzetra, quadrats(bronzetra, nx=6, ny = 3))
 #'plot(bronzesample, use.marks = FALSE)
 #'plot(backtransformed(bronzesample), use.marks = FALSE)
