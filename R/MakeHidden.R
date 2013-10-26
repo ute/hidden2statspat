@@ -261,8 +261,9 @@ rescaled <- function (X,  invscale = NULL, intensity = NULL, ...)
 #'    and is valid at each point of \code{X}
 #'   \item a string with value \code{"gradx"} or \code{"grady"}.
 #'   }
-#' @param intensity optional, intensity. Only used if \code{backtrafo="gradx")} or \code{backtrafo="grady")}.
-#' can be given as  \itemize{
+#' @param intensity optional, intensity. Only used if \code{backtrafo="gradx"} 
+#'    or \code{backtrafo="grady"}. Can be given as  
+#'  \itemize{
 #'   \item a single number,
 #'   \item a vector of intensity values at the points of \code{X},
 #'   \item a \code{function(x,y)} that returns the intensity and is valid at each point of \code{X}

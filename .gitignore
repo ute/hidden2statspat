@@ -30,6 +30,7 @@ NAMESPACE
 #
 allfigures/*.*
 allfigures/*
+!allfigures/*.R
 testR/*.*
 paper/*.*
 Changelog

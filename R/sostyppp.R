@@ -290,9 +290,9 @@ longTypeName <- function(type){
 
 # documentation of class sostyppp -------------------------------------------
 
-#'@name sostyppp.object
-#'@aliases sostyppp.object sostyppp
-#'@title Class of Second-Order Stationarity-Typed Point Patterns
+#'@name sostyppp
+#'@aliases sostyppp
+#'@title Class for Second-Order Stationarity-Typed Planar Point Patterns
 #'@description
 #'  A class \code{"sostyppp"} to represent a two-dimensional point
 #'  pattern, with extra information about hidden second-order
@@ -316,10 +316,10 @@ longTypeName <- function(type){
 #'    \code{sostype} \tab integer, encrypts the type of stationarity that is
 #'    assumed in analysis, see below
 #'    \cr\code{sostinfo} \tab a list containing information relevant to
-#'    for calculating second-order statistics, such as the intensity function at
-#'    the points of the pattern,
+#'    for calculating second-order statistics,
+#'    \cr\tab such as the intensity function at  the points of the pattern,
 #'    \cr\code{extra} \tab a container (list) of additional information, intended for internal use.
-#'    This container is copied in subsetting operations.\cr
+#'    \cr\tab This container is copied in subsetting operations.\cr
 #'  }
 #'
 #'  The type of second-order stationarity of an object \code{X} of class \code{sostyppp}
@@ -329,14 +329,19 @@ longTypeName <- function(type){
 #'  Possible types of second-order stationarity (s.o.s.) are
 #'  \tabular{ll}{
 #'    \code{"w"}  \tab intensity reweighted s.o.s.
-#'                \cr\tab \code{tinfo} contains a data frame \code{tmarks}, with a variable \code{intens} with intensity evaluated
-#'               in each data point
+#'                \cr\tab \code{tinfo} contains a data frame \code{tmarks},
+#'                 with a variable \code{intens} giving the 
+#'               \cr\tab intensity evaluated in each data point.
 #'    \cr\code{"t"} \tab obtained by coordinate transformation
-#'               \cr\tab \code{tinfo} contains a function \code{backtrafo(x,y)} that yields the backtransformed pattern.
-#'                \cr\tab and a character variable \code{gradient}, taking values \code{"gradx"} or \code{"grady"}
-#'                if the transformation depends only on one coordinate.
+#'               \cr\tab attribute \code{sostinfo} contains a function 
+#'               \code{backtrafo(x,y)} that yields the backtransformed 
+#'               \cr\tab pattern, and a character variable \code{gradient}, taking 
+#'               values \code{"gradx"} or \code{"grady"}
+#'                \cr\tab if the transformation depends only on one coordinate.
 #'    \cr\code{"s"} \tab locally rescaled s.o.s.
-#'                  \cr\tab \code{tinfo} contains a data frame \code{tmarks}, with a variable  \code{invscale}, the inverse scale factor in each data point\cr
+#'                  \cr\tab \code{sostinfo} contains a data frame \code{tmarks}, with a variable
+#'                    \code{invscale}, 
+#'                    \cr\tab the inverse scale factor in each data point\cr
 #'    \cr\code{"h"}  \tab homogeneous, to be evaluated with standard methods
 #'    \cr\code{"hs"} \tab homogeneous, to be evaluated with scale invariant statistics.
 #'    }

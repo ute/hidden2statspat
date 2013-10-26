@@ -22,9 +22,10 @@
 #'@examples
 #'# quadrat plot for the beilschmiedia pattern
 #'beiquads <- twoquadsets(bei, nx = 8, ny = 4, minpoints = 30)
-#'beistyle <- list(hi = simplist(col.win = "red"), lo = simplist(col.win = "blue"))
+#'beistyle <- list(hi = simplist(col.win="red"), lo = simplist(col.win="blue"))
 #'
-#'quadratsplot(bei, beiquads, beistyle, alpha.win = 0.2, main = "Beilschmiedia: quadrats")
+#'quadratsplot(bei, beiquads, beistyle, alpha.win = 0.2, 
+#'             main = "Beilschmiedia: quadrats")
 #'
 #'# does the same colours:
 #'

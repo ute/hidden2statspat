@@ -178,7 +178,8 @@ sos.test <- function (x,
 #'bei.ml <- reweighted(bei, intensity = bei.intens.maxlik)
 #'bei.quads <- twoquadsets(bei, nx = 8, ny = 4, minpoints = 30)
 #'beitest <- sos.test(bei.ml, qsets = bei.quads, rmax =25 )
-#'beistyle <- list(hi = simplist(col = "red", alpha = .5), lo = simplist(col = "blue", alpha = .5))
+#'beistyle <- list(hi = simplist(col = "red", alpha = .5), 
+#'                 lo = simplist(col = "blue", alpha = .5))
 #'
 #'plot(beitest, beistyle, main = "bei.ml: K estimated on quadrats", ylim = c(0,3000))
 
