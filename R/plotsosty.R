@@ -36,3 +36,24 @@ plot.sostyppp <- function(x, main, ..., col.win = NULL, alpha.win = 0.4) {
   useargs$col <- NULL
   do.call("plot.ppp", c(list(x), useargs))
 }
+
+
+#'splot method for class sostyppp
+#'
+#'Plots an object of class \code{sostyppp}. The function \code{splot.sostyppp}
+#'is an alias for \code{\link{plot.sostyppp}}
+#' @param x sos-typed point pattern which is plotted.
+#' @param main title text
+#' @param ... arguments passed to \code{\link{plot.ppp}}
+#' @param col.win color of the plot window
+#' @param alpha.win numeric between 0 and 1, alpha-value of window color, see
+#'   \code{\link{alphacol}}
+#' @S3method splot sostyppp
+#' @method splot sostyppp
+# @export splot.sostyppp
+#' @seealso \code{\link{plot.sostyppp}}.
+#' @author Ute Hahn,  \email{ute@@imf.au.dk}
+
+splot.sostyppp <- function(x, main, ..., col.win = NULL, alpha.win = 0.4) {
+  plot.sostyppp(x, main, ..., col.win = col.win, alpha.win = alpha.win)
+}
