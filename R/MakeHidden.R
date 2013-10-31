@@ -11,7 +11,7 @@
 #'    "w", "t", "s", "h", "hs" (or "none").
 #' @param ... further arguments
 #' @return an object of class \code{"sostyppp"}, but with no type information.
-#' @seealso \code{\link{sostyppp.object}} for details on the class.
+#' @seealso \code{\link{sostyppp}} for details on the class.
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 
 as.sostyppp <- function(x, type = "h", ...)
@@ -37,7 +37,7 @@ as.sostyppp <- function(x, type = "h", ...)
 #' @details Type \code{"none"} is only for internal use, and may result in errors when
 #' trying to estimate summary statistics or alike.
 #' @return an object of class \code{"sostyppp"}, but with no type information.
-#' @seealso \code{\link{sostyppp.object}} for details on the class.
+#' @seealso \code{\link{sostyppp}} for details on the class.
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 #' @examples
 #' # print an ordinary ppp point pattern
@@ -77,7 +77,7 @@ as.sostyppp.ppp <- function(x, type = "h", ...)
 #' @param ... arguments passed to \code{\link{reweighted}}, \code{\link{retransformed}},
 #' \code{\link{rescaled}}. Ignored if \code{type} = \code{"h"} or \code{type} = \code{"hs"}.
 #' @return an object of class \code{"sostyppp"} with corresponding type information.
-#' @seealso \code{\link{sostyppp.object}} for details on the class.
+#' @seealso \code{\link{sostyppp}} for details on the class.
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 #' @examples
 #' brofi <- as.sostyppp (bronzefilter)
@@ -201,7 +201,7 @@ reweighted <- function (X, intensity = NULL, ...)#, normpower = 0)
 #'   constant scale factor, which effectively means that it will be analysed as a homogeneous
 #'   point process.
 #' @seealso related functions: \code{\link{reweighted}}, \code{\link{retransformed}}, \code{\link{homogeneous}}
-#' @seealso \code{\link{sostyppp.object}} for details on the class.
+#' @seealso \code{\link{sostyppp}} for details on the class.
 #' @export
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 #'@references
@@ -276,7 +276,7 @@ rescaled <- function (X,  invscale = NULL, intensity = NULL, ...)
 #' @return A retransformed s.o.s. typed point pattern (object of class \code{"\link{sostyppp}"})
 #' with information about the backtransform.
 #' @seealso related functions: \code{\link{reweighted}}, \code{\link{rescaled}}, \code{\link{homogeneous}}
-#' @seealso \code{\link{sostyppp.object}} for details on the class.
+#' @seealso \code{\link{sostyppp}} for details on the class.
 #' @details
 #'   If \code{backtrafo = "gradx"} or \code{backtrafo = "grady"}, the backtransformation is obtained
 #'   from the  data by inverse cdf transform, affecting only the \eqn{x}- or \eqn{y}-coordinate,
@@ -412,7 +412,7 @@ retransformed <- function (X, backtrafo = identxy, intensity = NULL, trafo = NUL
 #'   with   elements \code{intensity} (estimated intensity) and
 #'   \code{invscale} (square root of intensity).
 #' @seealso related functions: \code{\link{rescaled}}, \code{\link{retransformed}}, \code{\link{reweighted}}
-#' @seealso \code{\link{sostyppp.object}} for details on the class.
+#' @seealso \code{\link{sostyppp}} for details on the class.
 #' @export
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 

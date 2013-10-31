@@ -1,6 +1,6 @@
 Package: sostatpp
-Version: 0.11.4
-Date: 2013-10-25
+Version: 0.11.4-1
+Date: 2013-10-31
 Title: Analysis of hidden second-order stationary point processes
 Authors@R: c(person("Ute", "Hahn", role = c("aut", "cre"),
     email = "ute@imf.au.dk"))
@@ -10,7 +10,7 @@ Depends:
     R (>= 2.15),
     spatstat (>= 1.25),
     plutils,
-    fdnonpar
+    fdnonpar (>= 0.12.5)
 Imports:
     plyr
 Description: A package on top of spatstat, contributing functions for

@@ -7,7 +7,7 @@
 #' @param x any \code{R} object
 #' @return \code{TRUE} if \code{x} belongs to class \code{"sostyppp"}, otherwise \code{FALSE}.
 #' @export
-#' @seealso \code{\link{sostyppp.object}} for details on the class.
+#' @seealso \code{\link{sostyppp}} for details on the class.
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 
 is.sostyppp <- function(x) inherits(x, "sostyppp")
@@ -25,7 +25,7 @@ is.sostyppp <- function(x) inherits(x, "sostyppp")
 #' @param x a sos-typed point pattern, object of class \code{"sostyppp"}.
 #' @param i subset index, see spatstat \code{\link[spatstat]{[<-.ppp}}.
 # @param j,drop ignored.
-#' @seealso \code{\link{sostyppp.object}} for details on the class.
+#' @seealso \code{\link{sostyppp}} for details on the class.
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 
 
@@ -183,7 +183,7 @@ print.sostyppp <- function(x, ...)
 #' Access the encrypted type information of second-order stationarity typed point
 #' patterns, objects of class \code{sostyppp}.
 #' @param x point pattern, of class sostyppp
-#' @param type character, type of second-order stationarity. See \code{\link{sostyppp.object}}
+#' @param type character, type of second-order stationarity. See \code{\link{sostyppp}}
 #' for details.
 # @return logical
 #' @export
