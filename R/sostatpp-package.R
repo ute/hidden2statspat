@@ -81,11 +81,11 @@
 #'}
 #'\subsection{Subsampling}{
 #'\tabular{ll}{
-#'\code{ppsubsample}\tab generates a quadrat subsample of a point pattern (object of type \code{ppsample}) 
-#'\cr\code{plot.ppsample}\tab can be used to plot a subsample
-#'\cr\code{twoquadsets}\tab to divide a set of quadrats into two sets that suitable 
+#'\code{\link{ppsubsample}}\tab generates a quadrat subsample of a point pattern (object of type \code{ppsample}) 
+#'\cr\code{\link{plot.ppsample}}\tab can be used to plot a subsample
+#'\cr\code{\link{twoquadsets}}\tab to divide a set of quadrats into two sets that suitable 
 #'for testing second-order stationarity
-#'\cr\code{quadratsplot}\tab a plot to visualize two quadrat subsamples of a point pattern.
+#'\cr\code{\link{quadratsplot}}\tab a plot to visualize two quadrat subsamples of a point pattern.
 #'}
 #'}
 #'@section Statistical analysis:
@@ -96,6 +96,14 @@
 #' \cr\code{\link{L.est}} \tab estimates the template \eqn{L}-function,
 #' \cr\code{\link{DeltaKdir.est}} \tab estimates the \eqn{\Delta K_{dir}}-function
 #' }
+#'There are corresponding versions of these estimators that return objects of class
+#'\code{\link{fdnonpar::funsample}}, namely
+#' \tabular{ll}{
+#' \code{\link{estK}} \tab estimates the template \eqn{K}-function, according to type
+#' \cr\code{\link{estL}} \tab estimates the template \eqn{L}-function,
+#' \cr\code{\link{estDeltaKdir}} \tab estimates the \eqn{\Delta K_{dir}}-function
+#' }
+#'
 #' }
 #' \subsection{Tests}{
 #' \tabular{ll}{
