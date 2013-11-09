@@ -165,7 +165,9 @@ DeltaKdir.est <- function (X,
   Kname <- paste("Delta K[dir]^{(", typename, ")}", sep="")
   Krname <- paste("Delta K[dir]^{(", typename, ")}(r)", sep="")
   Khatname <- paste("widehat(Delta*K)[dir]^(", typename, ")", sep="")
-  Ktheolab <- substitute(Delta*K[dir]^(name)*(r), list(name = typename))
+ # <<<< CHANGED HERE FOR PAPER >>>>
+ #   Ktheolab <- substitute(Delta*K[dir]^(name)*(r), list(name = typename))
+  Ktheolab <- substitute(widehat(Delta*K)[dir]^(name)*(r), list(name = typename))
 
   # start data frame with CSR
   K <- data.frame(r = r, theo = 0)

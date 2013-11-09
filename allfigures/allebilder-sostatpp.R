@@ -2,7 +2,7 @@
 
 library(sostatpp)
 
-.plotoptions$alphamixing <- TRUE
+ploptions(alphamix = TRUE)
 
 
 setparams <- function(bw = FALSE) {
@@ -20,9 +20,9 @@ setparams <- function(bw = FALSE) {
     col.blau <<- rgb(0, .2, 1) #"blue",
     styles <<- list( 
       hi = simplist(col = col.rot, lwd = 0.8, lty = "solid", col.win = col.rot, 
-                     alpha = .5, alpha.win = .3),
+                     alpha = .4, alpha.win = .3, alpha.smf = .8),
       lo = simplist(col = col.blau, lwd = 0.8, lty = "solid", col.win = col.blau, 
-                     alpha = .5, alpha.win = .3)
+                     alpha = .4, alpha.win = .3, alpha.smf = .8)
       )
     theostyle <<- simplist(lty = "dashed", lwd = 1.5)
   }
@@ -32,6 +32,9 @@ patterns <- function() par(mar=c(0.01, 0.01, 0.01, 0.01))
 curves <- function() par(mar=c(3.6, 4.1, 1.1, 1.1)) 
 
 setparams()
+
+# bronze: hi and lo refer to x-coordinate. Therefore, swap colors
+brostyles <- list(hi = styles$lo, lo = styles$hi)
 
 data(intensities)
 
@@ -43,7 +46,7 @@ bronzequads <- twoquadsets(bronzefilter, nx = 6, ny = 3, gradx = TRUE,
 
 pdf(file="bronz-quads.pdf", width=7, height = 3)
 patterns()
-quadratsplot(bronzefilter, bronzequads, styles, use.marks=FALSE, pch=16, cex=.5,
+quadratsplot(bronzefilter, bronzequads, brostyles, use.marks=FALSE, pch=16, cex=.5,
   main = "")
 dev.off()
 
@@ -55,12 +58,12 @@ test_w<- sos.test(bronze.w, bronzequads, rmax = 0.4, nperm = 2)
 
 pdf(file="bronze-Ks.pdf", width = 4, height = 3.2)
  curves()
- plot(test_s, styles, theostyle, ylim = c(0, 5))
+ plot(test_s, brostyles, theostyle, ylim = c(0, 5))
 dev.off()
 
 pdf(file="bronze-Kw.pdf", width = 4, height = 3.2)
  curves()
- plot(test_w, styles, theostyle, ylim = c(0, .5))
+ plot(test_w, brostyles, theostyle, ylim = c(0, .5))
 dev.off()
 
 bronze.t <- retransformed(bronzefilter, backtrafo="gradx", 
@@ -71,14 +74,14 @@ test_t<- sos.test(bronze.t, bronzequads, rmax = 0.5, nperm = 2)
 # Figure 12, left part: backtransformed quadratsplot 
 pdf(file="bronztra-quads.pdf", width=7, height = 3)
 patterns()
-quadratsplot(bronze.t, bronzequads, styles, use.marks = FALSE, pch=16, cex=.5,
+quadratsplot(bronze.t, bronzequads, brostyles, use.marks = FALSE, pch=16, cex=.5,
   backtransformed = TRUE, main = "")
 dev.off()
 
 
 pdf(file="bronze-Kt.pdf", width = 4, height = 3.2)
 curves()
- plot(test_t, styles, theostyle, ylim = c(0, .8))
+ plot(test_t, brostyles, theostyle, ylim = c(0, .8))
 dev.off()
 
 test_tdir<- sos.test(bronze.t, bronzequads, Kfun = DeltaKdir.est, rmax = 0.5, nperm = 2)
@@ -87,12 +90,12 @@ test_sdir<- sos.test(bronze.s, bronzequads, Kfun = DeltaKdir.est, rmax = 1.25, n
 
 pdf(file="bronze-Kdiff.pdf", width = 4, height = 3.2)
  curves()
- plot(test_sdir, styles, theostyle, ylim = c(-3, 3))
+ plot(test_sdir, brostyles, theostyle, ylim = c(-3, 3))
 dev.off()
 
 pdf(file="bronztra-Kdiff.pdf", width = 4, height = 3.2)
  curves()
- plot(test_tdir, styles, theostyle, ylim = c(-.5, .5))
+ plot(test_tdir, brostyles, theostyle, ylim = c(-.5, .5))
 dev.off()
 
 
@@ -103,23 +106,33 @@ data(intensities)
 
 q8x4 <- quadrats(bei, nx=8, ny=4)
 
-colseq <- gray(seq(0.00001,1,len=4096)^.2)
 
-pdf("bei-qintens-bayes")
-patterns()
-plot(bei.intens.bayes, log="T", main="", col=colseq)
+nco <- 4096
+#colseq <- gray(seq(0.00001,1,len=4096)^.2)
+colseq <- gray(seq(0.000001,1,len=nco))
+colseq <- colseq[length(colseq):1]
+refr <- log(range(bei.intens.nonpar$v))
+minr <- min(refr)
+rbay <- round((nco-1)*((log(range(bei.intens.bayes$v))-minr)/diff(refr))+1)
+rml <- round((nco-1)*((log(range(bei.intens.maxlik$v))-minr)/diff(refr))+1)
+
+beiqs <- function() par(mar=c(0.1, 0.1, 0.1, 2.1))
+
+pdf("bei-qintens-bayes.pdf", width=6, height = 2.5)
+beiqs()
+plot(bei.intens.bayes, log=T, main="", col=colseq[rbay[1]:rbay[2]])
 plot(q8x4, add=T)
 dev.off()
 
-pdf("bei-qintens-maxlik")
-patterns()
-plot(bei.intens.maxlik, log="F", main="", col=colseq)
+pdf("bei-qintens-maxlik.pdf", width=6, height = 2.5)
+beiqs()
+plot(bei.intens.maxlik, log=T, main="", col=colseq[rml[1]:rml[2]])
 plot(q8x4, add=T)
 dev.off()
 
-pdf("bei-qintens-nonpar")
-patterns()
-plot(bei.intens.nonpar, log="F", main="", col=colseq)
+pdf("bei-qintens-nonpar.pdf", width=6, height = 2.5)
+beiqs()
+plot(bei.intens.nonpar, log=T, main="", col=colseq)
 plot(q8x4, add=T)
 dev.off()
 
