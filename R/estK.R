@@ -23,29 +23,32 @@
 #' @param max.ls.r optional, upper limit for argument \eqn{r} if \code{type="s"}.
 #'
 #' @details
-#' By contrast to \code{\link{K.est}} that returns an object of class \code{fv}, 
-#' the function \code{estK} returns a \code{\link{funsample}}, which is a function.
+#' By contrast to \code{\link{K.est}}, which returns an object of class \code{fv}, 
+#' the function \code{estK} returns a \code{\link{funsample}}, which is a multivariate
+#' function.
 #'
-#' The present version of \code{K.est} also applies to inhomogeneous point processes
+#' \code{estK} takes both homogeneous and inhomogeneous point processes
 #' that are supposed to be hidden second-order stationary (H&J, 2013). It then estimates
 #' the so called \emph{template} \eqn{K}-function, the definition of which depends
 #' on the type of second-order stationarity.
 #' If \code{type} is not given, the last type of second-order stationarity assigned
-#' to \code{X} is used to determine how the template \eqn{K}-function is estimated.
+#' to the point pattern \code{X} is used to determine how the template \eqn{K}-function 
+#' is estimated.
 #' If \code{X} has no type of second-order stationarity, it is assumed to be homogeneous.
 #'
 #' If \code{type} is given, but does not match the type of \code{X}, the function
-#' \code{\link{as.sostyppp}} is called with arguments ... to ensure the correct
+#' \code{\link{as.sostyppp}} is called with arguments \ldots to ensure the correct
 #' hidden second-order information.
 #'
-#' If  \code{normpower} > 0, the intensity is renormalized, so that \code{\link{K.est}} yields similar results as
-#' \code{spatstat:\link[spatstat]{Kinhom}}. The intensity values \eqn{\lambda} are then multiplied by
+#' If  \code{normpower} > 0, the intensity is renormalized, so that \code{\link{estK}} 
+#' yields similar results as \code{spatstat:\link[spatstat]{Kinhom}}. 
+#' The intensity values \eqn{\lambda} are then multiplied by
 #' \deqn{c^{normpower/2}}{c^(normpower/2),} where
 #' \deqn{c = area(W)/sum_i(1/\lambda(x_i))}{c = area(W)/sum[i](1/lambda(x[i])).}
 #'
 #' The hidden \eqn{K}-function for \strong{reweighted} s.o. stationary point processes
 #' delivers the same result as  \code{spatstat:\link[spatstat]{Kinhom}}, up to a subtle
-#' difference for the border correction: \code{K.est} does not use fast optimized code.
+#' difference for the border correction, where \code{estK} does not use fast optimized code.
 #'
 #' If \code{X} is typed \strong{retransformed} s.o. stationary, the \eqn{K}-function of
 #' the \code{\link{backtransformed}} point pattern is returned, which corresponds to
@@ -56,7 +59,7 @@
 #' The Euclidean distance between two points is multiplied by the
 #' average of the square roots of the intensity values at the two points.
 #' Similarly, all edge corrections are implemented
-#' as approximations. Here \code{K.est} is similar to \code{spatstat:\link[spatstat]{Kscaled}}
+#' as approximations. Here \code{estK} is similar to \code{spatstat:\link[spatstat]{Kscaled}}
 #'  The translational edge
 #' correction suffers from a small intrinsic bias in some cases of locally
 #' rescaled s.o.s., depending on intensity and window shape. It is
@@ -285,7 +288,6 @@ estK <- function (X,
     weightfun <- approxfun(b, wtb)
     HTweightsIJ <- weightfun(dIJ)*newwIJ
     useIJ <- dIJ <= b[I]
-    # hier isses wohl falsch, wa
    
     wh <- whist(dIJ[useIJ], rvals, HTweightsIJ[useIJ])
     Kbord <- Kmaker(wh, rvals, "bord")

@@ -9,6 +9,7 @@
 .Rbuildignore
 *.Rproj
 .gitattributes
+.gitignore
 *.prj
 #
 # backups
@@ -28,6 +29,9 @@ NAMESPACE
 #
 # all figures, testkram und anderes
 #
+inst/*.*
+inst/*
+inst
 allfigures/*.*
 allfigures/*
 !allfigures/*.R
