@@ -97,11 +97,11 @@
 #' \cr\code{\link{DeltaKdir.est}} \tab estimates the \eqn{\Delta K_{dir}}-function
 #' }
 #'There are corresponding versions of these estimators that return objects of class
-#'\code{\link{fdnonpar::funsample}}, namely
+#'\code{fdnonpar::\link{funsample}}, namely
 #' \tabular{ll}{
 #' \code{\link{estK}} \tab estimates the template \eqn{K}-function, according to type
 #' \cr\code{\link{estL}} \tab estimates the template \eqn{L}-function,
-#' \cr\code{\link{estDeltaKdir}} \tab estimates the \eqn{\Delta K_{dir}}-function
+# \cr\code{\link{estDeltaKdir}} \tab estimates the \eqn{\Delta K_{dir}}-function
 #' }
 #'
 #' }

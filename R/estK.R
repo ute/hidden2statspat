@@ -13,8 +13,7 @@
 #'        \item \code{"hs"} homogeneous, but evaluated as scaled \eqn{K}-function
 #'   }
 #'   Only the first match is used.
-#' @param r optional: vector of argument values \eqn{r} at which \eqn{K(r)} should
-#'   be evaluated.
+#' @param rmax optional numeric value: maximal r at which K-function is evaluated.
 #' @param correction a character vector giving the edge correction type, may be
 #'   any subset of \code{"border"},  \code{"isotropic"}, \code{"translate"}, \code{"none"}.
 #' @param normpower an integer between 0 and 2. If \code{normpower} > 0, the
@@ -320,7 +319,75 @@ estK <- function (X,
   KK <- funsample(allK, 
     arglim = c(0, rmax),
     xlab = "r", ylab = Ktheolab, main = "" ) # TODO: sensible main
+  attr(KK, "sostype") <- sostype
   return(KK)
 }
 
+#' Template L-function of a hidden 2nd-order stationary process
+#'
+#' Estimates the template \eqn{L}-function of a point process by transforming
+#' the template \eqn{K}-function.
+#'
+#' @param ... Arguments for \code{\link{estK}}.
+#' @details
+#' For a reweighted or retransformed second-order stationary Poisson point process,
+#' the theoretical value of the template \eqn{L}-function is \deqn{L_0(r)=r}{L_0(r)=r}.
+#'
+#' Under locally rescaled second-order stationarity,
+#' this holds only approximately for large arguments, if the intensity varies strongly.
+#' Furthermore, approximations when calculating
+#' locally scaled distances and simplifications in the estimation of
+#' the locally scaled \eqn{K}-function may add a bias to the estimates of the locally scaled
+#' \eqn{L}-function for inhomogeneous Poisson point processes.
+#' The bias depends upon how fast the intensity function varies. Usually, the approximation
+#' holds very well for reasonably small arguments.
+#' @export
+#' @seealso \code{\link{estK}}
 
+estL <- function(...) {
+  K <- estK(...)
+  sostype <- attr(K, "sostype")
+  # change here once there is a method for funsamples
+  Kfuns <- attr(K, "funs")
+  Lfuns <- vector("list", length(Kfuns))
+  names (Lfuns) <- names(Kfuns)
+  if (sostype %in% c("w", "s", "t")) {
+    Ltheolab <- as.expression(substitute(L[0]^(name)*(r), list(name = typename)))
+  } else {
+    if (sostype == "h") {
+      Ltheolab <- "L(r)"
+    } else if (sostype == "hs") {
+      Ltheolab <- expression(L^symbol("*")*(r))
+    }
+  }
+  for (i in seq_along(Kfuns)) {
+    optio <- attr(Kfuns[[i]], "options")
+    optio$ylab <- Ltheolab
+    if (is.stepfun(Kfuns[[i]])){
+      rr <- knots(Kfuns[[i]])
+      ll <- sqrt(Kfuns[[i]](rr)/pi)
+      Lfuns[[i]] <- urfunction(stepfun(rr, c(0,ll)), optio)
+    } else {
+      if (names(Lfuns)[i] == "theo")
+        Lfuns[[i]] <- urfunction(function(r) r, optio)
+      else {
+        # need to create a new object, since R might look up the wrong code.  
+        # do this somehow q&d- no success with simple as.call and stuff things
+        # TODO: make number of data points a package option
+        argl <- attr(K, "arglim")
+        rr <- seq(argl[1], argl[2], length.out = 501)
+        ll <- sqrt(Kfuns[[i]](rr)/pi)
+        Lfuns[[i]] <- urfunction(approxfun(rr, ll), optio)
+      }
+    }
+  }
+  
+  opt <- attr(K, "options")
+  opt$ylab <- Ltheolab
+  LL <- funsample(Lfuns,
+    arglim = attr(K, "arglim"),
+    opt) 
+  
+  attr(LL, "sostype") <- sostype
+  return(LL)
+}
