@@ -87,24 +87,34 @@
 #'    \url{http://data.imf.au.dk/publications/csgb/2013/math-csgb-2013-07.pdf}
 #'
 #' @examples
+#' # Parameters for plotting
+#' Kstyle = simplist(col = list(theo = "black", trans = "red", iso = "blue", border = "green"),
+#'                   lty = list(theo = "dashed"))
+#' # For small point patterns, estK returns step functions by default
+#' plot(estK(runifpoint(25), correction = c("trans", "iso")), Kstyle)
+#' 
 #' # compare homogeneous version of K.est and spatstat's Kest
 #' # bronzefilter data are not marked as hidden second-order stationary
+#' # set some colours and line styles for plotting
+#' spatstatstyle = simplist(
+#'     col = list(theo = "blue", trans = "red", iso = "black", border = "green"),
+#'     lty = list(theo = "dotdash", trans = "dashed", iso = "solid", border = "dotted"))
 #' plot(spatstat::Kest(bronzefilter))
-#' plot(K.est(bronzefilter))
+#' plot(estK(bronzefilter), spatstatstyle)
 #'
 #' # Evaluate as reweighted, with default intensity estimate,
 #' # compare with spatstat's Kinhom
-#' plot(spatstat::Kinhom(bronzefilter))
-#' plot(K.est(reweighted(bronzefilter)))
+#' plot(spatstat::Kinhom(bronzefilter, correction = "iso"))
+#' plot(estK(reweighted(bronzefilter), correction = "iso"), Kstyle)
 #' # There is a subtle difference because spatstat uses intensity renormalisation
 #' # by default. We can do that, too:
-#' plot(K.est(bronzefilter, type = "w", normpower = 1))
+#' plot(estK(bronzefilter, type = "w", normpower = 1, correction = "iso"), Kstyle)
 #'
 #' # Evaluate a rescaled version of the bronzefilter data:
-#' plot(K.est(rescaled(bronzefilter)))
+#' plot(estK(rescaled(bronzefilter)))
 #'
 #' # The last given type is the one that counts
-#' plot(K.est(retransformed(rescaled(bronzefilter), backtrafo="gradx")))
+#' plot(estK(retransformed(rescaled(bronzefilter), backtrafo="gradx")))
 
 
 estK <- function (X,
@@ -202,14 +212,14 @@ estK <- function (X,
   if (sostype %in% c("w", "s", "t"))
   {
     Kname <- paste("K[0]^{(", typename, ")}", sep="")
-    Khatname <- paste("widehat(K)[0]^(", typename, ")", sep="")
+    Khatrname <- as.expression(substitute(widehat(K)[0]^(name)*(r), list(name = typename)))
     Ktheolab <- as.expression(substitute(K[0]^(name)*(r), list(name = typename)))
  # <<<< CHANGED HERE FOR PAPER >>>>
 #    Ktheolab <- substitute(widehat(K)[0]^(name)*(r), list(name = typename))
   }
   else if (sostype == "h") {
     Kname <- "K"
-    Khatname <- "widehat(K)"
+    Khatrname <- expression(widehat(K)*(r))
     Ktheolab <- "K(r)"
   }
   else if (sostype == "hs") {
@@ -314,7 +324,7 @@ estK <- function (X,
     
 #  attr(K, "sostype") <- sostype
 #  if (typename == "s") unitname (K) = NULL else unitname(K) <- unitname(X)
-  allK <- list(theo = Ktheo, trans = Ktrans, iso = Kiso, bord = Kbord)
+  allK <- list(theo = Ktheo, trans = Ktrans, iso = Kiso, border = Kbord)
   allK <- allK[!sapply(allK, is.null)]
   KK <- funsample(allK, 
     arglim = c(0, rmax),
@@ -351,15 +361,16 @@ estL <- function(...) {
   Kfuns <- attr(K, "funs")
   Lfuns <- vector("list", length(Kfuns))
   names (Lfuns) <- names(Kfuns)
-  if (sostype %in% c("w", "s", "t")) {
-    Ltheolab <- as.expression(substitute(L[0]^(name)*(r), list(name = typename)))
-  } else {
-    if (sostype == "h") {
-      Ltheolab <- "L(r)"
-    } else if (sostype == "hs") {
-      Ltheolab <- expression(L^symbol("*")*(r))
-    }
-  }
+  
+  opt <- attr(K, "options")
+  Klab <- opt$ylab
+  if (is.character(Klab)) 
+    Ltheolab <- sub("K", "L", Klab)
+  else if (is.expression(Klab))
+    Ltheolab <- as.expression(do.call("substitute", 
+                          list(Klab[[1]], list(K="L"))))
+  else Ltheolab <- Klab
+  opt$ylab <- Ltheolab
   for (i in seq_along(Kfuns)) {
     optio <- attr(Kfuns[[i]], "options")
     optio$ylab <- Ltheolab
@@ -382,8 +393,6 @@ estL <- function(...) {
     }
   }
   
-  opt <- attr(K, "options")
-  opt$ylab <- Ltheolab
   LL <- funsample(Lfuns,
     arglim = attr(K, "arglim"),
     opt) 
