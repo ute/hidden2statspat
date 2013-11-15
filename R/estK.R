@@ -328,7 +328,8 @@ estK <- function (X,
   allK <- allK[!sapply(allK, is.null)]
   KK <- funsample(allK, 
     arglim = c(0, rmax),
-    xlab = "r", ylab = Ktheolab, main = "" ) # TODO: sensible main
+    xlab = "r", ylab = Ktheolab, main = "",
+    sostatpp.options("Kstyles")) # TODO: sensible main
   attr(KK, "sostype") <- sostype
   return(KK)
 }
