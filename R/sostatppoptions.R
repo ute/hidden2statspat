@@ -1,7 +1,7 @@
 .onLoad <- function(libname, pkgname) {
     assign(".sostatppStuff", new.env(), envir=parent.env(environment()))
     Kstyle = list(
-      theo = simplist(col = "black", lwd = "dashed"),
+      theo = simplist(col = "black", lty = "dashed"),
       iso = simplist(col = "red", lty = "solid"),
       trans = simplist(col = "blue", lty = "solid"),
       border = simplist(col = "green", lty = "solid")
