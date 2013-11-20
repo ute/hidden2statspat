@@ -148,7 +148,7 @@ NA
 #HalloWelt("plutils", "http://R-Forge.R-project.org")
 #HalloWelt("fdnonpar", "http://R-Forge.R-project.org")
 
-HalloWelt <- function(pkg = "plyr", repo = "http://cran.r-mirror.de") {
+HalloWelt <- function(pkg = "plyr", version = NULL, repo = "http://cran.r-mirror.de") {
   IP <- installed.packages()
   instpa <- IP[,1]
   if(!is.element(pkg, instpa)) {
@@ -160,6 +160,13 @@ HalloWelt <- function(pkg = "plyr", repo = "http://cran.r-mirror.de") {
   }
 }
 
-HalloWelt("plyr", "http://cran.r-mirror.de")
-HalloWelt("plutils", "http://R-Forge.R-project.org")
-HalloWelt("fdnonpar", "http://R-Forge.R-project.org")
+#old.packages(repos = "http://R-Forge.R-project.org")
+update.packages(repos = "http://R-Forge.R-project.org", ask = FALSE,
+                oldPkgs = c("plutils", "fdnonpar"))
+
+update.packages(repos = "http://cran.r-mirror.de", ask = FALSE,
+                oldPkgs = c("plyr"))
+
+HalloWelt("plyr", repo = "http://cran.r-mirror.de")
+HalloWelt("plutils", repo = "http://R-Forge.R-project.org")
+HalloWelt("fdnonpar", repo = "http://R-Forge.R-project.org")

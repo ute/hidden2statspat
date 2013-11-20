@@ -9,8 +9,8 @@ Maintainer: Ute Hahn <ute@imf.au.dk>
 Depends:
     R (>= 2.15),
     spatstat (>= 1.25),
-    plutils (>= 0.3.0),
-    fdnonpar (>= 0.13.0)
+    plutils,
+    fdnonpar
 Imports:
     plyr
 Description: A package on top of spatstat, contributing functions for
