@@ -1,6 +1,14 @@
+  CHANGES IN sostatpp VERSION 0.12.1
+
+    o new function spatstat.options
+
+    o new function setplotstyle for K-functions etc., according to edge correction
+
+    o install packages depended on (workaround to be able to build on R-forge)
+
   CHANGES IN sostatpp VERSION 0.12.0
 
-    o new function estK that return a funsample object (which is essentially
+    o new function estK that returns a funsample object (which is essentially
       a function with list properties)
 
   CHANGES IN sostatpp VERSION 0.11.4

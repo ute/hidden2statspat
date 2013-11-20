@@ -135,3 +135,31 @@
 #'@keywords  package
 #'@seealso  The \code{\link[spatstat]{spatstat}} package
 NA
+
+
+
+#@title Hallo Welt
+#@description Say hello and install my package, please
+#@param pkg package wanted
+#@param repo where to get it
+#@export
+#@examples
+#HalloWelt("plyr", "http://cran.r-mirror.de")
+#HalloWelt("plutils", "http://R-Forge.R-project.org")
+#HalloWelt("fdnonpar", "http://R-Forge.R-project.org")
+
+HalloWelt <- function(pkg = "plyr", repo = "http://cran.r-mirror.de") {
+  IP <- installed.packages()
+  instpa <- IP[,1]
+  if(!is.element(pkg, instpa)) {
+    cat("\ngetting", pkg,"... \n")
+    install.packages(pkg, repos = repo)
+    cat("Finally,",pkg,"is installed, version:",installed.packages()[pkg,"Version"],"\n")
+  } else {
+    cat("Yeps,",pkg,"is installed, version:",IP[pkg,"Version"],"\n")
+  }
+}
+
+HalloWelt("plyr", "http://cran.r-mirror.de")
+HalloWelt("plutils", "http://R-Forge.R-project.org")
+HalloWelt("fdnonpar", "http://R-Forge.R-project.org")
