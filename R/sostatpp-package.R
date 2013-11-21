@@ -161,12 +161,19 @@ HalloWelt <- function(pkg = "plyr", version = NULL, repo = "http://cran.r-mirror
 }
 
 #old.packages(repos = "http://R-Forge.R-project.org")
-update.packages(repos = "http://R-Forge.R-project.org", ask = FALSE,
-                oldPkgs = c("plutils", "fdnonpar"))
 
-update.packages(repos = "http://cran.r-mirror.de", ask = FALSE,
+.hack.R.forge <- function() {
+  HalloWelt("plyr", repo = "http://cran.r-mirror.de")
+  HalloWelt("plutils", repo = "http://R-Forge.R-project.org")
+  HalloWelt("fdnonpar", repo = "http://R-Forge.R-project.org")
+  
+  update.packages(repos = "http://R-Forge.R-project.org", ask = FALSE,
+                oldPkgs = c("plutils", "fdnonpar"))
+  update.packages(repos = "http://cran.r-mirror.de", ask = FALSE,
                 oldPkgs = c("plyr"))
 
-HalloWelt("plyr", repo = "http://cran.r-mirror.de")
-HalloWelt("plutils", repo = "http://R-Forge.R-project.org")
-HalloWelt("fdnonpar", repo = "http://R-Forge.R-project.org")
+  HalloWelt("plyr", repo = "http://cran.r-mirror.de")
+  HalloWelt("plutils", repo = "http://R-Forge.R-project.org")
+  HalloWelt("fdnonpar", repo = "http://R-Forge.R-project.org")
+}
+
