@@ -148,9 +148,9 @@ coordTransform <- function(X,  ...) UseMethod("coordTransform", X)
 #' @keywords spatial
 #' @keywords manip
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
-# @export
+#' @export
 #' @method coordTransform im
-#' @S3method coordTransform im
+# @S3method coordTransform im
 #' @examples
 #' # transformation of the polygonal window letterR from the spatstat package
 #' # as image
@@ -219,9 +219,9 @@ coordTransform.im <- function (X, trafoxy = identxy, invtrafoxy = identxy, ...) 
 #'      computation time when transforming xy-rectangles with a transformation
 #'      that preserves axe-parallel rectangles.
 #' @seealso \code{\link{coordTransform.im}}, which is called if \code{X} is a pixel image.
-# @export
+#' @export
 #' @method coordTransform owin
-#' @S3method coordTransform owin
+# @S3method coordTransform owin
 #' @keywords manip
 #' @keywords spatial
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
@@ -267,7 +267,7 @@ coordTransform.owin <- function(X, trafoxy = identxy, invtrafoxy = NULL,
     # recalculate areas
     newerbdry <- lapply(newbdry,
                         function(b) {b$area <-NULL; b$perimeter <- NULL;
-                                     b$area <- area.xypolygon(b); return(b)})
+                                     b$area <- Area.xypolygon(b); return(b)})
     P$bdry <- newerbdry
     P$xrange <- range(sapply(P$bdry, function(p) p$x))
     P$yrange <- range(sapply(P$bdry, function(p) p$y))
@@ -301,9 +301,9 @@ coordTransform.owin <- function(X, trafoxy = identxy, invtrafoxy = NULL,
 #'      If the window of $X$ is a pixel mask, an additional inverse transformation
 #'      has to be provided, see \code{\link{coordTransform.owin}}.
 #' @seealso \code{\link{coordTransform.owin}} for the transformation of windows
-# @export
+#' @export
 #' @method coordTransform ppp
-#' @S3method coordTransform ppp
+# @S3method coordTransform ppp
 #' @keywords manip
 #' @keywords spatial
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}

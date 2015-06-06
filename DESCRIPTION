@@ -1,14 +1,14 @@
 Package: sostatpp
-Version: 0.12.1-1
-Date: 2013-11-21
+Version: 0.12.1-3
+Date: 2015-06-06
 Title: Analysis of hidden second-order stationary point processes
 Authors@R: c(person("Ute", "Hahn", role = c("aut", "cre"),
-    email = "ute@imf.au.dk"))
-Author: Ute Hahn <ute@imf.au.dk>
-Maintainer: Ute Hahn <ute@imf.au.dk>
+    email = "ute@math.au.dk"))
+Author: Ute Hahn <ute@math.au.dk>
+Maintainer: Ute Hahn <ute@math.au.dk>
 Depends:
     R (>= 2.15),
-    spatstat (>= 1.25),
+    spatstat (>= 1.42),
     plutils,
     fdnonpar
 Imports:

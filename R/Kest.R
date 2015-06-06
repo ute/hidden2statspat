@@ -161,54 +161,54 @@ L.est <- function(...) {
 
 
 K.est <- function (X,
-                  type,
-                  r = NULL,
-                  correction = c("border", "isotropic", "Ripley", "translate"),
-                  normpower = 0,
-                  ...,
-                  max.ls.r = 3.0)
+                   type,
+                   r = NULL,
+                   correction = c("border", "isotropic", "Ripley", "translate"),
+                   normpower = 0,
+                   ...,
+                   max.ls.r = 3.0)
 {
   # verifyclass(X, "ppp")
   npts <- npoints(X)
   stopifnot(npts > 1)
-
+  
   if (missing(type))
   {
     if(is.sostyppp(X)) sostype <- currentType(X) else sostype <- NULL
     if (length(sostype) == 0)
-      {
-         X <- homogeneous(X)
-         sostype <- "h"
-      }
+    {
+      X <- homogeneous(X)
+      sostype <- "h"
+    }
   }
   else {
     sostype <- type[1]
     X <- as.sostyppp(X, type = sostype, ...)
   }
-
+  
   sostinfo <- attr(X, "sostinfo") 
   marx <- sostinfo$tmarks
   if (normpower != 0) {
     stopifnot ((1 <= normpower) & (normpower <= 2))
     if (!is.null(marx$intens)){
-      renorm.factor <-  (sum(1 / marx$intens) / (area.owin(X)))^(normpower / 2)
+      renorm.factor <-  (sum(1 / marx$intens) / (area.owin(X$window)))^(normpower / 2)
       marx$intens <- marx$intens * renorm.factor
     }
     if(!is.null(marx$invscale)){
-      renorm.factor <-  (sum(1 / marx$invscale^2) / (area.owin(X)))^(normpower / 4)
+      renorm.factor <-  (sum(1 / marx$invscale^2) / (area.owin(X$window)))^(normpower / 4)
       marx$invscale <- marx$invscale * renorm.factor
     }
   }
-
+  
   # algorithms to be used
   scaling <- sostype %in% c("s", "hs")
   homogen <- sostype %in% c("t", "h")
   weighted <- sostype == "w"
-
+  
   # modify point pattern to "become" the template, if retransformed or rescaled
-
+  
   if (scaling) marx$intens <- rep(1, npts) # refers to unit rate template
-
+  
   if (sostype == "t")
   {
     X <- backtransformed (X)
@@ -217,13 +217,13 @@ K.est <- function (X,
     sostinfo <- attr(X, "sostinfo")
     marx <- sostinfo$tmarks
   }
-
+  
   W <- X$window
   area <- area.owin(W)
-
-
+  
+  
   # get arguments r for K
-
+  
   if (scaling) {
     # transition from scaled to real world
     maxrescale <- max(marx$invscale)
@@ -257,35 +257,35 @@ K.est <- function (X,
     # recommended range of r values
     alim <- c(0, min(rmax, rmaxdefault))
   }
-
-
+  
+  
   correction.given <- !missing(correction) && !is.null(correction)
   if (is.null(correction))
-        correction <- c("border", "isotropic", "Ripley", "translate")
+    correction <- c("border", "isotropic", "Ripley", "translate")
   correction <- pickoption("correction", correction, c(none = "none",
                                                        border = "border", bord.modif = "bord.modif", isotropic = "isotropic",
                                                        Ripley = "isotropic", trans = "translate", translate = "translate",
                                                        translation = "translate"), multi = TRUE)
   correction <- implemented.for.K(correction, W$type, correction.given)
-
-
+  
+  
   # name of the function and its estimates
   typename = sostype
   if (sostype == "hs") typename ="s"
   # if (sostype == "h") typename ="w"
-
+  
   if (sostype %in% c("w", "s", "t"))
   {
     Kname <- paste("K[0]^{(", typename, ")}", sep="")
     Khatname <- paste("widehat(K)[0]^(", typename, ")", sep="")
- # <<<< CHANGED HERE FOR PAPER >>>>
-#    Ktheolab <- substitute(K[0]^(name)*(r), list(name = typename))
+    # <<<< CHANGED HERE FOR PAPER >>>>
+    #    Ktheolab <- substitute(K[0]^(name)*(r), list(name = typename))
     Ktheolab <- substitute(widehat(K)[0]^(name)*(r), list(name = typename))
   }
   else if (sostype == "h") {
     Kname <- "K"
     Khatname <- "widehat(K)"
-    Ktheolab <- "K(r)"
+    Ktheolab <- expression(K(r))
   }
   else if (sostype == "hs") {
     Kname <- "K^*"
@@ -293,26 +293,25 @@ K.est <- function (X,
     Ktheolab <- expression(K^symbol("*")*(r))
   }
   Krname <- paste(Kname, "*(r)", sep="")
- 
+  
   # start data frame with CSR
-  K <- data.frame(r=r, theo= pi * r^2)
+  Kdf <- data.frame(r=r, theo= pi * r^2)
   desc <- c("distance argument r", "theoretical Poisson %s")
-  K <- fv(K, "r", Ktheolab,
-            "theo", , alim, c("r",Krname), desc, fname=Kname)
-  CSRlab <- if(typename == "s") "paste(K^symbol('*')*(r),', ',scriptstyle(CSR))"
-            else  "paste(K*(r),', ',scriptstyle(CSR))"
+  K <- fv(Kdf, "r", ylab = quote(K(r)), valu = "theo", 
+          fmla = ".~r", alim, labl = c("r", "%s[pois](r)"), desc, fname = "K")
+  if(typename == "s") CSRlab <- "paste(K^symbol('*')*(r),', ',scriptstyle(pois))"  else CSRlab <- "paste(K*(r),', ',scriptstyle(pois))"
   K <- tweak.fv.entry(K, "theo", new.labl=CSRlab)
-
-
- # K <- tweak.fv.entry(K, "theo", new.labl="paste(Krname,', ',scriptstyle(CSR))")
-
-
+  
+  
+  # K <- tweak.fv.entry(K, "theo", new.labl="paste(Krname,', ',scriptstyle(CSR))")
+  
+  
   # identify all close pairs
   rmax <- max(r)
-
+  
   if(scaling) close <- lsclosepairs(X, rmax, invscale = marx$invscale)
   else close <- lsclosepairs(X, rmax)
-
+  
   dIJ <- close$d
   eudIJ <- close$eud
   # compute weights for these pairs
@@ -320,22 +319,22 @@ K.est <- function (X,
   J <- close$j
   XI <- X[I]
   XJ <- X[J]
-
-# intensityweights. No worries, mate, intensities are one if we deal with scaled processes.
-# we use them here in the homogeneous / scaled case, too, and implement implicitely that
-# infamous Poisson lambda^2 estimator n*(n-1)/area^2
-
+  
+  # intensityweights. No worries, mate, intensities are one if we deal with scaled processes.
+  # we use them here in the homogeneous / scaled case, too, and implement implicitely that
+  # infamous Poisson lambda^2 estimator n*(n-1)/area^2
+  
   if (weighted) wIJ <- 1 / (marx$intens[J] * marx$intens[I])
   else wIJ <- 1 / marx$intens[J] * area / (npts - 1)
-
-
+  
+  
   if (any(correction == "none")) {
     wh <- whist(dIJ, breaks$val, wIJ)
     Kun <- cumsum(wh) / area
     K <- bind.fv(K, data.frame(un = Kun), "%s[un](r)",
-                    "uncorrected estimate of %s", "un")
+                 "uncorrected estimate of %s", "un")
   }
-
+  
   if (any(correction == "border" | correction == "bord.modif")) {
     b <- bdist.points(X)
     if (scaling) b <- b * marx$invscale
@@ -345,46 +344,46 @@ K.est <- function (X,
     RS <- Kwtsum(dIJ, bI, newwIJ, b, w = 1/marx$intens, breaks)
     if (any(correction == "border")) {
       Kb <- RS$ratio
-      K <- bind.fv(K, data.frame(border=Kb),"%s*(r)", # "%s[bord](r)",
+      K <- bind.fv(K, data.frame(border=Kb),"%s*(r)[bord]", # "%s[bord](r)",
                    "border-corrected estimate of %s",
                    "border")
       K <- rebadge.fv(K, Ktheolab, Khatname)
-      K <- tweak.fv.entry(K, "border", new.labl="paste(%s*(r),', ',scriptstyle(bord))")
+      #K <- tweak.fv.entry(K, "border", new.labl=expression(paste(%s*(r),', ',scriptstyle(bord))))
     }
     if (any(correction == "bord.modif")) {
       Kbm <- RS$numerator / eroded.areas(W, r)
-      K <- bind.fv(K, data.frame(bord.modif = Kbm),"%s*(r)", # "%s[bordm](r)",
+      K <- bind.fv(K, data.frame(bord.modif = Kbm),"%s*(r)[bord.modif]", 
                    "modified border-corrected estimate of %s",
                    "bord.modif")
       K <- rebadge.fv(K, Ktheolab, Khatname)
-      K <- tweak.fv.entry(K, "bord.modif", new.labl="paste(%s*(r),', ',scriptstyle(bord.mod))")
+      #K <- tweak.fv.entry(K, "bord.modif", new.labl=expression(paste(%s*(r),', ',scriptstyle(bord.mod))))
     }
   }
-
+  
   if (any(correction == "translate")) {
     edgewt <- edge.Trans(XI, XJ, paired = TRUE)
     totalwt <- edgewt * wIJ
     wh <- whist(dIJ, breaks$val, totalwt)
     Ktrans <- cumsum(wh) / area
-    K <- bind.fv(K, data.frame(trans=Ktrans), "%s[trans](r)",
+    K <- bind.fv(K, data.frame(trans=Ktrans), "%s*(r)[trans]", #"%s[trans](r)",
                  "translation-corrected estimate of %s",
                  "trans")
     K <- rebadge.fv(K, Ktheolab, Khatname)
-    K <- tweak.fv.entry(K, "trans", new.labl="paste(%s*(r),', ',scriptstyle(trans))")
+    #K <- tweak.fv.entry(K, "trans", new.labl=expression(paste(%s*(r),', ',scriptstyle(trans))))
   }
-
+  
   if (any(correction == "isotropic")) {
     edgewt <- edge.Ripley(XI, matrix(eudIJ, ncol = 1))
     totalwt <- edgewt * wIJ
     wh <- whist(dIJ, breaks$val, totalwt)
     Kiso <- cumsum(wh) / area
-    K <- bind.fv(K, data.frame(iso=Kiso), "%s[iso](r)",
+    K <- bind.fv(K, data.frame(iso=Kiso), "%s*(r)[iso]",
                  "Ripley isotropic correction estimate of %s",
                  "iso")
     K <- rebadge.fv(K, Ktheolab, Khatname)
-    K <- tweak.fv.entry(K, "iso", new.labl="paste(%s*(r),', ',scriptstyle(iso))")
+    #K <- tweak.fv.entry(K, "iso", new.labl=expression(paste(%s*(r),', ',scriptstyle(iso))))
   }
-
+  
   formula(K) <- . ~ r
   nama <- rev(colnames(K))
   nama <- nama[nama != "r"] #!(nama %in% c("r", "rip", "ls"))]

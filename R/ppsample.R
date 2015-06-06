@@ -68,9 +68,9 @@ is.ppsample <- function(x) inherits(x, "ppsample")
 #'@return A numeric vector of estimated intensities.
 #'@details
 #'The intensities are estimated as the number of points divided by the area.
-#'@S3method intensity ppsample
+#@S3method intensity ppsample
 #'@method intensity ppsample
-#@export
+#'@export
 # @author Ute Hahn,  \email{ute@@imf.au.dk}
 #'@seealso \code{\link{ppsubsample}} for creating \code{ppsample} objects,
 #'\code{\link{npoints.ppsample}} for obtaining the number of points,
@@ -86,9 +86,9 @@ intensity.ppsample <- function(X, ...) sapply(X, npoints)/ sapply(X, area.owin)
 #'
 #'@param x a sample of point patterns, object of class \code{ppsample}
 #'@return integer vector, the number of points in each pattern contained in \code{X}
-#'@S3method npoints ppsample
+#@S3method npoints ppsample
 #'@method npoints ppsample
-#@export
+#'@export
 # @author Ute Hahn,  \email{ute@@imf.au.dk}
 #'@seealso \code{\link{ppsubsample}} for creating \code{ppsample} objects,
 #'\code{intensity.ppsample} for estimating the empirical intensity,
@@ -105,7 +105,7 @@ npoints.ppsample <- function(x) sapply(x, npoints)
 #' @return a \code{ppsample} object consisiting of homogeneous s.o.s. typed point patterns.
 #' @details The parent window is also retransformed. For more details, see the function
 #' \code{\link{backtransformed}} for single point patterns.
-#' @S3method backtransformed ppsample
+# @S3method backtransformed ppsample
 #' @method backtransformed ppsample
 #' @export backtransformed.ppsample
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}

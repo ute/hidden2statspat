@@ -8,7 +8,7 @@
 #' @param allinone logical, if \code{FALSE} start a new plot for every pattern (default: \code{TRUE}).
 # @param allwindows logical, if \code{TRUE} plot the window for every pattern (default: \code{TRUE}).
 # so ein quatsch, das ist dochn sample, mann! Also immer mit Rand
-#' @S3method plot ppsample
+# @S3method plot ppsample
 #' @method plot ppsample
 #' @export
 #' @seealso \code{\link{plot.ppp}} and \code{\link{plot.sostyppp}}

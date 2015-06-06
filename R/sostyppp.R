@@ -19,9 +19,9 @@ is.sostyppp <- function(x) inherits(x, "sostyppp")
 #' point pattern, i.e. a spatstat-object of class \code{ppp}.
 #'
 #' @rdname Extract.sostyppp
-#' @S3method [ sostyppp
+# @S3method [ sostyppp
 #' @method [ sostyppp
-# @export
+#' @export
 #' @param x a sos-typed point pattern, object of class \code{"sostyppp"}.
 #' @param i subset index, see spatstat \code{\link[spatstat]{[<-.ppp}}.
 # @param j,drop ignored.
@@ -78,8 +78,9 @@ is.sostyppp <- function(x) inherits(x, "sostyppp")
   }
 
 #' @rdname Extract.sostyppp
-#' @S3method [<- sostyppp
+# @S3method [<- sostyppp
 #'@usage \method{[}{sostyppp} (x, i) <- value
+#' @method [<- sostyppp
 #' @export
 #' @param value Replacement for the subset, a sos-typed point pattern of same type.
 #' @details Replacing a subset in a gradient retransformed point patterns does not make much sense
@@ -160,9 +161,9 @@ is.sostyppp <- function(x) inherits(x, "sostyppp")
 #'
 #' @param x sos-typed point pattern.
 #' @param ... ignored
-#' @S3method print sostyppp
+# @S3method print sostyppp
 #' @method print sostyppp
-# @export
+#' @export
 #' @seealso \code{\link{print.ppp}} for the print method of class ancestor \code{ppp}.
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
 

@@ -26,9 +26,9 @@ as.sostyppp <- function(x, type = "h", ...)
 #' stationarity typed point pattern of class \code{"sostyppp"}, and assigns type of
 #' second-order stationarity.
 #'
-#' @S3method as.sostyppp ppp
+# @S3method as.sostyppp ppp
 #' @method as.sostyppp ppp
-# @export
+#' @export
 #' @param x an object of class \code{"ppp"}
 #' @param type character giving the type of second order stationarity. One of
 #'    "w", "t", "s", "h", "hs" (or "none").
@@ -68,9 +68,9 @@ as.sostyppp.ppp <- function(x, type = "h", ...)
 #' \code{\link{rescaled}} and \code{\link{homogeneous}}, assigns type of
 #' second-order stationarity.
 #'
-#' @S3method as.sostyppp sostyppp
+# @S3method as.sostyppp sostyppp
 #' @method as.sostyppp sostyppp
-# @export
+#' @export
 #' @param x an object of class \code{"sostyppp"}
 #' @param type character giving the type of second order stationarity. One of
 #'    "w", "t", "s", "h", or "hs".
@@ -490,7 +490,7 @@ backtransformed <- function(X) UseMethod("backtransformed", X)
 #' For patterns with windows that are binary masks (objects of class \code{spatstat::\link{im}}),
 #' also information on the inverse of \code{backtransformed} is required. This information
 #' is stored as element \code{invtransform} in attribute \code{sostinfo}.
-#' @S3method backtransformed sostyppp
+# @S3method backtransformed sostyppp
 #' @method backtransformed sostyppp
 #' @export backtransformed.sostyppp
 #' @author Ute Hahn,  \email{ute@@imf.au.dk}
