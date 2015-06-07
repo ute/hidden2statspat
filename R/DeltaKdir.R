@@ -83,11 +83,11 @@ DeltaKdir.est <- function (X,
   if (normpower != 0) {
     stopifnot ((1 <= normpower) & (normpower <= 2))
     if (!is.null(marx$intens)){
-      renorm.factor <-  (sum(1 / marx$intens) / (area.owin(X)))^(normpower / 2)
+      renorm.factor <-  (sum(1 / marx$intens) / (area.owin(X$window)))^(normpower / 2)
       marx$intens <- marx$intens * renorm.factor
     }
     if(!is.null(marx$invscale)){
-      renorm.factor <-  (sum(1 / marx$invscale^2) / (area.owin(X)))^(normpower / 4)
+      renorm.factor <-  (sum(1 / marx$invscale^2) / (area.owin(X$window)))^(normpower / 4)
       marx$invscale <- marx$invscale * renorm.factor
     }
   }

@@ -600,7 +600,7 @@ normalizedIntensity <- function(X, intensity = NULL, normpower = 2)
   }
   if (normpower != 0) {
     stopifnot ((1 <= normpower) & (normpower <= 2))
-    renorm.factor <-  (sum(1 / intensity) / (area.owin(X)))^(normpower / 2)
+    renorm.factor <-  (sum(1 / intensity) / (area.owin(X$window)))^(normpower / 2)
     intensity <- intensity * renorm.factor
   }
   return(intensity)

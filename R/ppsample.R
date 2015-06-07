@@ -37,7 +37,7 @@ ppsubsample <- function (pp, quads = NULL, ...)
   nonamequads <- unnamelist(quads)
   ppsample <- lapply(nonamequads, function(w) pp[w])
 #  npts <- sapply(ppsample, npoints)
-#  areas <- sapply(ppsample, area.owin)
+#  areas <- sapply(ppsample, function(x) area.owin(x$window))
   attr(ppsample, "parentwindow") <- pp$window
 #  attr(ppsample, "npoints") <- npts too dangerous if manipulated
 #  attr(ppsample, "area") <- areas
@@ -77,7 +77,7 @@ is.ppsample <- function(x) inherits(x, "ppsample")
 #'\code{\link[spatstat]{intensity}} for spatstats generic function.
 #@examples
 
-intensity.ppsample <- function(X, ...) sapply(X, npoints)/ sapply(X, area.owin)
+intensity.ppsample <- function(X, ...) sapply(X, intensity)
 
 
 #'Number of points in a point pattern sample

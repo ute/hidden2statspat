@@ -1,8 +1,8 @@
-  CHANGES IN sostatpp VERSION 0.12.1-3
+  CHANGES IN sostatpp VERSION 0.12.2
   
     o now depends on spatstat >= 1.42
     
-    o new spatstat required a number of changes...
+    o new spatstat required a number of internal changes...
 
   CHANGES IN sostatpp VERSION 0.12.1
 
